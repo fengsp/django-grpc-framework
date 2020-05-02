@@ -1,7 +1,7 @@
 .. _services:
 
-Services
-========
+Building Services
+=================
 
 This tutorial will create a simple blog gRPC Service.
 

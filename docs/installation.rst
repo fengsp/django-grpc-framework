@@ -19,17 +19,13 @@ We requires the following:
 virtualenv
 ----------
 
-Virtualenv might be something you want to use for development!  If you do not
-have it yet, try the following command::
-
-    $ sudo pip install virtualenv
-
-Since we have virtualenv installed now, let's create one working environment::
+Virtualenv might be something you want to use for development!  let's create
+one working environment::
 
     $ mkdir myproject
     $ cd myproject
-    $ virtualenv venv
-    $ . venv/bin/activate
+    $ python3 -m venv env
+    $ source env/bin/activate
 
 It is time to get the django grpc framework::
 
