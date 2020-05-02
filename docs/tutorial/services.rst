@@ -1,0 +1,234 @@
+.. _services:
+
+Services
+========
+
+This tutorial will create a simple blog gRPC Service.
+
+
+Environment setup
+-----------------
+
+Create a new virtual environment for our project::
+
+    python3 -m venv env
+    source env/bin/activate
+
+Install our packages::
+
+    pip install django
+    pip install djangorestframework   # we need the serialization
+    pip install djangogrpcframework
+
+
+Project setup
+-------------
+
+Let's create a new project to work with::
+
+    django-admin startproject tutorial
+    cd tutorial
+
+Now we can create an app that we'll use to create a simple gRPC Service::
+
+    python manage.py startapp blog
+
+We'll need to add our new `blog` app and the `django_grpc_framework` app to
+`INSTALLED_APPS`.  Let's edit the `tutorial/settings.py` file::
+
+    INSTALLED_APPS = [
+        ...
+        'django_grpc_framework',
+        'blog',
+    ]
+
+
+Create a model
+--------------
+
+Now we're going to create a simple `Post` model that is used to store blog
+posts.  Edit the `blog/models.py` file::
+
+    from django.db import models
+
+
+    class Post(models.Model):
+        title = models.CharField(max_length=100)
+        content = models.TextField()
+        created = models.DateTimeField(auto_now_add=True)
+
+        class Meta:
+            ordering = ['created']
+
+We also need to create a migration for our post model, and sync the database::
+
+    python manage.py makemigrations blog
+    python manage.py migrate
+
+
+Defining a service
+------------------
+
+Our first step is to define the gRPC service and messages, create a directory
+`tutorial/protos` that sits next to `tutorial/manage.py`, create another
+directory `protos/blog_proto` and create the `protos/blog_proto/post.proto`
+file::
+
+    syntax = "proto3";
+
+    package blog_proto;
+
+    import "google/protobuf/empty.proto";
+
+    message Post {
+        int32 id = 1;
+        string title = 2;
+        string content = 3;
+    }
+
+    service PostController {
+        rpc List(google.protobuf.Empty) returns (stream Post) {}
+        rpc Create(Post) returns (Post) {}
+        rpc Retrieve(Post) returns (Post) {}
+        rpc Update(Post) returns (Post) {}
+        rpc PartialUpdate(Post) returns (Post) {}
+        rpc Destroy(Post) returns (google.protobuf.Empty) {}
+    }
+
+Next we need to generate gRPC code, from the `tutorial` directory, run::
+
+    python -m grpc_tools.protoc --proto_path=./protos --python_out=./ --grpc_python_out=./ ./protos/blog_proto/post.proto
+
+
+Create a Serializer class
+-------------------------
+
+Before we implement our gRPC service, we need to provide a way of serializing
+and deserializing the post instances into protocol buffer messages.  We can
+do this by declaring `rest_framework` serializers, create a file in the `blog`
+directory named `serializers.py` and add the following::
+
+    from rest_framework import serializers
+    from blog.models import Post
+
+
+    class PostSerializer(serializers.ModelSerializer):
+        class Meta:
+            model = Post
+            fields = ['id', 'title', 'content']
+
+
+Write a service
+---------------
+
+With our serializer class, we'll write a regular grpc service, create a file
+in the `blog` directory named `services.py` and add the following::
+
+    import grpc
+    from google.protobuf.json_format import MessageToDict, ParseDict
+    from google.protobuf import empty_pb2
+    from blog_proto import post_pb2, post_pb2_grpc
+    from blog.models import Post
+    from blog.serializers import PostSerializer
+
+
+    class PostService(post_pb2_grpc.PostControllerServicer):
+        def List(self, request, context):
+            posts = Post.objects.all()
+            serializer = PostSerializer(posts, many=True)
+            for post_data in serializer.data:
+                yield ParseDict(post_data, post_pb2.Post())
+
+        def Create(self, request, context):
+            data = MessageToDict(request, preserving_proto_field_name=True)
+            serializer = PostSerializer(data=data)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return ParseDict(serializer.data, post_pb2.Post())
+
+        def get_object(self, pk, context):
+            try:
+                return Post.objects.get(pk=pk)
+            except Post.DoesNotExist:
+                context.abort(grpc.StatusCode.NOT_FOUND, 'Post:%s not found!' % pk)
+
+        def Retrieve(self, request, context):
+            post = self.get_object(request.id, context)
+            serializer = PostSerializer(post)
+            return ParseDict(serializer.data, post_pb2.Post())
+
+        def _update(self, request, context, partial=False):
+            post = self.get_object(request.id, context)
+            data = MessageToDict(request, preserving_proto_field_name=True)
+            serializer = PostSerializer(post, data=data, partial=partial)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return ParseDict(serializer.data, post_pb2.Post())
+
+        def Update(self, request, context):
+            return self._update(request, context)
+
+        def PartialUpdate(self, request, context):
+            return self._update(request, context, True)
+
+        def Destroy(self, request, context):
+            post = self.get_object(request.id, context)
+            post.delete()
+            return empty_pb2.Empty()
+
+Finally we need to wire there services up, create `blog/handlers.py` file::
+
+    from blog.services import PostService
+    from blog_proto import post_pb2_grpc
+
+
+    def grpc_handlers(server):
+        post_pb2_grpc.add_PostControllerServicer_to_server(PostService(), server)
+
+Also we need to wire up the root handlers conf, in `tutorial/urls.py`
+file, include our blog app's grpc handlers::
+
+    from blog.handlers import grpc_handlers as blog_grpc_handlers
+
+
+    urlpatterns = []
+
+
+    def grpc_handlers(server):
+        blog_grpc_handlers(server)
+
+
+Testing our gRPC Service
+------------------------
+
+Now we can start up a gRPC server so that clients can actually use our
+service::
+
+    python manage.py grpcrunserver
+
+In another terminal window, we can test the server::
+
+    import grpc
+    from google.protobuf import empty_pb2
+    from blog_proto import post_pb2, post_pb2_grpc
+
+
+    with grpc.insecure_channel('localhost:50051') as channel:
+        stub = post_pb2_grpc.PostControllerStub(channel)
+        print('----- Create -----')
+        response = stub.Create(post_pb2.Post(title='t1', content='c1'))
+        print(response, end='')
+        print('----- List -----')
+        for post in stub.List(empty_pb2.Empty()):
+            print(post, end='')
+        print('----- Retrieve -----')
+        response = stub.Retrieve(post_pb2.Post(id=response.id))
+        print(response, end='')
+        print('----- Update -----')
+        response = stub.Update(post_pb2.Post(id=response.id, title='t2', content='c2'))
+        print(response, end='')
+        print('----- Partial Update -----')
+        response = stub.PartialUpdate(post_pb2.Post(id=response.id, title='t3'))
+        print(response, end='')
+        print('----- Delete -----')
+        stub.Destroy(post_pb2.Post(id=response.id))

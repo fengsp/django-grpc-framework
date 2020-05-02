@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package blog_proto;
+
+import "google/protobuf/empty.proto";
+
+message Post {
+    int32 id = 1;
+    string title = 2;
+    string content = 3;
+}
+    
+service PostController {
+    rpc List(google.protobuf.Empty) returns (stream Post) {}
+    rpc Create(Post) returns (Post) {}
+    rpc Retrieve(Post) returns (Post) {}
+    rpc Update(Post) returns (Post) {}
+    rpc PartialUpdate(Post) returns (Post) {}
+    rpc Destroy(Post) returns (google.protobuf.Empty) {}
+}

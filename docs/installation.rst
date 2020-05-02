@@ -11,6 +11,9 @@ We requires the following:
 
 - Python (3.6,3.7,3.8)
 - Django (2.0,2.1,2.2,3.0)
+- Django REST Framework (3.10.x,3.11.x)
+- gRPC
+- gRPC tools
 
 
 virtualenv
@@ -31,6 +34,10 @@ Since we have virtualenv installed now, let's create one working environment::
 It is time to get the django grpc framework::
 
     $ pip install djangogrpcframework
+    $ pip install django
+    $ pip install djangorestframework         # Serialization support
+    $ pip install grpcio
+    $ pip install grpcio-tools
 
 
 System Wide
