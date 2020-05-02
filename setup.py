@@ -12,7 +12,7 @@ setup(
     version=version,
     description='gRPC for Django.',
     url='https://github.com/fengsp/django-grpc-framework',
-    author_name='Shipeng Feng',
+    author='Shipeng Feng',
     author_email='fsp261@gmail.com',
     packages=find_packages(),
     install_requires=[],
