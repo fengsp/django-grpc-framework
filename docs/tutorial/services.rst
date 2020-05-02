@@ -33,8 +33,8 @@ Now we can create an app that we'll use to create a simple gRPC Service::
 
     python manage.py startapp blog
 
-We'll need to add our new `blog` app and the `django_grpc_framework` app to
-`INSTALLED_APPS`.  Let's edit the `tutorial/settings.py` file::
+We'll need to add our new ``blog`` app and the ``django_grpc_framework`` app to
+``INSTALLED_APPS``.  Let's edit the ``tutorial/settings.py`` file::
 
     INSTALLED_APPS = [
         ...
@@ -46,8 +46,8 @@ We'll need to add our new `blog` app and the `django_grpc_framework` app to
 Create a model
 --------------
 
-Now we're going to create a simple `Post` model that is used to store blog
-posts.  Edit the `blog/models.py` file::
+Now we're going to create a simple ``Post`` model that is used to store blog
+posts.  Edit the ``blog/models.py`` file::
 
     from django.db import models
 
@@ -70,8 +70,8 @@ Defining a service
 ------------------
 
 Our first step is to define the gRPC service and messages, create a directory
-`tutorial/protos` that sits next to `tutorial/manage.py`, create another
-directory `protos/blog_proto` and create the `protos/blog_proto/post.proto`
+``tutorial/protos`` that sits next to ``tutorial/manage.py``, create another
+directory ``protos/blog_proto`` and create the ``protos/blog_proto/post.proto``
 file::
 
     syntax = "proto3";
@@ -95,7 +95,7 @@ file::
         rpc Destroy(Post) returns (google.protobuf.Empty) {}
     }
 
-Next we need to generate gRPC code, from the `tutorial` directory, run::
+Next we need to generate gRPC code, from the ``tutorial`` directory, run::
 
     python -m grpc_tools.protoc --proto_path=./protos --python_out=./ --grpc_python_out=./ ./protos/blog_proto/post.proto
 
@@ -105,8 +105,8 @@ Create a Serializer class
 
 Before we implement our gRPC service, we need to provide a way of serializing
 and deserializing the post instances into protocol buffer messages.  We can
-do this by declaring `rest_framework` serializers, create a file in the `blog`
-directory named `serializers.py` and add the following::
+do this by declaring ``rest_framework`` serializers, create a file in the ``blog``
+directory named ``serializers.py`` and add the following::
 
     from rest_framework import serializers
     from blog.models import Post
@@ -122,7 +122,7 @@ Write a service
 ---------------
 
 With our serializer class, we'll write a regular grpc service, create a file
-in the `blog` directory named `services.py` and add the following::
+in the ``blog`` directory named ``services.py`` and add the following::
 
     import grpc
     from google.protobuf.json_format import MessageToDict, ParseDict
@@ -176,7 +176,7 @@ in the `blog` directory named `services.py` and add the following::
             post.delete()
             return empty_pb2.Empty()
 
-Finally we need to wire there services up, create `blog/handlers.py` file::
+Finally we need to wire there services up, create ``blog/handlers.py`` file::
 
     from blog.services import PostService
     from blog_proto import post_pb2_grpc
@@ -185,7 +185,7 @@ Finally we need to wire there services up, create `blog/handlers.py` file::
     def grpc_handlers(server):
         post_pb2_grpc.add_PostControllerServicer_to_server(PostService(), server)
 
-Also we need to wire up the root handlers conf, in `tutorial/urls.py`
+Also we need to wire up the root handlers conf, in ``tutorial/urls.py``
 file, include our blog app's grpc handlers::
 
     from blog.handlers import grpc_handlers as blog_grpc_handlers
