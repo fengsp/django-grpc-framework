@@ -1,45 +1,26 @@
-import grpc
-from google.protobuf.json_format import MessageToDict, ParseDict
-from google.protobuf import empty_pb2
 from blog_proto import post_pb2, post_pb2_grpc
 from blog.models import Post
 from blog.serializers import PostSerializer
+from django_grpc_framework import mixins
+from django_grpc_framework import generics
 
 
-class PostService(post_pb2_grpc.PostControllerServicer):
-    def List(self, request, context):
-        posts = Post.objects.all()
-        serializer = PostSerializer(posts, many=True)
-        for post_data in serializer.data:
-            yield ParseDict(post_data, post_pb2.Post())
+"""
+class PostService(mixins.ListModelMixin,
+                  mixins.CreateModelMixin,
+                  mixins.RetrieveModelMixin,
+                  mixins.UpdateModelMixin,
+                  mixins.DestroyModelMixin,
+                  generics.GenericService,
+                  post_pb2_grpc.PostControllerServicer):
+    queryset = Post.objects.all()
+    serializer_class = PostSerializer
+    protobuf_class = post_pb2.Post
+"""
 
-    def Create(self, request, context):
-        data = MessageToDict(request)
-        serializer = PostSerializer(data=data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return ParseDict(serializer.data, post_pb2.Post())
 
-    def get_object(self, pk, context):
-        try:
-            return Post.objects.get(pk=pk)
-        except Post.DoesNotExist:
-            context.abort(grpc.StatusCode.NOT_FOUND, 'Post:%s not found!' % pk)
-
-    def Retrieve(self, request, context):
-        post = self.get_object(request.id, context)
-        serializer = PostSerializer(post)
-        return ParseDict(serializer.data, post_pb2.Post())
-
-    def Update(self, request, context):
-        post = self.get_object(request.id, context)
-        data = MessageToDict(request)
-        serializer = PostSerializer(post, data=data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return ParseDict(serializer.data, post_pb2.Post())
-
-    def Destroy(self, request, context):
-        post = self.get_object(request.id, context)
-        post.delete()
-        return empty_pb2.Empty()
+class PostService(generics.ModelService,
+                  post_pb2_grpc.PostControllerServicer):
+    queryset = Post.objects.all()
+    serializer_class = PostSerializer
+    protobuf_class = post_pb2.Post

@@ -14,6 +14,7 @@ We requires the following:
 - Django REST Framework (3.10.x,3.11.x)
 - gRPC
 - gRPC tools
+- proto3
 
 
 virtualenv

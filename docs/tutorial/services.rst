@@ -19,6 +19,8 @@ Install our packages::
     pip install django
     pip install djangorestframework   # we need the serialization
     pip install djangogrpcframework
+    pip install grpcio
+    pip install grpcio-tools
 
 
 Project setup
@@ -139,7 +141,7 @@ in the ``blog`` directory named ``services.py`` and add the following::
                 yield ParseDict(post_data, post_pb2.Post())
 
         def Create(self, request, context):
-            data = MessageToDict(request)
+            data = MessageToDict(request, including_default_value_fields=True)
             serializer = PostSerializer(data=data)
             serializer.is_valid(raise_exception=True)
             serializer.save()
@@ -158,7 +160,7 @@ in the ``blog`` directory named ``services.py`` and add the following::
 
         def Update(self, request, context):
             post = self.get_object(request.id, context)
-            data = MessageToDict(request)
+            data = MessageToDict(request, including_default_value_fields=True)
             serializer = PostSerializer(post, data=data)
             serializer.is_valid(raise_exception=True)
             serializer.save()
