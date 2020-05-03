@@ -15,6 +15,5 @@ service PostController {
     rpc Create(Post) returns (Post) {}
     rpc Retrieve(Post) returns (Post) {}
     rpc Update(Post) returns (Post) {}
-    rpc PartialUpdate(Post) returns (Post) {}
     rpc Destroy(Post) returns (google.protobuf.Empty) {}
 }

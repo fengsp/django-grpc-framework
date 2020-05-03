@@ -91,7 +91,6 @@ file::
         rpc Create(Post) returns (Post) {}
         rpc Retrieve(Post) returns (Post) {}
         rpc Update(Post) returns (Post) {}
-        rpc PartialUpdate(Post) returns (Post) {}
         rpc Destroy(Post) returns (google.protobuf.Empty) {}
     }
 
@@ -140,7 +139,7 @@ in the ``blog`` directory named ``services.py`` and add the following::
                 yield ParseDict(post_data, post_pb2.Post())
 
         def Create(self, request, context):
-            data = MessageToDict(request, preserving_proto_field_name=True)
+            data = MessageToDict(request)
             serializer = PostSerializer(data=data)
             serializer.is_valid(raise_exception=True)
             serializer.save()
@@ -157,19 +156,13 @@ in the ``blog`` directory named ``services.py`` and add the following::
             serializer = PostSerializer(post)
             return ParseDict(serializer.data, post_pb2.Post())
 
-        def _update(self, request, context, partial=False):
+        def Update(self, request, context):
             post = self.get_object(request.id, context)
-            data = MessageToDict(request, preserving_proto_field_name=True)
-            serializer = PostSerializer(post, data=data, partial=partial)
+            data = MessageToDict(request)
+            serializer = PostSerializer(post, data=data)
             serializer.is_valid(raise_exception=True)
             serializer.save()
             return ParseDict(serializer.data, post_pb2.Post())
-
-        def Update(self, request, context):
-            return self._update(request, context)
-
-        def PartialUpdate(self, request, context):
-            return self._update(request, context, True)
 
         def Destroy(self, request, context):
             post = self.get_object(request.id, context)
@@ -226,9 +219,6 @@ In another terminal window, we can test the server::
         print(response, end='')
         print('----- Update -----')
         response = stub.Update(post_pb2.Post(id=response.id, title='t2', content='c2'))
-        print(response, end='')
-        print('----- Partial Update -----')
-        response = stub.PartialUpdate(post_pb2.Post(id=response.id, title='t3'))
         print(response, end='')
         print('----- Delete -----')
         stub.Destroy(post_pb2.Post(id=response.id))

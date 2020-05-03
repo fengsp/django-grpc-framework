@@ -17,8 +17,5 @@ with grpc.insecure_channel('localhost:50051') as channel:
     print('----- Update -----')
     response = stub.Update(post_pb2.Post(id=response.id, title='t2', content='c2'))
     print(response, end='')
-    print('----- Partial Update -----')
-    response = stub.PartialUpdate(post_pb2.Post(id=response.id, title='t3'))
-    print(response, end='')
     print('----- Delete -----')
     stub.Destroy(post_pb2.Post(id=response.id))

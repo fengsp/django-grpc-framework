@@ -34,11 +34,6 @@ class PostControllerStub(object):
                 request_serializer=blog__proto_dot_post__pb2.Post.SerializeToString,
                 response_deserializer=blog__proto_dot_post__pb2.Post.FromString,
                 )
-        self.PartialUpdate = channel.unary_unary(
-                '/blog_proto.PostController/PartialUpdate',
-                request_serializer=blog__proto_dot_post__pb2.Post.SerializeToString,
-                response_deserializer=blog__proto_dot_post__pb2.Post.FromString,
-                )
         self.Destroy = channel.unary_unary(
                 '/blog_proto.PostController/Destroy',
                 request_serializer=blog__proto_dot_post__pb2.Post.SerializeToString,
@@ -73,12 +68,6 @@ class PostControllerServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    def PartialUpdate(self, request, context):
-        """Missing associated documentation comment in .proto file"""
-        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-        context.set_details('Method not implemented!')
-        raise NotImplementedError('Method not implemented!')
-
     def Destroy(self, request, context):
         """Missing associated documentation comment in .proto file"""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
@@ -105,11 +94,6 @@ def add_PostControllerServicer_to_server(servicer, server):
             ),
             'Update': grpc.unary_unary_rpc_method_handler(
                     servicer.Update,
-                    request_deserializer=blog__proto_dot_post__pb2.Post.FromString,
-                    response_serializer=blog__proto_dot_post__pb2.Post.SerializeToString,
-            ),
-            'PartialUpdate': grpc.unary_unary_rpc_method_handler(
-                    servicer.PartialUpdate,
                     request_deserializer=blog__proto_dot_post__pb2.Post.FromString,
                     response_serializer=blog__proto_dot_post__pb2.Post.SerializeToString,
             ),
@@ -187,22 +171,6 @@ class PostController(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/blog_proto.PostController/Update',
-            blog__proto_dot_post__pb2.Post.SerializeToString,
-            blog__proto_dot_post__pb2.Post.FromString,
-            options, channel_credentials,
-            call_credentials, compression, wait_for_ready, timeout, metadata)
-
-    @staticmethod
-    def PartialUpdate(request,
-            target,
-            options=(),
-            channel_credentials=None,
-            call_credentials=None,
-            compression=None,
-            wait_for_ready=None,
-            timeout=None,
-            metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/blog_proto.PostController/PartialUpdate',
             blog__proto_dot_post__pb2.Post.SerializeToString,
             blog__proto_dot_post__pb2.Post.FromString,
             options, channel_credentials,

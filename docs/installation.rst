@@ -49,7 +49,7 @@ Development Version
 
 Try the latest version::
 
-    $ . venv/bin/activate
+    $ source env/bin/activate
     $ git clone https://github.com/fengsp/django-grpc-framework.git
     $ cd django-grpc-framework
     $ python setup.py develop

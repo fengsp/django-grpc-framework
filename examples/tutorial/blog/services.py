@@ -14,7 +14,7 @@ class PostService(post_pb2_grpc.PostControllerServicer):
             yield ParseDict(post_data, post_pb2.Post())
 
     def Create(self, request, context):
-        data = MessageToDict(request, preserving_proto_field_name=True)
+        data = MessageToDict(request)
         serializer = PostSerializer(data=data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
@@ -31,19 +31,13 @@ class PostService(post_pb2_grpc.PostControllerServicer):
         serializer = PostSerializer(post)
         return ParseDict(serializer.data, post_pb2.Post())
 
-    def _update(self, request, context, partial=False):
+    def Update(self, request, context):
         post = self.get_object(request.id, context)
-        data = MessageToDict(request, preserving_proto_field_name=True)
-        serializer = PostSerializer(post, data=data, partial=partial)
+        data = MessageToDict(request)
+        serializer = PostSerializer(post, data=data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return ParseDict(serializer.data, post_pb2.Post())
-
-    def Update(self, request, context):
-        return self._update(request, context)
-
-    def PartialUpdate(self, request, context):
-        return self._update(request, context, True)
 
     def Destroy(self, request, context):
         post = self.get_object(request.id, context)
