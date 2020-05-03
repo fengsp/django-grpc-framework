@@ -16,6 +16,9 @@ instructions for building services.
    installation
    quickstart
    tutorial/index
+   testing
+   settings
+   patterns/index
 
 
 Additional Stuff

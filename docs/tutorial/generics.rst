@@ -26,12 +26,12 @@ classes, here is our ``blog/services`` file again::
 
 
     class PostService(mixins.ListModelMixin,
-                    mixins.CreateModelMixin,
-                    mixins.RetrieveModelMixin,
-                    mixins.UpdateModelMixin,
-                    mixins.DestroyModelMixin,
-                    generics.GenericService,
-                    post_pb2_grpc.PostControllerServicer):
+                      mixins.CreateModelMixin,
+                      mixins.RetrieveModelMixin,
+                      mixins.UpdateModelMixin,
+                      mixins.DestroyModelMixin,
+                      generics.GenericService,
+                      post_pb2_grpc.PostControllerServicer):
         queryset = Post.objects.all()
         serializer_class = PostSerializer
         protobuf_class = post_pb2.Post
@@ -49,7 +49,7 @@ If you want all operations of create/list/retrieve/update/destroy, we provide
 one already mixed-in generic views::
 
     class PostService(generics.ModelService,
-                    post_pb2_grpc.PostControllerServicer):
+                      post_pb2_grpc.PostControllerServicer):
         queryset = Post.objects.all()
         serializer_class = PostSerializer
         protobuf_class = post_pb2.Post
