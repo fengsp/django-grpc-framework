@@ -10,3 +10,4 @@ In this tutorial, we will create a simple blog rpc server.
    :maxdepth: 2
 
    services
+   generics
