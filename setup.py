@@ -11,6 +11,7 @@ setup(
     name='djangogrpcframework',
     version=version,
     description='gRPC for Django.',
+    long_description=open('README.rst', 'r', encoding='utf-8').read(),
     url='https://github.com/fengsp/django-grpc-framework',
     author='Shipeng Feng',
     author_email='fsp261@gmail.com',
