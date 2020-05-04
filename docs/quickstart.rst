@@ -156,9 +156,9 @@ We're done, the project layout should look like::
 Testing our gRPC Service
 ------------------------
 
-Fire up the server::
+Fire up the server with development mode::
 
-    python manage.py grpcrunserver
+    python manage.py grpcrunserver --dev
 
 We can now access our service from the gRPC client::
 

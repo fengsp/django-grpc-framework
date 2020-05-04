@@ -41,3 +41,10 @@ Configuration values
 
         def grpc_handlers(server):
             demo_pb2_grpc.add_UserControllerServicer_to_server(UserService.as_servicer(), server)
+
+.. py:data:: SERVER_INTERCEPTORS
+
+    An optional list of ServerInterceptor objects that observe and optionally
+    manipulate the incoming RPCs before handing them over to handlers.
+
+    Default: ``None``

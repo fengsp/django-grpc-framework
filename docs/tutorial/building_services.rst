@@ -200,7 +200,7 @@ Testing our gRPC Service
 Now we can start up a gRPC server so that clients can actually use our
 service::
 
-    python manage.py grpcrunserver
+    python manage.py grpcrunserver --dev
 
 In another terminal window, we can test the server::
 

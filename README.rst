@@ -97,7 +97,7 @@ That's it, we're done!
 
 .. code-block:: bash
     
-    $ python manage.py grpcrunserver
+    $ python manage.py grpcrunserver --dev
 
 You can now run a gRPC client to access the service:
 

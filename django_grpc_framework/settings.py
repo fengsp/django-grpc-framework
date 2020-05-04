@@ -20,13 +20,14 @@ DEFAULTS = {
     'ROOT_HANDLERS_HOOK': None,
 
     # gRPC server configuration
-    'DEFAULT_HOST': None,
+    'SERVER_INTERCEPTORS': None,
 }
 
 
 # List of settings that may be in string import notation.
 IMPORT_STRINGS = [
     'ROOT_HANDLERS_HOOK',
+    'SERVER_INTERCEPTORS',
 ]
 
 
