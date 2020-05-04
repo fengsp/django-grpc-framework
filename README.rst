@@ -4,6 +4,12 @@ Django gRPC Framework
 .. image:: https://img.shields.io/pypi/v/djangogrpcframework.svg
    :alt: pypi version
 
+.. image:: image:: https://readthedocs.org/projects/djangogrpcframework/badge/?version=latest
+   :alt: readthedocs status
+
+.. image:: https://travis-ci.org/fengsp/django-grpc-framework.svg?branch=master
+   :alt: build status
+
 Django gRPC framework is a toolkit for building gRPC services, inspired by
 djangorestframework.
 
