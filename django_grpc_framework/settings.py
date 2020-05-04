@@ -121,7 +121,7 @@ grpc_settings = GRPCSettings(None, DEFAULTS, IMPORT_STRINGS)
 
 def reload_grpc_settings(*args, **kwargs):
     setting = kwargs['setting']
-    if setting == 'GRPC_FRAMEWORK':
+    if setting == 'GRPC_FRAMEWORK' or setting == 'ROOT_URLCONF':
         grpc_settings.reload()
 
 
