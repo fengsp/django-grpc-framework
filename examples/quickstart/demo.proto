@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package demo;
+
+import "google/protobuf/empty.proto";
+
+message User {
+    int32 id = 1;
+    string username = 2;
+    string email = 3;
+    repeated int32 groups = 4;
+}
+
+service UserController {
+    rpc List(google.protobuf.Empty) returns (stream User) {}
+    rpc Create(User) returns (User) {}
+    rpc Retrieve(User) returns (User) {}
+    rpc Update(User) returns (User) {}
+    rpc Destroy(User) returns (google.protobuf.Empty) {}
+}

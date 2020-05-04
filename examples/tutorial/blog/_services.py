@@ -1,12 +1,13 @@
 import grpc
 from google.protobuf.json_format import MessageToDict, ParseDict
 from google.protobuf import empty_pb2
-from blog_proto import post_pb2, post_pb2_grpc
+from django_grpc_framework.services import Service
+from blog_proto import post_pb2
 from blog.models import Post
 from blog.serializers import PostSerializer
 
 
-class PostService(post_pb2_grpc.PostControllerServicer):
+class PostService(Service):
     def List(self, request, context):
         posts = Post.objects.all()
         serializer = PostSerializer(posts, many=True)

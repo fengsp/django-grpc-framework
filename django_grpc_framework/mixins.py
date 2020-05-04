@@ -11,10 +11,10 @@ class CreateModelMixin:
     """
     def Create(self, request, context):
         data = message_to_dict(request)
-        serializer = self.get_serializer(request, context, data=data)
+        serializer = self.get_serializer(data=data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
-        protobuf_class = self.get_protobuf_class(request, context)
+        protobuf_class = self.get_protobuf_class()
         return parse_dict(serializer.data, protobuf_class())
 
     def perform_create(self, serializer):
@@ -26,11 +26,9 @@ class ListModelMixin:
     List a queryset.
     """
     def List(self, request, context):
-        queryset = self.filter_queryset(
-            request, context, self.get_queryset(request, context)
-        )
-        serializer = self.get_serializer(request, context, queryset, many=True)
-        protobuf_class = self.get_protobuf_class(request, context)
+        queryset = self.filter_queryset(self.get_queryset())
+        serializer = self.get_serializer(queryset, many=True)
+        protobuf_class = self.get_protobuf_class()
         for data in serializer.data:
             yield parse_dict(data, protobuf_class())
 
@@ -40,9 +38,9 @@ class RetrieveModelMixin:
     Retrieve a model instance.
     """
     def Retrieve(self, request, context):
-        instance = self.get_object(request, context)
-        serializer = self.get_serializer(request, context, instance)
-        protobuf_class = self.get_protobuf_class(request, context)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
+        protobuf_class = self.get_protobuf_class()
         return parse_dict(serializer.data, protobuf_class())
 
 
@@ -51,9 +49,9 @@ class UpdateModelMixin:
     Update a model instance.
     """
     def Update(self, request, context):
-        instance = self.get_object(request, context)
+        instance = self.get_object()
         data = message_to_dict(request)
-        serializer = self.get_serializer(request, context, instance, data=data)
+        serializer = self.get_serializer(instance, data=data)
         serializer.is_valid(raise_exception=True)
         self.perform_update(serializer)
 
@@ -62,7 +60,7 @@ class UpdateModelMixin:
             # forcibly invalidate the prefetch cache on the instance.
             instance._prefetched_objects_cache = {}
 
-        protobuf_class = self.get_protobuf_class(request, context)
+        protobuf_class = self.get_protobuf_class()
         return parse_dict(serializer.data, protobuf_class())
 
     def perform_update(self, serializer):
@@ -74,7 +72,7 @@ class DestroyModelMixin:
     Destroy a model instance.
     """
     def Destroy(self, request, context):
-        instance = self.get_object(request, context)
+        instance = self.get_object()
         self.perform_destroy(instance)
         return empty_pb2.Empty()
 

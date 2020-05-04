@@ -23,8 +23,8 @@ Add ``django_grpc_framework`` to ``INSTALLED_APPS`` setting::
     ]
 
 
-Quickstart
-----------
+Demo
+----
 
 Here is a quick example of using gRPC framework to build a simple
 model-backed service for accessing users, startup a new project:
@@ -77,7 +77,7 @@ Now edit the ``demo/urls.py`` module:
             fields = ['id', 'username', 'email']
 
 
-    class UserService(generics.ModelService, demo_pb2_grpc.UserControllerServicer):
+    class UserService(generics.ModelService):
         queryset = User.objects.all()
         serializer_class = UserSerializer
         protobuf_class = demo_pb2.User
@@ -85,7 +85,7 @@ Now edit the ``demo/urls.py`` module:
 
     urlpatterns = []
     def grpc_handlers(server):
-        demo_pb2_grpc.add_UserControllerServicer_to_server(UserService(), server)
+        demo_pb2_grpc.add_UserControllerServicer_to_server(UserService.as_servicer(), server)
 
 That's it, we're done!
 

@@ -4,10 +4,10 @@ from django.core.exceptions import ValidationError
 from django.http import Http404
 import grpc
 
-from django_grpc_framework import mixins
+from django_grpc_framework import mixins, services
 
 
-class GenericService:
+class GenericService(services.Service):
     """
     Base class for all other generic services.
     """
@@ -21,7 +21,7 @@ class GenericService:
     lookup_field = 'id'
     lookup_request_field = None
 
-    def get_queryset(self, request, context):
+    def get_queryset(self):
         """
         Get the list of items for this service.
         This must be an iterable, and may be a queryset.
@@ -42,7 +42,7 @@ class GenericService:
             queryset = queryset.all()
         return queryset
 
-    def get_serializer_class(self, request, context):
+    def get_serializer_class(self):
         """
         Return the class to use for the serializer.
         Defaults to using `self.serializer_class`.
@@ -54,7 +54,7 @@ class GenericService:
         )
         return self.serializer_class
 
-    def get_protobuf_class(self, request, context):
+    def get_protobuf_class(self):
         """
         Return the class to use for the protobuf message.
         Defaults to using `self.protobuf_class`.
@@ -66,46 +66,44 @@ class GenericService:
         )
         return self.protobuf_class
 
-    def get_object(self, request, context):
-        queryset = self.filter_queryset(
-            request, context, self.get_queryset(request, context)
-        )
+    def get_object(self):
+        queryset = self.filter_queryset(self.get_queryset())
         lookup_request_field = self.lookup_request_field or self.lookup_field
-        assert hasattr(request, lookup_request_field), (
+        assert hasattr(self.request, lookup_request_field), (
             'Expected service %s to be called with request that has a field '
             'named "%s". Fix your request protocol definition, or set the '
             '`.lookup_field` attribute on the service correctly.' %
             (self.__class__.__name__, lookup_request_field)
         )
-        lookup_value = getattr(request, lookup_request_field)
+        lookup_value = getattr(self.request, lookup_request_field)
         filter_kwargs = {self.lookup_field: lookup_value}
         try:
             return get_object_or_404(queryset, **filter_kwargs)
         except (TypeError, ValueError, ValidationError, Http404):
-            context.abort(grpc.StatusCode.NOT_FOUND, (
+            self.context.abort(grpc.StatusCode.NOT_FOUND, (
                 '%s: %s not found!' %
                 (queryset.model.__name__, lookup_value)
             ))
 
-    def get_serializer(self, request, context, *args, **kwargs):
+    def get_serializer(self, *args, **kwargs):
         """
         Return the serializer instance that should be used for validating and
         deserializing input, and for serializing output.
         """
-        serializer_class = self.get_serializer_class(request, context)
-        kwargs.setdefault('context', self.get_serializer_context(request, context))
+        serializer_class = self.get_serializer_class()
+        kwargs.setdefault('context', self.get_serializer_context())
         return serializer_class(*args, **kwargs)
 
-    def get_serializer_context(self, request, context):
+    def get_serializer_context(self):
         """
         Extra context provided to the serializer class.
         """
         return {
-            'request': request,
-            'grpc_context': context,
+            'grpc_request': self.request,
+            'grpc_context': self.context,
         }
 
-    def filter_queryset(self, request, context, queryset):
+    def filter_queryset(self, queryset):
         return queryset
 
 

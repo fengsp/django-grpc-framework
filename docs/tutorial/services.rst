@@ -128,12 +128,13 @@ in the ``blog`` directory named ``services.py`` and add the following::
     import grpc
     from google.protobuf.json_format import MessageToDict, ParseDict
     from google.protobuf import empty_pb2
-    from blog_proto import post_pb2, post_pb2_grpc
+    from django_grpc_framework.services import Service
+    from blog_proto import post_pb2
     from blog.models import Post
     from blog.serializers import PostSerializer
 
 
-    class PostService(post_pb2_grpc.PostControllerServicer):
+    class PostService(Service):
         def List(self, request, context):
             posts = Post.objects.all()
             serializer = PostSerializer(posts, many=True)
@@ -173,12 +174,12 @@ in the ``blog`` directory named ``services.py`` and add the following::
 
 Finally we need to wire there services up, create ``blog/handlers.py`` file::
 
-    from blog.services import PostService
+    from blog._services import PostService
     from blog_proto import post_pb2_grpc
 
 
     def grpc_handlers(server):
-        post_pb2_grpc.add_PostControllerServicer_to_server(PostService(), server)
+        post_pb2_grpc.add_PostControllerServicer_to_server(PostService.as_servicer(), server)
 
 Also we need to wire up the root handlers conf, in ``tutorial/urls.py``
 file, include our blog app's grpc handlers::

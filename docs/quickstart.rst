@@ -101,11 +101,9 @@ Now we'd write some a service, create ``demo/services.py``::
     from django_grpc_framework import generics
     from demo.serializers import UserSerializer
     import demo_pb2
-    import demo_pb2_grpc
 
 
-    class UserService(generics.ModelService,
-                      demo_pb2_grpc.UserControllerServicer):
+    class UserService(generics.ModelService):
         """
         gRPC service that allows users to be retrieved or updated.
         """
@@ -127,7 +125,7 @@ Ok, let's wire up the gRPC handlers, edit ``quickstart/urls.py``::
 
 
     def grpc_handlers(server):
-        demo_pb2_grpc.add_UserControllerServicer_to_server(UserService(), server)
+        demo_pb2_grpc.add_UserControllerServicer_to_server(UserService.as_servicer(), server)
 
 We're done, the project layout should look like::
 

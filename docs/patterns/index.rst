@@ -1,6 +1,6 @@
 .. _patterns:
 
-Patterns For gRPC
+Patterns for gRPC
 =================
 
 This part contains some snippets and patterns for Django gRPC framework.
