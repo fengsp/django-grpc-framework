@@ -2,6 +2,7 @@ from functools import update_wrapper
 
 import grpc
 from django.db.models.query import QuerySet
+from django import db
 
 
 class Service:
@@ -33,11 +34,17 @@ class Service:
                     return not_implemented
 
                 def handler(request, context):
-                    self = cls(**initkwargs)
-                    self.request = request
-                    self.context = context
-                    self.action = action
-                    return getattr(self, action)(request, context)
+                    # db connection state managed similarly to the wsgi handler
+                    db.reset_queries()
+                    db.close_old_connections()
+                    try:
+                        self = cls(**initkwargs)
+                        self.request = request
+                        self.context = context
+                        self.action = action
+                        return getattr(self, action)(request, context)
+                    finally:
+                        db.close_old_connections()
                 update_wrapper(handler, getattr(cls, action))
                 return handler
         update_wrapper(Servicer, cls, updated=())
