@@ -26,11 +26,11 @@ classes, here is our ``blog/services`` file again::
 
 
     class PostService(mixins.ListModelMixin,
-                    mixins.CreateModelMixin,
-                    mixins.RetrieveModelMixin,
-                    mixins.UpdateModelMixin,
-                    mixins.DestroyModelMixin,
-                    generics.GenericService):
+                      mixins.CreateModelMixin,
+                      mixins.RetrieveModelMixin,
+                      mixins.UpdateModelMixin,
+                      mixins.DestroyModelMixin,
+                      generics.GenericService):
         queryset = Post.objects.all()
         serializer_class = PostSerializer
         protobuf_class = post_pb2.Post
