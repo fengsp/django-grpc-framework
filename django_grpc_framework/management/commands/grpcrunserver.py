@@ -2,9 +2,9 @@
 from concurrent import futures
 
 import grpc
-from django.conf import settings
-from django.utils.module_loading import import_string
 from django.core.management.base import BaseCommand, CommandError
+
+from django_grpc_framework.settings import grpc_settings
 
 
 class Command(BaseCommand):
@@ -16,9 +16,7 @@ class Command(BaseCommand):
     def _serve(self):
         self.stdout.write('Starting grpc server')
         server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
-        root_grpc_handlers_conf = '%s.grpc_handlers' % settings.ROOT_URLCONF
-        grpc_handlers = import_string(root_grpc_handlers_conf)
-        grpc_handlers(server)
+        grpc_settings.ROOT_HANDLERS_HOOK(server)
         server.add_insecure_port('[::]:50051')
         server.start()
         server.wait_for_termination()
