@@ -74,7 +74,9 @@ Defining a service
 Our first step is to define the gRPC service and messages, create a directory
 ``tutorial/protos`` that sits next to ``tutorial/manage.py``, create another
 directory ``protos/blog_proto`` and create the ``protos/blog_proto/post.proto``
-file::
+file:
+
+.. code-block:: protobuf
 
     syntax = "proto3";
 

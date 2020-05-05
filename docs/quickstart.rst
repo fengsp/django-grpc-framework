@@ -48,7 +48,9 @@ Protos
 ------
 
 Our first step is to define the gRPC service and messages, create a file
-``quickstart/demo.proto`` next to ``quickstart/manage.py``::
+``quickstart/demo.proto`` next to ``quickstart/manage.py``:
+
+.. code-block:: protobuf
 
     syntax = "proto3";
 

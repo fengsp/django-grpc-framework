@@ -46,7 +46,9 @@ model-backed service for accessing users, startup a new project:
     $ django-admin startproject demo
     $ python manage.py migrate
 
-Now define protos in ``demo.proto``::
+Now define protos in ``demo.proto``:
+
+.. code-block:: protobuf
 
     syntax = "proto3";
 
