@@ -20,6 +20,14 @@ Django gRPC framework is a toolkit for building gRPC services, inspired by
 djangorestframework.
 
 
+Requirements
+------------
+
+- Python (3.6, 3.7, 3.8)
+- Django (2.2, 3.0), Django REST Framework (3.10.x, 3.11.x)
+- gRPC, gRPC tools, proto3
+
+
 Installation
 ------------
 

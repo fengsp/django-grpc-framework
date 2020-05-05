@@ -9,9 +9,9 @@ Requirements
 
 We requires the following:
 
-- Python (3.6,3.7,3.8)
-- Django (2.0,2.1,2.2,3.0)
-- Django REST Framework (3.10.x,3.11.x)
+- Python (3.6, 3.7, 3.8)
+- Django (2.2, 3.0)
+- Django REST Framework (3.10.x, 3.11.x)
 - gRPC
 - gRPC tools
 - proto3
