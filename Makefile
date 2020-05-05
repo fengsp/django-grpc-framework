@@ -16,7 +16,7 @@ release:
 	python setup.py bdist_wheel upload
 
 test:
-	@py.test -vv --tb=short
+	@py.test -vv --tb=short tests
 
 flake8:
 	@flake8 --ignore=E501,F401,W292 django_grpc_framework examples/tutorial/blog examples/tutorial/tutorial examples/tutorial/blog_client.py examples/quickstart/demo examples/demo/demo
