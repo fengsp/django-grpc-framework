@@ -80,7 +80,7 @@ class Command(BaseCommand):
         quit_command = 'CTRL-BREAK' if sys.platform == 'win32' else 'CONTROL-C'
         self.stdout.write((
             "Django version %(version)s, using settings %(settings)r\n"
-            "Starting development server at %(address)s\n"
+            "Starting development gRPC server at %(address)s\n"
             "Quit the server with %(quit_command)s.\n"
         ) % {
             "version": self.get_version(),
