@@ -45,7 +45,10 @@ class Command(BaseCommand):
     def run(self, **options):
         """Run the server, using the autoreloader if needed."""
         if self.development_mode:
-            autoreload.run_with_reloader(self.inner_run, **options)
+            if hasattr(autoreload, "run_with_reloader"):
+                autoreload.run_with_reloader(self.inner_run, **options)
+            else:
+                autoreload.main(self.inner_run, None, options)
         else:
             self.stdout.write((
                 "Starting gRPC server at %(address)s\n"
