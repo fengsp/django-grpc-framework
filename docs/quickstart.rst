@@ -32,8 +32,8 @@ Now sync the database::
     python manage.py migrate
 
 
-Settings
---------
+Update settings
+---------------
 
 Add ``django_grpc_framework`` to ``INSTALLED_APPS``, settings module is in
 ``quickstart/settings.py``::
@@ -44,8 +44,8 @@ Add ``django_grpc_framework`` to ``INSTALLED_APPS``, settings module is in
     ]
 
 
-Protos
-------
+Defining protos
+---------------
 
 Our first step is to define the gRPC service and messages, create a file
 ``quickstart/demo.proto`` next to ``quickstart/manage.py``:
@@ -78,8 +78,8 @@ Next we need to generate gRPC code, from the ``quickstart`` directory, run::
     python -m grpc_tools.protoc --proto_path=./ --python_out=./ --grpc_python_out=./ ./demo.proto
 
 
-Serializers
------------
+Writing serializers
+-------------------
 
 Then we're going to define a serializer, let's create a new module named
 ``demo/serializers.py``::
@@ -94,8 +94,8 @@ Then we're going to define a serializer, let's create a new module named
             fields = ['id', 'username', 'email', 'groups']
 
 
-Services
---------
+Writing services
+----------------
 
 Now we'd write some a service, create ``demo/services.py``::
 
@@ -114,8 +114,8 @@ Now we'd write some a service, create ``demo/services.py``::
         protobuf_class = demo_pb2.User
 
 
-Handlers
---------
+Register handlers
+-----------------
 
 Ok, let's wire up the gRPC handlers, edit ``quickstart/urls.py``::
 
@@ -155,8 +155,8 @@ We're done, the project layout should look like::
     ./manage.py
 
 
-Testing our gRPC Service
-------------------------
+Calling our service
+-------------------
 
 Fire up the server with development mode::
 

@@ -1,4 +1,4 @@
-.. _services:
+.. _building_services:
 
 Building Services
 =================
@@ -196,8 +196,8 @@ file, include our blog app's grpc handlers::
         blog_grpc_handlers(server)
 
 
-Testing our gRPC Service
-------------------------
+Calling our service
+-------------------
 
 Now we can start up a gRPC server so that clients can actually use our
 service::

@@ -1,4 +1,4 @@
-.. _generics:
+.. _using_generics:
 
 Using Generic Services
 ======================
