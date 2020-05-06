@@ -5,6 +5,7 @@ Changelog
 Version 0.2
 -----------
 
+- Added ``RPCTestCase``
 
 
 Version 0.1

@@ -1,0 +1,6 @@
+.. _server:
+
+Server
+======
+
+TODO

@@ -1,7 +1,7 @@
 .. _testing:
 
-Testing Services
-================
+Testing
+=======
 
 Django gRPC framework includes a few helper classes that come in handy when
 writing tests for services.

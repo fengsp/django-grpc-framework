@@ -16,6 +16,9 @@ instructions for building services.
    installation
    quickstart
    tutorial/index
+   services
+   generics
+   server
    testing
    settings
    patterns/index
