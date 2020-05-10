@@ -54,31 +54,17 @@ model-backed service for accessing users, startup a new project:
     $ django-admin startproject demo
     $ python manage.py migrate
 
-Now define protos in ``demo.proto``:
+Now generate proto definition demo.proto_.
 
-.. code-block:: protobuf
+.. _demo.proto: https://github.com/fengsp/django-grpc-framework/blob/master/examples/demo/demo.proto
 
-    syntax = "proto3";
+.. code-block:: bash
 
-    package demo;
+    python manage.py generateproto --model django.contrib.auth.models.User --fields id,username,email --file demo.proto
 
-    import "google/protobuf/empty.proto";
+Generate gRPC code:
 
-    message User { 
-        int32 id = 1;
-        string username = 2;
-        string email = 3;
-    }   
-
-    service UserController {
-        rpc List(google.protobuf.Empty) returns (stream User) {}
-        rpc Create(User) returns (User) {}
-        rpc Retrieve(User) returns (User) {}
-        rpc Update(User) returns (User) {}
-        rpc Destroy(User) returns (google.protobuf.Empty) {}
-    }
-
-Generate gRPC code::
+.. code-block:: bash
 
     python -m grpc_tools.protoc --proto_path=./ --python_out=./ --grpc_python_out=./ ./demo.proto
 
@@ -119,9 +105,7 @@ You can now run a gRPC client to access the service:
 
 .. code-block:: python
 
-    from google.protobuf import empty_pb2
-
     with grpc.insecure_channel('localhost:50051') as channel:
         stub = demo_pb2_grpc.UserControllerStub(channel)
-        for user in stub.List(empty_pb2.Empty()):
+        for user in stub.List(demo_pb2.UserListRequest()):
             print(user, end='')

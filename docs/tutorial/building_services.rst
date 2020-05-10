@@ -84,19 +84,29 @@ file:
 
     import "google/protobuf/empty.proto";
 
+    service PostController {
+        rpc List(PostListRequest) returns (stream Post) {}
+        rpc Create(Post) returns (Post) {}
+        rpc Retrieve(Post) returns (Post) {}
+        rpc Update(Post) returns (Post) {}
+        rpc Destroy(Post) returns (google.protobuf.Empty) {}
+    }
+
     message Post {
         int32 id = 1;
         string title = 2;
         string content = 3;
     }
 
-    service PostController {
-        rpc List(google.protobuf.Empty) returns (stream Post) {}
-        rpc Create(Post) returns (Post) {}
-        rpc Retrieve(Post) returns (Post) {}
-        rpc Update(Post) returns (Post) {}
-        rpc Destroy(Post) returns (google.protobuf.Empty) {}
+    message PostListRequest {
     }
+
+For a model-backed service, you could also just run the model proto generator::
+
+    python manage.py generateproto --model blog.models.Post --fields=id,title,content --file protos/blog_proto/post.proto
+
+Then edit it as needed, here the package name can't be automatically inferred
+by the proto generator, change ``package post`` to ``package blog_proto``.
 
 Next we need to generate gRPC code, from the ``tutorial`` directory, run::
 
@@ -207,7 +217,6 @@ service::
 In another terminal window, we can test the server::
 
     import grpc
-    from google.protobuf import empty_pb2
     from blog_proto import post_pb2, post_pb2_grpc
 
 
@@ -217,7 +226,7 @@ In another terminal window, we can test the server::
         response = stub.Create(post_pb2.Post(title='t1', content='c1'))
         print(response, end='')
         print('----- List -----')
-        for post in stub.List(empty_pb2.Empty()):
+        for post in stub.List(post_pb2.PostListRequest()):
             print(post, end='')
         print('----- Retrieve -----')
         response = stub.Retrieve(post_pb2.Post(id=response.id))

@@ -4,7 +4,6 @@ TODO
 - relationships
 - null support
 - partial update
-- auto protobuf generation from model
 - error handling
 - add BulkCreate\BulkDestroy\BulkUpdate with stream-unary mode  ?
 - authentication

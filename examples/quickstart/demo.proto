@@ -4,6 +4,14 @@ package demo;
 
 import "google/protobuf/empty.proto";
 
+service UserController {
+    rpc List(UserListRequest) returns (stream User) {}
+    rpc Create(User) returns (User) {}
+    rpc Retrieve(User) returns (User) {}
+    rpc Update(User) returns (User) {}
+    rpc Destroy(User) returns (google.protobuf.Empty) {}
+}
+
 message User {
     int32 id = 1;
     string username = 2;
@@ -11,10 +19,5 @@ message User {
     repeated int32 groups = 4;
 }
 
-service UserController {
-    rpc List(google.protobuf.Empty) returns (stream User) {}
-    rpc Create(User) returns (User) {}
-    rpc Retrieve(User) returns (User) {}
-    rpc Update(User) returns (User) {}
-    rpc Destroy(User) returns (google.protobuf.Empty) {}
+message UserListRequest {
 }

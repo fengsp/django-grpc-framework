@@ -19,7 +19,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   package='blog_proto',
   syntax='proto3',
   serialized_options=None,
-  serialized_pb=b'\n\x15\x62log_proto/post.proto\x12\nblog_proto\x1a\x1bgoogle/protobuf/empty.proto\"2\n\x04Post\x12\n\n\x02id\x18\x01 \x01(\x05\x12\r\n\x05title\x18\x02 \x01(\t\x12\x0f\n\x07\x63ontent\x18\x03 \x01(\t2\x8f\x02\n\x0ePostController\x12\x34\n\x04List\x12\x16.google.protobuf.Empty\x1a\x10.blog_proto.Post\"\x00\x30\x01\x12.\n\x06\x43reate\x12\x10.blog_proto.Post\x1a\x10.blog_proto.Post\"\x00\x12\x30\n\x08Retrieve\x12\x10.blog_proto.Post\x1a\x10.blog_proto.Post\"\x00\x12.\n\x06Update\x12\x10.blog_proto.Post\x1a\x10.blog_proto.Post\"\x00\x12\x35\n\x07\x44\x65stroy\x12\x10.blog_proto.Post\x1a\x16.google.protobuf.Empty\"\x00\x62\x06proto3'
+  serialized_pb=b'\n\x15\x62log_proto/post.proto\x12\nblog_proto\x1a\x1bgoogle/protobuf/empty.proto\"2\n\x04Post\x12\n\n\x02id\x18\x01 \x01(\x05\x12\r\n\x05title\x18\x02 \x01(\t\x12\x0f\n\x07\x63ontent\x18\x03 \x01(\t\"\x11\n\x0fPostListRequest2\x94\x02\n\x0ePostController\x12\x39\n\x04List\x12\x1b.blog_proto.PostListRequest\x1a\x10.blog_proto.Post\"\x00\x30\x01\x12.\n\x06\x43reate\x12\x10.blog_proto.Post\x1a\x10.blog_proto.Post\"\x00\x12\x30\n\x08Retrieve\x12\x10.blog_proto.Post\x1a\x10.blog_proto.Post\"\x00\x12.\n\x06Update\x12\x10.blog_proto.Post\x1a\x10.blog_proto.Post\"\x00\x12\x35\n\x07\x44\x65stroy\x12\x10.blog_proto.Post\x1a\x16.google.protobuf.Empty\"\x00\x62\x06proto3'
   ,
   dependencies=[google_dot_protobuf_dot_empty__pb2.DESCRIPTOR,])
 
@@ -70,7 +70,32 @@ _POST = _descriptor.Descriptor(
   serialized_end=116,
 )
 
+
+_POSTLISTREQUEST = _descriptor.Descriptor(
+  name='PostListRequest',
+  full_name='blog_proto.PostListRequest',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=118,
+  serialized_end=135,
+)
+
 DESCRIPTOR.message_types_by_name['Post'] = _POST
+DESCRIPTOR.message_types_by_name['PostListRequest'] = _POSTLISTREQUEST
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
 Post = _reflection.GeneratedProtocolMessageType('Post', (_message.Message,), {
@@ -80,6 +105,13 @@ Post = _reflection.GeneratedProtocolMessageType('Post', (_message.Message,), {
   })
 _sym_db.RegisterMessage(Post)
 
+PostListRequest = _reflection.GeneratedProtocolMessageType('PostListRequest', (_message.Message,), {
+  'DESCRIPTOR' : _POSTLISTREQUEST,
+  '__module__' : 'blog_proto.post_pb2'
+  # @@protoc_insertion_point(class_scope:blog_proto.PostListRequest)
+  })
+_sym_db.RegisterMessage(PostListRequest)
+
 
 
 _POSTCONTROLLER = _descriptor.ServiceDescriptor(
@@ -88,15 +120,15 @@ _POSTCONTROLLER = _descriptor.ServiceDescriptor(
   file=DESCRIPTOR,
   index=0,
   serialized_options=None,
-  serialized_start=119,
-  serialized_end=390,
+  serialized_start=138,
+  serialized_end=414,
   methods=[
   _descriptor.MethodDescriptor(
     name='List',
     full_name='blog_proto.PostController.List',
     index=0,
     containing_service=None,
-    input_type=google_dot_protobuf_dot_empty__pb2._EMPTY,
+    input_type=_POSTLISTREQUEST,
     output_type=_POST,
     serialized_options=None,
   ),

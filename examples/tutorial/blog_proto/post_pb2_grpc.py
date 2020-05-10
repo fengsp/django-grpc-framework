@@ -16,7 +16,7 @@ class PostControllerStub(object):
         """
         self.List = channel.unary_stream(
                 '/blog_proto.PostController/List',
-                request_serializer=google_dot_protobuf_dot_empty__pb2.Empty.SerializeToString,
+                request_serializer=blog__proto_dot_post__pb2.PostListRequest.SerializeToString,
                 response_deserializer=blog__proto_dot_post__pb2.Post.FromString,
                 )
         self.Create = channel.unary_unary(
@@ -79,7 +79,7 @@ def add_PostControllerServicer_to_server(servicer, server):
     rpc_method_handlers = {
             'List': grpc.unary_stream_rpc_method_handler(
                     servicer.List,
-                    request_deserializer=google_dot_protobuf_dot_empty__pb2.Empty.FromString,
+                    request_deserializer=blog__proto_dot_post__pb2.PostListRequest.FromString,
                     response_serializer=blog__proto_dot_post__pb2.Post.SerializeToString,
             ),
             'Create': grpc.unary_unary_rpc_method_handler(
@@ -123,7 +123,7 @@ class PostController(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_stream(request, target, '/blog_proto.PostController/List',
-            google_dot_protobuf_dot_empty__pb2.Empty.SerializeToString,
+            blog__proto_dot_post__pb2.PostListRequest.SerializeToString,
             blog__proto_dot_post__pb2.Post.FromString,
             options, channel_credentials,
             call_credentials, compression, wait_for_ready, timeout, metadata)

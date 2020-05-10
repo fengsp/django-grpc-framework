@@ -1,5 +1,4 @@
 import grpc
-from google.protobuf import empty_pb2
 from blog_proto import post_pb2, post_pb2_grpc
 
 
@@ -9,7 +8,7 @@ with grpc.insecure_channel('localhost:50051') as channel:
     response = stub.Create(post_pb2.Post(title='t1', content='c1'))
     print(response, end='')
     print('----- List -----')
-    for post in stub.List(empty_pb2.Empty()):
+    for post in stub.List(post_pb2.PostListRequest()):
         print(post, end='')
     print('----- Retrieve -----')
     response = stub.Retrieve(post_pb2.Post(id=response.id))

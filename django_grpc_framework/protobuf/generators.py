@@ -62,55 +62,43 @@ class ModelProtoGenerator:
         return self._writer.get_code()
 
     def _generate_service(self):
-        self._writer.write_line(
-            'service {model_name}Controller {{'.format(
-                model_name=self.model.__name__
-            )
-        )
+        self._writer.write_line('service %sController {' % self.model.__name__)
         with self._writer.indent():
             self._writer.write_line(
-                'rpc List(google.protobuf.Empty) returns (stream {model_name}) {{}}'.format(
-                    model_name=self.model.__name__
-                )
+                'rpc List(%sListRequest) returns (stream %s) {}' %
+                (self.model.__name__, self.model.__name__)
             )
             self._writer.write_line(
-                'rpc Create({model_name}) returns ({model_name}) {{}}'.format(
-                    model_name=self.model.__name__
-                )
+                'rpc Create(%s) returns (%s) {}' %
+                (self.model.__name__, self.model.__name__)
             )
             self._writer.write_line(
-                'rpc Retrieve({model_name}) returns ({model_name}) {{}}'.format(
-                    model_name=self.model.__name__
-                )
+                'rpc Retrieve(%s) returns (%s) {}' %
+                (self.model.__name__, self.model.__name__)
             )
             self._writer.write_line(
-                'rpc Update({model_name}) returns ({model_name}) {{}}'.format(
-                    model_name=self.model.__name__
-                )
+                'rpc Update(%s) returns (%s) {}' %
+                (self.model.__name__, self.model.__name__)
             )
             self._writer.write_line(
-                'rpc Destroy({model_name}) returns (google.protobuf.Empty) {{}}'.format(
-                    model_name=self.model.__name__
-                )
+                'rpc Destroy(%s) returns (google.protobuf.Empty) {}' %
+                self.model.__name__
             )
         self._writer.write_line('}')
 
     def _generate_message(self):
-        self._writer.write_line(
-            'message {model_name} {{'.format(
-                model_name=self.model.__name__
-            )
-        )
+        self._writer.write_line('message %s {' % self.model.__name__)
         with self._writer.indent():
             number = 0
             for field_name, proto_type in self.get_fields().items():
                 number += 1
                 self._writer.write_line(
-                    '{proto_type} {field_name} = {number};'.format(
-                        proto_type=proto_type, field_name=field_name,
-                        number=number,
-                    )
+                    '%s %s = %s;' %
+                    (proto_type, field_name, number)
                 )
+        self._writer.write_line('}')
+        self._writer.write_line('')
+        self._writer.write_line('message %sListRequest {' % self.model.__name__)
         self._writer.write_line('}')
 
     def get_fields(self):

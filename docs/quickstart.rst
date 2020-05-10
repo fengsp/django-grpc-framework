@@ -58,6 +58,14 @@ Our first step is to define the gRPC service and messages, create a file
 
     import "google/protobuf/empty.proto";
 
+    service UserController {
+        rpc List(UserListRequest) returns (stream User) {}
+        rpc Create(User) returns (User) {}
+        rpc Retrieve(User) returns (User) {}
+        rpc Update(User) returns (User) {}
+        rpc Destroy(User) returns (google.protobuf.Empty) {}
+    }
+
     message User {
         int32 id = 1;
         string username = 2;
@@ -65,13 +73,12 @@ Our first step is to define the gRPC service and messages, create a file
         repeated int32 groups = 4;
     }
 
-    service UserController {
-        rpc List(google.protobuf.Empty) returns (stream User) {}
-        rpc Create(User) returns (User) {}
-        rpc Retrieve(User) returns (User) {}
-        rpc Update(User) returns (User) {}
-        rpc Destroy(User) returns (google.protobuf.Empty) {}
+    message UserListRequest {
     }
+
+Or you can generate it automatically based on ``User`` model::
+
+    python manage.py generateproto --model django.contrib.auth.models.User --fields id,username,email,groups --file demo.proto
 
 Next we need to generate gRPC code, from the ``quickstart`` directory, run::
 
@@ -165,11 +172,11 @@ Fire up the server with development mode::
 We can now access our service from the gRPC client::
 
     import grpc
-    from google.protobuf import empty_pb2
+    import demo_pb2
     import demo_pb2_grpc
 
 
     with grpc.insecure_channel('localhost:50051') as channel:
         stub = demo_pb2_grpc.UserControllerStub(channel)
-        for user in stub.List(empty_pb2.Empty()):
+        for user in stub.List(demo_pb2.UserListRequest()):
             print(user, end='')

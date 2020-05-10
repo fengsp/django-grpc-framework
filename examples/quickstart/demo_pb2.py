@@ -19,7 +19,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   package='demo',
   syntax='proto3',
   serialized_options=None,
-  serialized_pb=b'\n\ndemo.proto\x12\x04\x64\x65mo\x1a\x1bgoogle/protobuf/empty.proto\"C\n\x04User\x12\n\n\x02id\x18\x01 \x01(\x05\x12\x10\n\x08username\x18\x02 \x01(\t\x12\r\n\x05\x65mail\x18\x03 \x01(\t\x12\x0e\n\x06groups\x18\x04 \x03(\x05\x32\xdf\x01\n\x0eUserController\x12.\n\x04List\x12\x16.google.protobuf.Empty\x1a\n.demo.User\"\x00\x30\x01\x12\"\n\x06\x43reate\x12\n.demo.User\x1a\n.demo.User\"\x00\x12$\n\x08Retrieve\x12\n.demo.User\x1a\n.demo.User\"\x00\x12\"\n\x06Update\x12\n.demo.User\x1a\n.demo.User\"\x00\x12/\n\x07\x44\x65stroy\x12\n.demo.User\x1a\x16.google.protobuf.Empty\"\x00\x62\x06proto3'
+  serialized_pb=b'\n\ndemo.proto\x12\x04\x64\x65mo\x1a\x1bgoogle/protobuf/empty.proto\"C\n\x04User\x12\n\n\x02id\x18\x01 \x01(\x05\x12\x10\n\x08username\x18\x02 \x01(\t\x12\r\n\x05\x65mail\x18\x03 \x01(\t\x12\x0e\n\x06groups\x18\x04 \x03(\x05\"\x11\n\x0fUserListRequest2\xde\x01\n\x0eUserController\x12-\n\x04List\x12\x15.demo.UserListRequest\x1a\n.demo.User\"\x00\x30\x01\x12\"\n\x06\x43reate\x12\n.demo.User\x1a\n.demo.User\"\x00\x12$\n\x08Retrieve\x12\n.demo.User\x1a\n.demo.User\"\x00\x12\"\n\x06Update\x12\n.demo.User\x1a\n.demo.User\"\x00\x12/\n\x07\x44\x65stroy\x12\n.demo.User\x1a\x16.google.protobuf.Empty\"\x00\x62\x06proto3'
   ,
   dependencies=[google_dot_protobuf_dot_empty__pb2.DESCRIPTOR,])
 
@@ -77,7 +77,32 @@ _USER = _descriptor.Descriptor(
   serialized_end=116,
 )
 
+
+_USERLISTREQUEST = _descriptor.Descriptor(
+  name='UserListRequest',
+  full_name='demo.UserListRequest',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=118,
+  serialized_end=135,
+)
+
 DESCRIPTOR.message_types_by_name['User'] = _USER
+DESCRIPTOR.message_types_by_name['UserListRequest'] = _USERLISTREQUEST
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
 User = _reflection.GeneratedProtocolMessageType('User', (_message.Message,), {
@@ -87,6 +112,13 @@ User = _reflection.GeneratedProtocolMessageType('User', (_message.Message,), {
   })
 _sym_db.RegisterMessage(User)
 
+UserListRequest = _reflection.GeneratedProtocolMessageType('UserListRequest', (_message.Message,), {
+  'DESCRIPTOR' : _USERLISTREQUEST,
+  '__module__' : 'demo_pb2'
+  # @@protoc_insertion_point(class_scope:demo.UserListRequest)
+  })
+_sym_db.RegisterMessage(UserListRequest)
+
 
 
 _USERCONTROLLER = _descriptor.ServiceDescriptor(
@@ -95,15 +127,15 @@ _USERCONTROLLER = _descriptor.ServiceDescriptor(
   file=DESCRIPTOR,
   index=0,
   serialized_options=None,
-  serialized_start=119,
-  serialized_end=342,
+  serialized_start=138,
+  serialized_end=360,
   methods=[
   _descriptor.MethodDescriptor(
     name='List',
     full_name='demo.UserController.List',
     index=0,
     containing_service=None,
-    input_type=google_dot_protobuf_dot_empty__pb2._EMPTY,
+    input_type=_USERLISTREQUEST,
     output_type=_USER,
     serialized_options=None,
   ),

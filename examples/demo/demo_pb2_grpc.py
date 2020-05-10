@@ -16,7 +16,7 @@ class UserControllerStub(object):
         """
         self.List = channel.unary_stream(
                 '/demo.UserController/List',
-                request_serializer=google_dot_protobuf_dot_empty__pb2.Empty.SerializeToString,
+                request_serializer=demo__pb2.UserListRequest.SerializeToString,
                 response_deserializer=demo__pb2.User.FromString,
                 )
         self.Create = channel.unary_unary(
@@ -79,7 +79,7 @@ def add_UserControllerServicer_to_server(servicer, server):
     rpc_method_handlers = {
             'List': grpc.unary_stream_rpc_method_handler(
                     servicer.List,
-                    request_deserializer=google_dot_protobuf_dot_empty__pb2.Empty.FromString,
+                    request_deserializer=demo__pb2.UserListRequest.FromString,
                     response_serializer=demo__pb2.User.SerializeToString,
             ),
             'Create': grpc.unary_unary_rpc_method_handler(
@@ -123,7 +123,7 @@ class UserController(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_stream(request, target, '/demo.UserController/List',
-            google_dot_protobuf_dot_empty__pb2.Empty.SerializeToString,
+            demo__pb2.UserListRequest.SerializeToString,
             demo__pb2.User.FromString,
             options, channel_credentials,
             call_credentials, compression, wait_for_ready, timeout, metadata)
