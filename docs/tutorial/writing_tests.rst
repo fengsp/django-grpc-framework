@@ -12,7 +12,6 @@ Writing tests
 Let's edit the ``blog/tests.py`` file::
 
     import grpc
-    from google.protobuf import empty_pb2
     from django_grpc_framework.test import RPCTestCase
     from blog_proto import post_pb2, post_pb2_grpc
     from blog.models import Post
@@ -30,7 +29,7 @@ Let's edit the ``blog/tests.py`` file::
             Post.objects.create(title='title1', content='content1')
             Post.objects.create(title='title2', content='content2')
             stub = post_pb2_grpc.PostControllerStub(self.channel)
-            post_list = list(stub.List(empty_pb2.Empty()))
+            post_list = list(stub.List(post_pb2.PostListRequest()))
             self.assertEqual(len(post_list), 2)
 
 

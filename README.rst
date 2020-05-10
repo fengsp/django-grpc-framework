@@ -54,7 +54,7 @@ model-backed service for accessing users, startup a new project:
     $ django-admin startproject demo
     $ python manage.py migrate
 
-Now generate proto definition demo.proto_.
+Generate ``.proto`` file demo.proto_:
 
 .. _demo.proto: https://github.com/fengsp/django-grpc-framework/blob/master/examples/demo/demo.proto
 
