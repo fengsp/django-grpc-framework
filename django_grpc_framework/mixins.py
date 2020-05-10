@@ -6,10 +6,14 @@ from django_grpc_framework.protobuf.json_format import (
 
 
 class CreateModelMixin:
-    """
-    Create a model instance.
-    """
     def Create(self, request, context):
+        """
+        Create a model instance.
+
+        The request shoule be a proto message of ``get_protobuf_class()``.  If
+        an object is created this returns a proto message of
+        ``get_protobuf_class()``.
+        """
         data = message_to_dict(request)
         serializer = self.get_serializer(data=data)
         serializer.is_valid(raise_exception=True)
@@ -18,14 +22,20 @@ class CreateModelMixin:
         return parse_dict(serializer.data, protobuf_class())
 
     def perform_create(self, serializer):
+        """Save a new object instance."""
         serializer.save()
 
 
 class ListModelMixin:
-    """
-    List a queryset.
-    """
     def List(self, request, context):
+        """
+        List a queryset.  This sends a sequence of messages of
+        ``get_protobuf_class()`` to the client.
+
+        .. note::
+
+            This is a server streaming RPC.
+        """
         queryset = self.filter_queryset(self.get_queryset())
         serializer = self.get_serializer(queryset, many=True)
         protobuf_class = self.get_protobuf_class()
@@ -34,10 +44,14 @@ class ListModelMixin:
 
 
 class RetrieveModelMixin:
-    """
-    Retrieve a model instance.
-    """
     def Retrieve(self, request, context):
+        """
+        Retrieve a model instance.
+
+        The request have to include a field corresponding to
+        ``lookup_request_field``.  If an object can be retrieved this returns
+        a proto message of ``get_protobuf_class()``.
+        """
         instance = self.get_object()
         serializer = self.get_serializer(instance)
         protobuf_class = self.get_protobuf_class()
@@ -45,10 +59,14 @@ class RetrieveModelMixin:
 
 
 class UpdateModelMixin:
-    """
-    Update a model instance.
-    """
     def Update(self, request, context):
+        """
+        Update a model instance.
+
+        The request shoule be a proto message of ``get_protobuf_class()``.  If
+        an object is updated this returns a proto message of
+        ``get_protobuf_class()``.
+        """
         instance = self.get_object()
         data = message_to_dict(request)
         serializer = self.get_serializer(instance, data=data)
@@ -64,17 +82,23 @@ class UpdateModelMixin:
         return parse_dict(serializer.data, protobuf_class())
 
     def perform_update(self, serializer):
+        """Save an existing object instance."""
         serializer.save()
 
 
 class DestroyModelMixin:
-    """
-    Destroy a model instance.
-    """
     def Destroy(self, request, context):
+        """
+        Destroy a model instance.
+
+        The request have to include a field corresponding to
+        ``lookup_request_field``.  If an object is deleted this returns
+        a proto message of ``google.protobuf.empty_pb2.Empty``.
+        """
         instance = self.get_object()
         self.perform_destroy(instance)
         return empty_pb2.Empty()
 
     def perform_destroy(self, instance):
+        """Delete an object instance."""
         instance.delete()

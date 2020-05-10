@@ -21,19 +21,19 @@ class PostService(Service):
         serializer.save()
         return ParseDict(serializer.data, post_pb2.Post())
 
-    def get_object(self, pk, context):
+    def get_object(self, pk):
         try:
             return Post.objects.get(pk=pk)
         except Post.DoesNotExist:
-            context.abort(grpc.StatusCode.NOT_FOUND, 'Post:%s not found!' % pk)
+            self.context.abort(grpc.StatusCode.NOT_FOUND, 'Post:%s not found!' % pk)
 
     def Retrieve(self, request, context):
-        post = self.get_object(request.id, context)
+        post = self.get_object(request.id)
         serializer = PostSerializer(post)
         return ParseDict(serializer.data, post_pb2.Post())
 
     def Update(self, request, context):
-        post = self.get_object(request.id, context)
+        post = self.get_object(request.id)
         data = MessageToDict(request, including_default_value_fields=True)
         serializer = PostSerializer(post, data=data)
         serializer.is_valid(raise_exception=True)
@@ -41,6 +41,6 @@ class PostService(Service):
         return ParseDict(serializer.data, post_pb2.Post())
 
     def Destroy(self, request, context):
-        post = self.get_object(request.id, context)
+        post = self.get_object(request.id)
         post.delete()
         return empty_pb2.Empty()

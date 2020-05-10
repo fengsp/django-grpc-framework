@@ -30,6 +30,13 @@ class GenericService(services.Service):
         If you are overriding a handler method, it is important that you call
         ``get_queryset()`` instead of accessing the ``queryset`` attribute as
         ``queryset`` will get evaluated only once.
+
+        Override this to provide dynamic behavior, for example::
+
+            def get_queryset(self):
+                if self.action == 'ListSpecialUser':
+                    return SpecialUser.objects.all()
+                return super().get_queryset()
         """
         assert self.queryset is not None, (
             "'%s' should either include a ``queryset`` attribute, "
@@ -44,8 +51,8 @@ class GenericService(services.Service):
 
     def get_serializer_class(self):
         """
-        Return the class to use for the serializer.
-        Defaults to using `self.serializer_class`.
+        Return the class to use for the serializer. Defaults to using
+        `self.serializer_class`.
         """
         assert self.serializer_class is not None, (
             "'%s' should either include a `serializer_class` attribute, "
@@ -67,6 +74,11 @@ class GenericService(services.Service):
         return self.protobuf_class
 
     def get_object(self):
+        """
+        Returns an object instance that should be used for detail services.
+        Defaults to using the lookup_field parameter to filter the base
+        queryset.
+        """
         queryset = self.filter_queryset(self.get_queryset())
         lookup_request_field = self.lookup_request_field or self.lookup_field
         assert hasattr(self.request, lookup_request_field), (
@@ -96,21 +108,25 @@ class GenericService(services.Service):
 
     def get_serializer_context(self):
         """
-        Extra context provided to the serializer class.
+        Extra context provided to the serializer class.  Defaults to including
+        ``grpc_request``, ``grpc_context``, and ``service`` keys.
         """
         return {
             'grpc_request': self.request,
             'grpc_context': self.context,
+            'service': self,
         }
 
     def filter_queryset(self, queryset):
+        """Given a queryset, filter it, returning a new queryset."""
         return queryset
 
 
 class CreateService(mixins.CreateModelMixin,
                     GenericService):
     """
-    Concrete service for creating a model instance.
+    Concrete service for creating a model instance that provides a ``Create()``
+    handler.
     """
     pass
 
@@ -118,7 +134,7 @@ class CreateService(mixins.CreateModelMixin,
 class ListService(mixins.ListModelMixin,
                   GenericService):
     """
-    Concrete service for listing a queryset.
+    Concrete service for listing a queryset that provides a ``List()`` handler.
     """
     pass
 
@@ -126,7 +142,8 @@ class ListService(mixins.ListModelMixin,
 class RetrieveService(mixins.RetrieveModelMixin,
                       GenericService):
     """
-    Concrete service for retrieving a model instance.
+    Concrete service for retrieving a model instance that provides a
+    ``Retrieve()`` handler.
     """
     pass
 
@@ -134,7 +151,8 @@ class RetrieveService(mixins.RetrieveModelMixin,
 class DestroyService(mixins.DestroyModelMixin,
                      GenericService):
     """
-    Concrete service for deleting a model instance.
+    Concrete service for deleting a model instance that provides a ``Destroy()``
+    handler.
     """
     pass
 
@@ -142,7 +160,8 @@ class DestroyService(mixins.DestroyModelMixin,
 class UpdateService(mixins.UpdateModelMixin,
                     GenericService):
     """
-    Concrete service for updating a model instance.
+    Concrete service for updating a model instance that provides a
+    ``Update()`` handler.
     """
     pass
 

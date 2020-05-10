@@ -12,6 +12,12 @@ class Service:
 
     @classmethod
     def as_servicer(cls, **initkwargs):
+        """
+        Returns a gRPC servicer instance::
+
+            servicer = PostService.as_servicer()
+            add_PostControllerServicer_to_server(servicer, server)
+        """
         for key in initkwargs:
             if not hasattr(cls, key):
                 raise TypeError(

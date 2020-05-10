@@ -3,9 +3,9 @@
 Proto
 =====
 
-Django gRPC framework provides support for automatic generation of protos_.
+Django gRPC framework provides support for automatic generation of proto_.
 
-.. _protos: https://developers.google.com/protocol-buffers/docs/proto3
+.. _proto: https://developers.google.com/protocol-buffers/docs/proto3
 
 
 Generate proto for model
