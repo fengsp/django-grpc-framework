@@ -4,7 +4,7 @@ Generic services
 ================
 
 The generic services provided by gRPC framework allow you to quickly build
-gRPC services that map closely to your database models.  If the generic views
+gRPC services that map closely to your database models.  If the generic services
 don't suit your needs, use the regular ``Service`` class, or reuse the mixins
 and base classes used by the generic services to compose your own set of
 ressable generic services.
@@ -38,7 +38,7 @@ Attributes
 The following attributes control the basic service behavior:
 
 - ``queryset`` - The queryset that should be used for returning objects from this
-  view.  You must set this or override the ``get_queryset`` method, you should
+  service.  You must set this or override the ``get_queryset`` method, you should
   call ``get_queryset`` instead of accessing this property directly, as ``queryset``
   will get evaluated once, and those results will be cached for all subsequent
   requests.

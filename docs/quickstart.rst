@@ -3,7 +3,7 @@
 Quickstart
 ==========
 
-We're going to create a simple service to allow clients to view and edit the
+We're going to create a simple service to allow clients to retrieve and edit the
 users in the system.
 
 

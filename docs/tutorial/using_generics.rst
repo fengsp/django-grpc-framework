@@ -45,7 +45,7 @@ Using model service
 -------------------
 
 If you want all operations of create/list/retrieve/update/destroy, we provide
-one already mixed-in generic views::
+one already mixed-in generic services::
 
     class PostService(generics.ModelService):
         queryset = Post.objects.all()
