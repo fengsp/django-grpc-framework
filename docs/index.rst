@@ -35,11 +35,3 @@ Changelog and license here if you are interested.
 
    changelog
    license
-
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
