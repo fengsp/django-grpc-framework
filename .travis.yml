@@ -1,8 +1,13 @@
 language: python
 python:
+  - "3.6"
+  - "3.7"
   - "3.8"
 
-install: pip install pytest
+install:
+  - pip install flake8
+  - pip install pytest
 
 script:
+  - make flake8
   - make test

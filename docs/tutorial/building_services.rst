@@ -87,7 +87,7 @@ file:
     service PostController {
         rpc List(PostListRequest) returns (stream Post) {}
         rpc Create(Post) returns (Post) {}
-        rpc Retrieve(Post) returns (Post) {}
+        rpc Retrieve(PostRetrieveRequest) returns (Post) {}
         rpc Update(Post) returns (Post) {}
         rpc Destroy(Post) returns (google.protobuf.Empty) {}
     }
@@ -99,6 +99,10 @@ file:
     }
 
     message PostListRequest {
+    }
+
+    message PostRetrieveRequest {
+        int32 id = 1;
     }
 
 For a model-backed service, you could also just run the model proto generator::
@@ -229,7 +233,7 @@ In another terminal window, we can test the server::
         for post in stub.List(post_pb2.PostListRequest()):
             print(post, end='')
         print('----- Retrieve -----')
-        response = stub.Retrieve(post_pb2.Post(id=response.id))
+        response = stub.Retrieve(post_pb2.PostRetrieveRequest(id=response.id))
         print(response, end='')
         print('----- Update -----')
         response = stub.Update(post_pb2.Post(id=response.id, title='t2', content='c2'))

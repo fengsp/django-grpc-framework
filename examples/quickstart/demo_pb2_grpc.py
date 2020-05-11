@@ -26,7 +26,7 @@ class UserControllerStub(object):
                 )
         self.Retrieve = channel.unary_unary(
                 '/demo.UserController/Retrieve',
-                request_serializer=demo__pb2.User.SerializeToString,
+                request_serializer=demo__pb2.UserRetrieveRequest.SerializeToString,
                 response_deserializer=demo__pb2.User.FromString,
                 )
         self.Update = channel.unary_unary(
@@ -89,7 +89,7 @@ def add_UserControllerServicer_to_server(servicer, server):
             ),
             'Retrieve': grpc.unary_unary_rpc_method_handler(
                     servicer.Retrieve,
-                    request_deserializer=demo__pb2.User.FromString,
+                    request_deserializer=demo__pb2.UserRetrieveRequest.FromString,
                     response_serializer=demo__pb2.User.SerializeToString,
             ),
             'Update': grpc.unary_unary_rpc_method_handler(
@@ -155,7 +155,7 @@ class UserController(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/demo.UserController/Retrieve',
-            demo__pb2.User.SerializeToString,
+            demo__pb2.UserRetrieveRequest.SerializeToString,
             demo__pb2.User.FromString,
             options, channel_credentials,
             call_credentials, compression, wait_for_ready, timeout, metadata)

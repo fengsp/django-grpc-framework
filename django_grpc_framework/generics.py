@@ -4,6 +4,7 @@ from django.core.exceptions import ValidationError
 from django.http import Http404
 import grpc
 
+from django_grpc_framework.utils import model_meta
 from django_grpc_framework import mixins, services
 
 
@@ -18,7 +19,7 @@ class GenericService(services.Service):
     # Either set this attribute or override ``get_protobuf_class``.
     protobuf_class = None
     # Set this if you want to use object lookups other than id
-    lookup_field = 'id'
+    lookup_field = None
     lookup_request_field = None
 
     def get_queryset(self):
@@ -80,7 +81,11 @@ class GenericService(services.Service):
         queryset.
         """
         queryset = self.filter_queryset(self.get_queryset())
-        lookup_request_field = self.lookup_request_field or self.lookup_field
+        lookup_field = (
+            self.lookup_field
+            or model_meta.get_model_pk(queryset.model).name
+        )
+        lookup_request_field = self.lookup_request_field or lookup_field
         assert hasattr(self.request, lookup_request_field), (
             'Expected service %s to be called with request that has a field '
             'named "%s". Fix your request protocol definition, or set the '
@@ -88,7 +93,7 @@ class GenericService(services.Service):
             (self.__class__.__name__, lookup_request_field)
         )
         lookup_value = getattr(self.request, lookup_request_field)
-        filter_kwargs = {self.lookup_field: lookup_value}
+        filter_kwargs = {lookup_field: lookup_value}
         try:
             return get_object_or_404(queryset, **filter_kwargs)
         except (TypeError, ValueError, ValidationError, Http404):

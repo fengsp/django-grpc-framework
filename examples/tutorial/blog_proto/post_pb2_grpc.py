@@ -26,7 +26,7 @@ class PostControllerStub(object):
                 )
         self.Retrieve = channel.unary_unary(
                 '/blog_proto.PostController/Retrieve',
-                request_serializer=blog__proto_dot_post__pb2.Post.SerializeToString,
+                request_serializer=blog__proto_dot_post__pb2.PostRetrieveRequest.SerializeToString,
                 response_deserializer=blog__proto_dot_post__pb2.Post.FromString,
                 )
         self.Update = channel.unary_unary(
@@ -89,7 +89,7 @@ def add_PostControllerServicer_to_server(servicer, server):
             ),
             'Retrieve': grpc.unary_unary_rpc_method_handler(
                     servicer.Retrieve,
-                    request_deserializer=blog__proto_dot_post__pb2.Post.FromString,
+                    request_deserializer=blog__proto_dot_post__pb2.PostRetrieveRequest.FromString,
                     response_serializer=blog__proto_dot_post__pb2.Post.SerializeToString,
             ),
             'Update': grpc.unary_unary_rpc_method_handler(
@@ -155,7 +155,7 @@ class PostController(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/blog_proto.PostController/Retrieve',
-            blog__proto_dot_post__pb2.Post.SerializeToString,
+            blog__proto_dot_post__pb2.PostRetrieveRequest.SerializeToString,
             blog__proto_dot_post__pb2.Post.FromString,
             options, channel_credentials,
             call_credentials, compression, wait_for_ready, timeout, metadata)

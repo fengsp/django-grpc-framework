@@ -73,7 +73,7 @@ class ModelProtoGenerator:
                 (self.model.__name__, self.model.__name__)
             )
             self._writer.write_line(
-                'rpc Retrieve(%s) returns (%s) {}' %
+                'rpc Retrieve(%sRetrieveRequest) returns (%s) {}' %
                 (self.model.__name__, self.model.__name__)
             )
             self._writer.write_line(
@@ -99,6 +99,18 @@ class ModelProtoGenerator:
         self._writer.write_line('}')
         self._writer.write_line('')
         self._writer.write_line('message %sListRequest {' % self.model.__name__)
+        self._writer.write_line('}')
+        self._writer.write_line('')
+        self._writer.write_line('message %sRetrieveRequest {' % self.model.__name__)
+        with self._writer.indent():
+            pk_field_name = self.field_info.pk.name
+            pk_proto_type = self.build_proto_type(
+                pk_field_name, self.field_info, self.model
+            )
+            self._writer.write_line(
+                '%s %s = 1;' %
+                (pk_proto_type, pk_field_name)
+            )
         self._writer.write_line('}')
 
     def get_fields(self):

@@ -49,7 +49,7 @@ The following attributes control the basic service behavior:
   proto message object.  You must either set this attribute, or override the
   ``get_protobuf_class()`` method.
 - ``lookup_field`` - The model field that should be used to for performing object
-  lookup of individual model instances. Defaults to 'id'.
+  lookup of individual model instances. Defaults to primary key field name.
 - ``lookup_request_field`` - The request field that should be used for object
   lookup.  If unset this defaults to using the same value as ``lookup_field``.
 

@@ -7,7 +7,7 @@ import "google/protobuf/empty.proto";
 service UserController {
     rpc List(UserListRequest) returns (stream User) {}
     rpc Create(User) returns (User) {}
-    rpc Retrieve(User) returns (User) {}
+    rpc Retrieve(UserRetrieveRequest) returns (User) {}
     rpc Update(User) returns (User) {}
     rpc Destroy(User) returns (google.protobuf.Empty) {}
 }
@@ -19,4 +19,8 @@ message User {
 }
 
 message UserListRequest {
+}
+
+message UserRetrieveRequest {
+    int32 id = 1;
 }

@@ -61,7 +61,7 @@ Our first step is to define the gRPC service and messages, create a file
     service UserController {
         rpc List(UserListRequest) returns (stream User) {}
         rpc Create(User) returns (User) {}
-        rpc Retrieve(User) returns (User) {}
+        rpc Retrieve(UserRetrieveRequest) returns (User) {}
         rpc Update(User) returns (User) {}
         rpc Destroy(User) returns (google.protobuf.Empty) {}
     }
@@ -74,6 +74,10 @@ Our first step is to define the gRPC service and messages, create a file
     }
 
     message UserListRequest {
+    }
+
+    message UserRetrieveRequest {
+        int32 id = 1;
     }
 
 Or you can generate it automatically based on ``User`` model::

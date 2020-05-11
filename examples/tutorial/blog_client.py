@@ -11,7 +11,7 @@ with grpc.insecure_channel('localhost:50051') as channel:
     for post in stub.List(post_pb2.PostListRequest()):
         print(post, end='')
     print('----- Retrieve -----')
-    response = stub.Retrieve(post_pb2.Post(id=response.id))
+    response = stub.Retrieve(post_pb2.PostRetrieveRequest(id=response.id))
     print(response, end='')
     print('----- Update -----')
     response = stub.Update(post_pb2.Post(id=response.id, title='t2', content='c2'))
