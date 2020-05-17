@@ -11,7 +11,7 @@ Project setup
 -------------
 
 Create a new Django project named ``quickstart``, then start a new app called
-``demo``::
+``account``::
 
     # Create a virtual environment
     python3 -m venv env
@@ -25,7 +25,7 @@ Create a new Django project named ``quickstart``, then start a new app called
     # Create a new project and a new application
     django-admin startproject quickstart
     cd quickstart
-    django-admin startapp demo
+    django-admin startapp account
 
 Now sync the database::
 
@@ -48,13 +48,13 @@ Defining protos
 ---------------
 
 Our first step is to define the gRPC service and messages, create a file
-``quickstart/demo.proto`` next to ``quickstart/manage.py``:
+``quickstart/account.proto`` next to ``quickstart/manage.py``:
 
 .. code-block:: protobuf
 
     syntax = "proto3";
 
-    package demo;
+    package account;
 
     import "google/protobuf/empty.proto";
 
@@ -82,18 +82,18 @@ Our first step is to define the gRPC service and messages, create a file
 
 Or you can generate it automatically based on ``User`` model::
 
-    python manage.py generateproto --model django.contrib.auth.models.User --fields id,username,email,groups --file demo.proto
+    python manage.py generateproto --model django.contrib.auth.models.User --fields id,username,email,groups --file account.proto
 
 Next we need to generate gRPC code, from the ``quickstart`` directory, run::
 
-    python -m grpc_tools.protoc --proto_path=./ --python_out=./ --grpc_python_out=./ ./demo.proto
+    python -m grpc_tools.protoc --proto_path=./ --python_out=./ --grpc_python_out=./ ./account.proto
 
 
 Writing serializers
 -------------------
 
 Then we're going to define a serializer, let's create a new module named
-``demo/serializers.py``::
+``account/serializers.py``::
 
     from django.contrib.auth.models import User
     from rest_framework import serializers
@@ -108,12 +108,12 @@ Then we're going to define a serializer, let's create a new module named
 Writing services
 ----------------
 
-Now we'd write some a service, create ``demo/services.py``::
+Now we'd write some a service, create ``account/services.py``::
 
     from django.contrib.auth.models import User
     from django_grpc_framework import generics
-    from demo.serializers import UserSerializer
-    import demo_pb2
+    from account.serializers import UserSerializer
+    import account_pb2
 
 
     class UserService(generics.ModelService):
@@ -122,7 +122,7 @@ Now we'd write some a service, create ``demo/services.py``::
         """
         queryset = User.objects.all().order_by('-date_joined')
         serializer_class = UserSerializer
-        protobuf_class = demo_pb2.User
+        protobuf_class = account_pb2.User
 
 
 Register handlers
@@ -130,33 +130,19 @@ Register handlers
 
 Ok, let's wire up the gRPC handlers, edit ``quickstart/urls.py``::
 
-    import demo_pb2_grpc
-    from demo.services import UserService
+    import account_pb2_grpc
+    from account.services import UserService
 
 
     urlpatterns = []
 
 
     def grpc_handlers(server):
-        demo_pb2_grpc.add_UserControllerServicer_to_server(UserService.as_servicer(), server)
+        account_pb2_grpc.add_UserControllerServicer_to_server(UserService.as_servicer(), server)
 
 We're done, the project layout should look like::
 
     .
-    ./demo
-    ./demo/migrations
-    ./demo/migrations/__init__.py
-    ./demo/services.py
-    ./demo/models.py
-    ./demo/serializers.py
-    ./demo/__init__.py
-    ./demo/apps.py
-    ./demo/admin.py
-    ./demo/tests.py
-    ./demo/views.py
-    ./demo.proto
-    ./demo_pb2.py
-    ./demo_pb2_grpc.py
     ./quickstart
     ./quickstart/asgi.py
     ./quickstart/__init__.py
@@ -164,6 +150,20 @@ We're done, the project layout should look like::
     ./quickstart/urls.py
     ./quickstart/wsgi.py
     ./manage.py
+    ./account
+    ./account/migrations
+    ./account/migrations/__init__.py
+    ./account/services.py
+    ./account/models.py
+    ./account/serializers.py
+    ./account/__init__.py
+    ./account/apps.py
+    ./account/admin.py
+    ./account/tests.py
+    ./account/views.py
+    ./account.proto
+    ./account_pb2_grpc.py
+    ./account_pb2.py
 
 
 Calling our service
@@ -176,11 +176,11 @@ Fire up the server with development mode::
 We can now access our service from the gRPC client::
 
     import grpc
-    import demo_pb2
-    import demo_pb2_grpc
+    import account_pb2
+    import account_pb2_grpc
 
 
     with grpc.insecure_channel('localhost:50051') as channel:
-        stub = demo_pb2_grpc.UserControllerStub(channel)
-        for user in stub.List(demo_pb2.UserListRequest()):
+        stub = account_pb2_grpc.UserControllerStub(channel)
+        for user in stub.List(account_pb2.UserListRequest()):
             print(user, end='')

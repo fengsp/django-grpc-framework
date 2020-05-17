@@ -6,17 +6,17 @@ Run the ``python manage.py shell``, create two groups first::
     Group.objects.create(name='group2')
 """
 import grpc
-import demo_pb2_grpc
-import demo_pb2
+import account_pb2_grpc
+import account_pb2
 
 
 with grpc.insecure_channel('localhost:50051') as channel:
-    stub = demo_pb2_grpc.UserControllerStub(channel)
+    stub = account_pb2_grpc.UserControllerStub(channel)
     print('----- Create -----')
-    request = demo_pb2.User(username='tom', email='tom@demo.com')
+    request = account_pb2.User(username='tom', email='tom@account.com')
     request.groups.extend([1,2])
     response = stub.Create(request)
     print(response, end='')
     print('----- List -----')
-    for user in stub.List(demo_pb2.UserListRequest()):
+    for user in stub.List(account_pb2.UserListRequest()):
         print(user, end='')

@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package demo;
+package account;
 
 import "google/protobuf/empty.proto";
 
