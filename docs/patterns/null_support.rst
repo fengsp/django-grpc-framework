@@ -3,4 +3,4 @@
 Null Support
 ============
 
-TODO
+In proto3, all fields are never null.

@@ -2,6 +2,7 @@ Django gRPC Framework
 =====================
 
 Django gRPC framework is a toolkit for building gRPC services with Django.
+Officially we only support proto3.
 
 
 User's Guide

@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package hrm;
+
+import "google/protobuf/wrappers.proto";
+
+service PersonController {
+    rpc PartialUpdate(PersonPartialUpdateRequest) returns (Person) {}
+}
+
+message Person {
+    int32 id = 1;
+    string name = 2;
+    string email = 3;
+}
+
+message PersonPartialUpdateRequest {
+    int32 id = 1;
+    google.protobuf.StringValue name = 2;
+    google.protobuf.StringValue email = 3;
+}

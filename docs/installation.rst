@@ -32,7 +32,7 @@ It is time to get the django grpc framework::
 
     $ pip install djangogrpcframework
     $ pip install django
-    $ pip install djangorestframework         # Serialization support
+    $ pip install djangorestframework
     $ pip install grpcio
     $ pip install grpcio-tools
 
