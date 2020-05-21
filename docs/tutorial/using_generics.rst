@@ -18,22 +18,20 @@ operations are implemented in gRPC framework's mixin classes.
 Let's take a look at how we can compose the services by using the mixin
 classes, here is our ``blog/services`` file again::
 
-    from blog_proto import post_pb2
     from blog.models import Post
-    from blog.serializers import PostSerializer
+    from blog.serializers import PostProtoSerializer
     from django_grpc_framework import mixins
     from django_grpc_framework import generics
 
 
     class PostService(mixins.ListModelMixin,
-                      mixins.CreateModelMixin,
-                      mixins.RetrieveModelMixin,
-                      mixins.UpdateModelMixin,
-                      mixins.DestroyModelMixin,
-                      generics.GenericService):
+                     mixins.CreateModelMixin,
+                     mixins.RetrieveModelMixin,
+                     mixins.UpdateModelMixin,
+                     mixins.DestroyModelMixin,
+                     generics.GenericService):
         queryset = Post.objects.all()
-        serializer_class = PostSerializer
-        protobuf_class = post_pb2.Post
+        serializer_class = PostProtoSerializer
 
 We are building our service with ``GenericService``, and adding in
 ``ListModelMixin``,``CreateModelMixin``, etc.  The base class provides the
@@ -49,5 +47,4 @@ one already mixed-in generic services::
 
     class PostService(generics.ModelService):
         queryset = Post.objects.all()
-        serializer_class = PostSerializer
-        protobuf_class = post_pb2.Post
+        serializer_class = PostProtoSerializer

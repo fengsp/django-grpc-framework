@@ -7,25 +7,22 @@ Django gRPC framework provides an ``Service`` class, which is pretty much the
 same as using a regular gRPC generated servicer interface.  For example::
 
     import grpc
-    from google.protobuf.json_format import MessageToDict, ParseDict
     from django_grpc_framework.services import Service
-    from blog_proto import post_pb2
     from blog.models import Post
-    from blog.serializers import PostSerializer
+    from blog.serializers import PostProtoSerializer
 
 
     class PostService(Service):
-        def get_object(self):
-            """You can access the self.request and self.context here."""
+        def get_object(self, pk):
             try:
-                return Post.objects.get(pk=self.request.id)
+                return Post.objects.get(pk=pk)
             except Post.DoesNotExist:
                 self.context.abort(grpc.StatusCode.NOT_FOUND, 'Post:%s not found!' % pk)
 
         def Retrieve(self, request, context):
-            post = self.get_object()
-            serializer = PostSerializer(post)
-            return ParseDict(serializer.data, post_pb2.Post())
+            post = self.get_object(request.id)
+            serializer = PostProtoSerializer(post)
+            return serializer.message
 
 
 Service instance attributes

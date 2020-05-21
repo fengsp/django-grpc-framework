@@ -2,7 +2,6 @@ TODO
 ====
 
 - relationships
-- null support
 - error handling
 - add BulkCreate\BulkDestroy\BulkUpdate with stream-unary mode  ?
 - authentication

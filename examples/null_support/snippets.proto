@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package snippets;
+
+import "google/protobuf/struct.proto";
+
+service SnippetController {
+    rpc Update(Snippet) returns (Snippet) {}
+}
+
+message NullableString {
+    oneof kind {
+        string value = 1;
+        google.protobuf.NullValue null = 2;
+    }
+}
+
+message Snippet {
+    int32 id = 1;
+    string title = 2;
+    NullableString language = 3;
+}

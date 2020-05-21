@@ -1,6 +1,5 @@
-from blog_proto import post_pb2
 from blog.models import Post
-from blog.serializers import PostSerializer
+from blog.serializers import PostProtoSerializer
 from django_grpc_framework import mixins
 from django_grpc_framework import generics
 
@@ -13,12 +12,10 @@ class PostService(mixins.ListModelMixin,
                   mixins.DestroyModelMixin,
                   generics.GenericService):
     queryset = Post.objects.all()
-    serializer_class = PostSerializer
-    protobuf_class = post_pb2.Post
+    serializer_class = PostProtoSerializer
 """
 
 
 class PostService(generics.ModelService):
     queryset = Post.objects.all()
-    serializer_class = PostSerializer
-    protobuf_class = post_pb2.Post
+    serializer_class = PostProtoSerializer

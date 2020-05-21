@@ -1,20 +1,19 @@
 from django.contrib.auth.models import User
-from rest_framework import serializers
-from django_grpc_framework import generics
+from django_grpc_framework import generics, serializers
 import demo_pb2
 import demo_pb2_grpc
 
 
-class UserSerializer(serializers.ModelSerializer):
+class UserProtoSerializer(serializers.ModelProtoSerializer):
     class Meta:
         model = User
+        proto_class = demo_pb2.User
         fields = ['id', 'username', 'email']
 
 
 class UserService(generics.ModelService):
     queryset = User.objects.all()
-    serializer_class = UserSerializer
-    protobuf_class = demo_pb2.User
+    serializer_class = UserProtoSerializer
 
 
 urlpatterns = []

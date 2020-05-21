@@ -16,8 +16,6 @@ class GenericService(services.Service):
     queryset = None
     # Either set this attribute or override ``get_serializer_class()``.
     serializer_class = None
-    # Either set this attribute or override ``get_protobuf_class``.
-    protobuf_class = None
     # Set this if you want to use object lookups other than id
     lookup_field = None
     lookup_request_field = None
@@ -61,18 +59,6 @@ class GenericService(services.Service):
             % self.__class__.__name__
         )
         return self.serializer_class
-
-    def get_protobuf_class(self):
-        """
-        Return the class to use for the protobuf message.
-        Defaults to using `self.protobuf_class`.
-        """
-        assert self.protobuf_class is not None, (
-            "'%s' should either include a `protobuf_class` attribute, "
-            "or override the `get_protobuf_class()` method."
-            % self.__class__.__name__
-        )
-        return self.protobuf_class
 
     def get_object(self):
         """

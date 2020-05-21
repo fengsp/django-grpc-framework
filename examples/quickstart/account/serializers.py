@@ -1,8 +1,10 @@
 from django.contrib.auth.models import User
-from rest_framework import serializers
+from django_grpc_framework import serializers
+import account_pb2
 
 
-class UserSerializer(serializers.ModelSerializer):
+class UserProtoSerializer(serializers.ModelProtoSerializer):
     class Meta:
         model = User
+        proto_class = account_pb2.User
         fields = ['id', 'username', 'email', 'groups']

@@ -11,16 +11,14 @@ ressable generic services.
 
 For example::
 
-    from blog_proto import post_pb2
-    from blog.models import Post
-    from blog.serializers import PostSerializer
-    from django_grpc_framework import generics
+   from blog.models import Post
+   from blog.serializers import PostProtoSerializer
+   from django_grpc_framework import generics
 
 
-    class PostService(generics.ModelService):
-        queryset = Post.objects.all()
-        serializer_class = PostSerializer
-        protobuf_class = post_pb2.Post
+   class PostService(generics.ModelService):
+      queryset = Post.objects.all()
+      serializer_class = PostProtoSerializer
 
 
 GenericService
@@ -45,9 +43,6 @@ The following attributes control the basic service behavior:
 - ``serializer_class`` - The serializer class that should be used for validating
   and deserializing input, and for serializing output. You must either set this
   attribute, or override the ``get_serializer_class()`` method.
-- ``protobuf_class`` - The protobuf class that should be used for create output
-  proto message object.  You must either set this attribute, or override the
-  ``get_protobuf_class()`` method.
 - ``lookup_field`` - The model field that should be used to for performing object
   lookup of individual model instances. Defaults to primary key field name.
 - ``lookup_request_field`` - The request field that should be used for object

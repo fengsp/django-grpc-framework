@@ -122,16 +122,18 @@ Create a Serializer class
 
 Before we implement our gRPC service, we need to provide a way of serializing
 and deserializing the post instances into protocol buffer messages.  We can
-do this by declaring ``rest_framework`` serializers, create a file in the ``blog``
-directory named ``serializers.py`` and add the following::
+do this by declaring serializers, create a file in the ``blog`` directory
+named ``serializers.py`` and add the following::
 
-    from rest_framework import serializers
+    from django_grpc_framework import serializers
     from blog.models import Post
+    from blog_proto import post_pb2
 
 
-    class PostSerializer(serializers.ModelSerializer):
+    class PostProtoSerializer(serializers.ModelProtoSerializer):
         class Meta:
             model = Post
+            proto_class = post_pb2.Post
             fields = ['id', 'title', 'content']
 
 
@@ -142,27 +144,24 @@ With our serializer class, we'll write a regular grpc service, create a file
 in the ``blog`` directory named ``services.py`` and add the following::
 
     import grpc
-    from google.protobuf.json_format import MessageToDict, ParseDict
     from google.protobuf import empty_pb2
     from django_grpc_framework.services import Service
-    from blog_proto import post_pb2
     from blog.models import Post
-    from blog.serializers import PostSerializer
+    from blog.serializers import PostProtoSerializer
 
 
     class PostService(Service):
         def List(self, request, context):
             posts = Post.objects.all()
-            serializer = PostSerializer(posts, many=True)
-            for post_data in serializer.data:
-                yield ParseDict(post_data, post_pb2.Post())
+            serializer = PostProtoSerializer(posts, many=True)
+            for msg in serializer.message:
+                yield msg
 
         def Create(self, request, context):
-            data = MessageToDict(request, including_default_value_fields=True)
-            serializer = PostSerializer(data=data)
+            serializer = PostProtoSerializer(message=request)
             serializer.is_valid(raise_exception=True)
             serializer.save()
-            return ParseDict(serializer.data, post_pb2.Post())
+            return serializer.message
 
         def get_object(self, pk):
             try:
@@ -172,16 +171,15 @@ in the ``blog`` directory named ``services.py`` and add the following::
 
         def Retrieve(self, request, context):
             post = self.get_object(request.id)
-            serializer = PostSerializer(post)
-            return ParseDict(serializer.data, post_pb2.Post())
+            serializer = PostProtoSerializer(post)
+            return serializer.message
 
         def Update(self, request, context):
             post = self.get_object(request.id)
-            data = MessageToDict(request, including_default_value_fields=True)
-            serializer = PostSerializer(post, data=data)
+            serializer = PostProtoSerializer(post, message=request)
             serializer.is_valid(raise_exception=True)
             serializer.save()
-            return ParseDict(serializer.data, post_pb2.Post())
+            return serializer.message
 
         def Destroy(self, request, context):
             post = self.get_object(request.id)

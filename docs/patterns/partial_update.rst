@@ -60,30 +60,23 @@ Here is the client usage::
 
 The service implementation::
 
-    from google.protobuf.json_format import MessageToDict, ParseDict
-
-
     class PersonService(generics.GenericService):
         queryset = Person.objects.all()
-        serializer_class = PersonSerializer
-        protobuf_class = hrm_pb2.Person
+        serializer_class = PersonProtoSerializer
 
         def PartialUpdate(self, request, context):
             instance = self.get_object()
-            data = MessageToDict(request, including_default_value_fields=True)
-            serializer = self.get_serializer(instance, data=data, partial=True)
+            serializer = self.get_serializer(instance, message=request, partial=True)
             serializer.is_valid(raise_exception=True)
             serializer.save()
-            protobuf_class = self.get_protobuf_class()
-            return ParseDict(serializer.data, protobuf_class())
+            return serializer.message
 
 Or you can just use ``PartialUpdateModelMixin`` to get the same behavior::
 
     class PersonService(mixins.PartialUpdateModelMixin,
                         generics.GenericService):
         queryset = Person.objects.all()
-        serializer_class = PersonSerializer
-        protobuf_class = hrm_pb2.Person
+        serializer_class = PersonProtoSerializer
 
 
 Repeated and map field absence
