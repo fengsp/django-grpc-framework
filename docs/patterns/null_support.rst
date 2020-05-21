@@ -86,6 +86,6 @@ The service implementation::
 
 
     class SnippetService(mixins.UpdateModelMixin,
-                        generics.GenericService):
+                         generics.GenericService):
         queryset = Snippet.objects.all()
         serializer_class = SnippetProtoSerializer

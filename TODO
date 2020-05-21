@@ -1,9 +1,11 @@
 TODO
 ====
 
+- add docs for serializer
 - relationships
 - error handling
 - add BulkCreate\BulkDestroy\BulkUpdate with stream-unary mode  ?
 - authentication
 - logging
 - add testcases for project
+- filter support  ?
