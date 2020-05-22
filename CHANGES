@@ -5,7 +5,9 @@ Changelog
 Version 0.2
 -----------
 
-- Added ``RPCTestCase``
+- Added test module
+- Added proto serializers
+- Added proto generators
 
 
 Version 0.1
