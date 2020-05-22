@@ -73,12 +73,12 @@ Now edit the ``demo/urls.py`` module:
 .. code-block:: python
 
     from django.contrib.auth.models import User
-    from django_grpc_framework import generics, serializers
+    from django_grpc_framework import generics, proto_serializers
     import demo_pb2
     import demo_pb2_grpc
 
 
-    class UserProtoSerializer(serializers.ModelProtoSerializer):
+    class UserProtoSerializer(proto_serializers.ModelProtoSerializer):
         class Meta:
             model = User
             proto_class = demo_pb2.User

@@ -19,7 +19,7 @@ instructions for building services.
    tutorial/index
    services
    generics
-   serializers
+   proto_serializers
    protos
    server
    testing

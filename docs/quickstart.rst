@@ -96,11 +96,11 @@ Then we're going to define a serializer, let's create a new module named
 ``account/serializers.py``::
 
     from django.contrib.auth.models import User
-    from django_grpc_framework import serializers
+    from django_grpc_framework import proto_serializers
     import account_pb2
 
 
-    class UserProtoSerializer(serializers.ModelProtoSerializer):
+    class UserProtoSerializer(proto_serializers.ModelProtoSerializer):
         class Meta:
             model = User
             proto_class = account_pb2.User
