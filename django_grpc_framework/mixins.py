@@ -6,7 +6,7 @@ class CreateModelMixin:
         """
         Create a model instance.
 
-        The request shoule be a proto message of ``serializer.Meta.proto_class``.
+        The request should be a proto message of ``serializer.Meta.proto_class``.
         If an object is created this returns a proto message of
         ``serializer.Meta.proto_class``.
         """
@@ -55,7 +55,7 @@ class UpdateModelMixin:
         """
         Update a model instance.
 
-        The request shoule be a proto message of ``serializer.Meta.proto_class``.
+        The request should be a proto message of ``serializer.Meta.proto_class``.
         If an object is updated this returns a proto message of
         ``serializer.Meta.proto_class``.
         """
