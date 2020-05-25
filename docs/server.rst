@@ -23,6 +23,25 @@ Run the server with a certain address::
 Configuration
 -------------
 
+Root handlers hook
+```````````````````
+
+We need a hanlders hook function to add all servicers to the server, for
+example::
+
+    def grpc_handlers(server):
+        demo_pb2_grpc.add_UserControllerServicer_to_server(UserService.as_servicer(), server)
+
+You can set the root handlers hook using the ``ROOT_HANDLERS_HOOK`` setting
+key, for example set the following in your ``settings.py`` file::
+
+    GRPC_FRAMEWORK = {
+        ...
+        'ROOT_HANDLERS_HOOK': 'path.to.your.curtom_grpc_handlers',
+    }
+
+The default setting is ``'{settings.ROOT_URLCONF}.grpc_handlers'``.
+
 Setting the server interceptors
 ```````````````````````````````
 
