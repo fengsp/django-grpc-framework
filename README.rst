@@ -35,7 +35,9 @@ Installation
     
     $ pip install djangogrpcframework
 
-Add ``django_grpc_framework`` to ``INSTALLED_APPS`` setting::
+Add ``django_grpc_framework`` to ``INSTALLED_APPS`` setting:
+
+.. code-block:: python
 
     INSTALLED_APPS = [
         ...
