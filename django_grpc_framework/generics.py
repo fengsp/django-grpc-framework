@@ -1,11 +1,12 @@
-from django.db.models.query import QuerySet
-from django.shortcuts import get_object_or_404
-from django.core.exceptions import ValidationError
-from django.http import Http404
 import grpc
+from django.core.exceptions import ValidationError
+from django.db.models.query import QuerySet
+from django.http import Http404
+from django.shortcuts import get_object_or_404
+from rest_framework.settings import api_settings
 
-from django_grpc_framework.utils import model_meta
 from django_grpc_framework import mixins, services
+from django_grpc_framework.utils import model_meta
 
 
 class GenericService(services.Service):
@@ -19,6 +20,8 @@ class GenericService(services.Service):
     # Set this if you want to use object lookups other than id
     lookup_field = None
     lookup_request_field = None
+
+    filter_backends = api_settings.DEFAULT_FILTER_BACKENDS
 
     def get_queryset(self):
         """
@@ -110,8 +113,9 @@ class GenericService(services.Service):
 
     def filter_queryset(self, queryset):
         """Given a queryset, filter it, returning a new queryset."""
+        for backend in list(self.filter_backends):
+            queryset = backend().filter_queryset(self.request, queryset, self)
         return queryset
-
 
 class CreateService(mixins.CreateModelMixin,
                     GenericService):
