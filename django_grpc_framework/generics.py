@@ -2,6 +2,7 @@ import grpc
 from django.core.exceptions import ValidationError
 from django.db.models.query import QuerySet
 from django.http import Http404
+from django.http.request import HttpRequest, QueryDict
 from django.shortcuts import get_object_or_404
 from rest_framework.settings import api_settings
 
@@ -113,9 +114,15 @@ class GenericService(services.Service):
 
     def filter_queryset(self, queryset):
         """Given a queryset, filter it, returning a new queryset."""
+        keys = self.request.DESCRIPTOR.fields_by_name.keys()
+        request = HttpRequest()
+        query_params = QueryDict('', mutable=True)
+        query_params.update(dict(zip([k for k in keys], [getattr(self.request, k) for k in keys])))
+        request.query_params = query_params
         for backend in list(self.filter_backends):
-            queryset = backend().filter_queryset(self.request, queryset, self)
+            queryset = backend().filter_queryset(request, queryset, self)
         return queryset
+
 
 class CreateService(mixins.CreateModelMixin,
                     GenericService):
