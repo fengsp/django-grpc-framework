@@ -35,11 +35,19 @@ class Command(BaseCommand):
                 'the auto-reloader and run checks.'
             )
         )
+        parser.add_argument(
+            "--server-key", dest="server_key", help="Server Key Certificate path"
+        )
+        parser.add_argument(
+            "--server-crt", dest="server_crt", help="Server CTR Certificate path"
+        )
 
     def handle(self, *args, **options):
         self.address = options['address']
         self.development_mode = options['development_mode']
         self.max_workers = options['max_workers']
+        self.server_key = options["server_key"]
+        self.server_crt = options["server_crt"]
         self.run(**options)
 
     def run(self, **options):
@@ -61,7 +69,20 @@ class Command(BaseCommand):
         server = grpc.server(futures.ThreadPoolExecutor(max_workers=self.max_workers),
                              interceptors=grpc_settings.SERVER_INTERCEPTORS)
         grpc_settings.ROOT_HANDLERS_HOOK(server)
-        server.add_insecure_port(self.address)
+        if self.server_crt and self.server_key:
+            # read in key and certificate
+            private_key = open(self.server_key, "rb").read()
+            certificate_chain = open(self.server_crt, "rb").read()
+
+            # create server credentials
+            server_credentials = grpc.ssl_server_credentials(
+                ((private_key, certificate_chain),)
+            )
+
+            # add secure port using crendentials
+            server.add_secure_port(self.address, server_credentials)
+        else:
+            server.add_insecure_port(self.address)
         server.start()
         server.wait_for_termination()
 
