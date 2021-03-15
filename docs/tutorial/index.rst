@@ -8,7 +8,7 @@ In this tutorial, we will create a simple blog rpc server.  You can get the
 source code in `tutorial example`_.
 
 .. _tutorial example:
-   https://github.com/fengsp/django-grpc-framework/tree/master/examples/tutorial
+   https://github.com/algori-io/django-grpc-framework/tree/master/examples/tutorial
 
 .. toctree::
    :maxdepth: 2
