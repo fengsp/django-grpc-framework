@@ -57,3 +57,15 @@ in your ``settings.py`` file::
             'path.to.DoAnotherThingInterceptor',
         ]
     }
+
+Exception handler
+```````````````````
+
+The exception handler must also be configured in your settings, using the
+``EXCEPTION_HANDLER`` setting key, for example set the following in your
+``settings.py`` file::
+
+    GRPC_FRAMEWORK = {
+        ...
+        'EXCEPTION_HANDLER': 'django_grpc_framework.services.exception_handler',
+    }

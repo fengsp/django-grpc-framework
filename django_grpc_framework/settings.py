@@ -4,6 +4,7 @@ For example your project's `settings.py` file might look like this:
 
 GRPC_FRAMEWORK = {
     'ROOT_HANDLERS_HOOK': 'path.to.my.custom_grpc_handlers',
+    'EXCEPTION_HANDLER': 'django_grpc_framework.services.exception_handler',
 }
 
 This module provides the `grpc_setting` object, that is used to access
@@ -21,6 +22,12 @@ DEFAULTS = {
 
     # gRPC server configuration
     'SERVER_INTERCEPTORS': None,
+
+    # Exception handling
+    'EXCEPTION_HANDLER': None,
+
+    # Generic view behavior
+    'DEFAULT_PAGINATION_CLASS': None,
 }
 
 
@@ -28,6 +35,8 @@ DEFAULTS = {
 IMPORT_STRINGS = [
     'ROOT_HANDLERS_HOOK',
     'SERVER_INTERCEPTORS',
+    'EXCEPTION_HANDLER',
+    'DEFAULT_PAGINATION_CLASS',
 ]
 
 

@@ -7,6 +7,8 @@ import grpc
 from django_grpc_framework.utils import model_meta
 from django_grpc_framework import mixins, services
 
+from django_grpc_framework.settings import grpc_settings
+
 
 class GenericService(services.Service):
     """
@@ -19,6 +21,9 @@ class GenericService(services.Service):
     # Set this if you want to use object lookups other than id
     lookup_field = None
     lookup_request_field = None
+
+    # The style to use for queryset pagination.
+    pagination_class = grpc_settings.DEFAULT_PAGINATION_CLASS
 
     def get_queryset(self):
         """
@@ -111,6 +116,35 @@ class GenericService(services.Service):
     def filter_queryset(self, queryset):
         """Given a queryset, filter it, returning a new queryset."""
         return queryset
+
+    @property
+    def paginator(self):
+        """
+        The paginator instance associated with the view, or `None`.
+        """
+        if not hasattr(self, '_paginator'):
+            if self.pagination_class is None:
+                self._paginator = None
+            else:
+                self._paginator = self.pagination_class()
+        return self._paginator
+
+    def paginate_queryset(self, queryset):
+        """
+        Return a single page of results, or `None` if pagination is disabled.
+        """
+        if self.paginator is None:
+            return None
+        return self.paginator.paginate_queryset(queryset,
+                                                self.request,
+                                                view=self)
+
+    def get_paginated_response(self, data):
+        """
+        Return a paginated style `Response` object for the given output data.
+        """
+        assert self.paginator is not None
+        return self.paginator.get_paginated_response(data)
 
 
 class CreateService(mixins.CreateModelMixin,
