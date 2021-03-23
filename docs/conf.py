@@ -18,8 +18,8 @@ import sys
 # -- Project information -----------------------------------------------------
 
 project = 'django-grpc-framework'
-copyright = '2020, Shipeng Feng'
-author = 'Shipeng Feng'
+copyright = '2021, Algori.io'
+author = 'Algori.io'
 
 # The full version, including alpha/beta/rc tags
 import pkg_resources
@@ -61,7 +61,7 @@ html_theme = 'alabaster'
 
 html_theme_options = {
     'github_button': True,
-    'github_user': 'fengsp',
+    'github_user': 'algori-io',
     'github_repo': 'django-grpc-framework',
 }
 

@@ -7,8 +7,8 @@ Django gRPC Framework
 .. image:: https://readthedocs.org/projects/djangogrpcframework/badge/?version=latest
    :target: https://readthedocs.org/projects/djangogrpcframework/badge/?version=latest
 
-.. image:: https://travis-ci.org/fengsp/django-grpc-framework.svg?branch=master
-   :target: https://travis-ci.org/fengsp/django-grpc-framework.svg?branch=master
+.. image:: https://travis-ci.org/algori-io/django-grpc-framework.svg?branch=master
+   :target: https://travis-ci.org/algori-io/django-grpc-framework.svg?branch=master
 
 .. image:: https://img.shields.io/pypi/pyversions/djangogrpcframework
    :target: https://img.shields.io/pypi/pyversions/djangogrpcframework
@@ -58,7 +58,7 @@ model-backed service for accessing users, startup a new project:
 
 Generate ``.proto`` file demo.proto_:
 
-.. _demo.proto: https://github.com/fengsp/django-grpc-framework/blob/master/examples/demo/demo.proto
+.. _demo.proto: https://github.com/algori-io/django-grpc-framework/blob/master/examples/demo/demo.proto
 
 .. code-block:: bash
 
