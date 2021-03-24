@@ -1,12 +1,12 @@
 from functools import update_wrapper
 
 import grpc
-from django.db.models.query import QuerySet
 from django import db
+from django.db.models.query import QuerySet
 from django.http import Http404
-
-import grpc
 from rest_framework import exceptions
+
+from django_grpc_framework.settings import grpc_settings
 
 
 def find_unique_value_error(exc_detail):
@@ -47,6 +47,9 @@ def exception_handler(exc: Exception, context) -> None:  # noqa: WPS231
 
 
 class Service:
+
+    settings = grpc_settings
+
     def __init__(self, **kwargs):
         for key, value in kwargs.items():
             setattr(self, key, value)
@@ -73,6 +76,7 @@ class Service:
                     'as the result will be cached and reused between requests.'
                     ' Use `.all()` or call `.get_queryset()` instead.'
                 )
+
             cls.queryset._fetch_all = force_evaluation
 
         class Servicer:
@@ -93,6 +97,7 @@ class Service:
                         self.handle_exception(exc)
                     finally:
                         db.close_old_connections()
+
                 update_wrapper(handler, getattr(cls, action))
                 return handler
 

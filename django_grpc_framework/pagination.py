@@ -1,22 +1,23 @@
 from collections import OrderedDict
 
-from django.conf import settings
 from django.core.paginator import InvalidPage
 
 from rest_framework.exceptions import NotFound
 from rest_framework.pagination import _positive_int  # noqa: WPS450
-from rest_framework.pagination import PageNumberPagination
+from rest_framework.pagination import PageNumberPagination as BasePageNumberPagination
 
 from django_grpc_framework.settings import grpc_settings
+from django_grpc_framework.protobuf.json_format import parse_dict
 
 
-class Pagination(PageNumberPagination):
+class PageNumberPagination(BasePageNumberPagination):
     """Pagination class for service."""
 
     # Client can control the page size using this query parameter.
     # Default is 'None'. Set to eg 'page_size' to enable usage.
     page_size_query_param = None
     max_page_size = None
+    proto_class = None
 
     def paginate_queryset(self, queryset, request, view=None):
         """Paginate queryset or raise 'NotFound' on receiving invalid page number."""
@@ -60,9 +61,11 @@ class Pagination(PageNumberPagination):
 
     def get_paginated_response(self, data):  # noqa: WPS110
         """Return a paginated style `OrderedDict` object for the given output data."""
-        return OrderedDict([
+        response = OrderedDict([
             ('count', self.page.paginator.count),
             ('pageSize', self.page_size),
             ('totalPages', self.page.paginator.num_pages),
             ('results', data),
         ])
+        kwargs = {'ignore_unknown_fields': True}
+        return parse_dict(response, self.proto_class(), **kwargs)
