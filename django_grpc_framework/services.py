@@ -1,6 +1,5 @@
 from functools import update_wrapper
 
-import grpc
 from django import db
 from django.db.models.query import QuerySet
 from django.http import Http404
