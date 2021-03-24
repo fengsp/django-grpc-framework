@@ -23,7 +23,7 @@ class GenericService(services.Service):
     lookup_request_field = None
 
     # The style to use for queryset pagination.
-    pagination_class = grpc_settings.DEFAULT_PAGINATION_CLASS
+    pagination_class = None
 
     def get_queryset(self):
         """

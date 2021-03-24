@@ -123,6 +123,7 @@ Now we'd write some a service, create ``account/services.py``::
         """
         queryset = User.objects.all().order_by('-date_joined')
         serializer_class = UserProtoSerializer
+        pagination_class = PageNumberPagination
 
 
 Register handlers

@@ -13,6 +13,10 @@ from django_grpc_framework.protobuf.json_format import parse_dict
 class PageNumberPagination(BasePageNumberPagination):
     """Pagination class for service."""
 
+    # The default page size.
+    # Defaults to `None`, meaning pagination is disabled.
+    page_size = grpc_settings.PAGE_SIZE
+
     # Client can control the page size using this query parameter.
     # Default is 'None'. Set to eg 'page_size' to enable usage.
     page_size_query_param = None
@@ -61,6 +65,11 @@ class PageNumberPagination(BasePageNumberPagination):
 
     def get_paginated_response(self, data):  # noqa: WPS110
         """Return a paginated style `OrderedDict` object for the given output data."""
+        assert self.proto_class is not None, (
+            "'%s' should either include a `proto_class` attribute, "
+            "or override the `get_paginated_response()` method." %
+            self.__class__.__name__)
+
         response = OrderedDict([
             ('count', self.page.paginator.count),
             ('pageSize', self.page_size),

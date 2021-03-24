@@ -10,6 +10,7 @@ file might look like this::
     GRPC_FRAMEWORK = {
         'ROOT_HANDLERS_HOOK': 'project.urls.grpc_handlers',
         'EXCEPTION_HANDLER': 'django_grpc_framework.services.exception_handler',
+        'PAGE_SIZE': 10,
     }
 
 

@@ -14,7 +14,7 @@ setup(
     long_description=open('README.rst', 'r', encoding='utf-8').read(),
     url='https://github.com/algori-io/django-grpc-framework',
     author='Algori.io',
-    author_email='',
+    author_email='it@algori.io',
     packages=find_packages(),
     install_requires=[],
     python_requires=">=3.6",

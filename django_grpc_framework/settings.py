@@ -26,8 +26,8 @@ DEFAULTS = {
     # Exception handling
     'EXCEPTION_HANDLER': None,
 
-    # Generic view behavior
-    'DEFAULT_PAGINATION_CLASS': None,
+    # Pagination
+    'PAGE_SIZE': None,
 }
 
 
@@ -36,7 +36,6 @@ IMPORT_STRINGS = [
     'ROOT_HANDLERS_HOOK',
     'SERVER_INTERCEPTORS',
     'EXCEPTION_HANDLER',
-    'DEFAULT_PAGINATION_CLASS',
 ]
 
 
