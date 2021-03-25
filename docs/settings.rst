@@ -9,6 +9,8 @@ file might look like this::
 
     GRPC_FRAMEWORK = {
         'ROOT_HANDLERS_HOOK': 'project.urls.grpc_handlers',
+        'EXCEPTION_HANDLER': 'django_grpc_framework.services.exception_handler',
+        'PAGE_SIZE': 10,
     }
 
 
@@ -46,5 +48,11 @@ Configuration values
 
     An optional list of ServerInterceptor objects that observe and optionally
     manipulate the incoming RPCs before handing them over to handlers.
+
+    Default: ``None``
+
+.. py:data:: EXCEPTION_HANDLER
+
+    The exception handler must also be configured in your settings, using the EXCEPTION_HANDLER setting key.
 
     Default: ``None``

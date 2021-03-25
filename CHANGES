@@ -2,6 +2,20 @@ Changelog
 =========
 
 
+Version 0.4
+-----------
+
+- Add docs
+- Fix bugs
+
+
+Version 0.3
+-----------
+
+- Added exception handler
+- Added pagination
+
+
 Version 0.2
 -----------
 

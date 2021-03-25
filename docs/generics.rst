@@ -43,6 +43,9 @@ The following attributes control the basic service behavior:
 - ``serializer_class`` - The serializer class that should be used for validating
   and deserializing input, and for serializing output. You must either set this
   attribute, or override the ``get_serializer_class()`` method.
+- ``pagination_class`` - The pagination class that should be used for pagination
+  style, although you might want to vary individual aspects of the pagination,
+  such as default or maximum page size.
 - ``lookup_field`` - The model field that should be used to for performing object
   lookup of individual model instances. Defaults to primary key field name.
 - ``lookup_request_field`` - The request field that should be used for object
