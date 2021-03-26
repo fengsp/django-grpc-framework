@@ -91,6 +91,7 @@ class Command(BaseCommand):
         try:
             self._serve()
         except OSError as e:
+            print('**** Error *****')
             # Use helpful error messages instead of ugly tracebacks.
             ERRORS = {
                 errno.EACCES: "You don't have permission to access that port.",

@@ -1,23 +1,7 @@
-Django gRPC Framework
-=====================
+Socotec.io Django gRPC Framework
+================================
 
-.. image:: https://img.shields.io/pypi/v/djangogrpcframework.svg
-   :target: https://img.shields.io/pypi/v/djangogrpcframework.svg
-
-.. image:: https://readthedocs.org/projects/djangogrpcframework/badge/?version=latest
-   :target: https://readthedocs.org/projects/djangogrpcframework/badge/?version=latest
-
-.. image:: https://travis-ci.org/fengsp/django-grpc-framework.svg?branch=master
-   :target: https://travis-ci.org/fengsp/django-grpc-framework.svg?branch=master
-
-.. image:: https://img.shields.io/pypi/pyversions/djangogrpcframework
-   :target: https://img.shields.io/pypi/pyversions/djangogrpcframework
-
-.. image:: https://img.shields.io/pypi/l/djangogrpcframework
-   :target: https://img.shields.io/pypi/l/djangogrpcframework
-
-Django gRPC framework is a toolkit for building gRPC services, inspired by
-djangorestframework.
+Django gRPC framework is a toolkit for building gRPC services, inspired by  django-grpc-framework.
 
 
 Requirements
@@ -28,37 +12,24 @@ Requirements
 - gRPC, gRPC tools, proto3
 
 
-Installation
-------------
+Quick start
+-----------
 
-.. code-block:: bash
-    
-    $ pip install djangogrpcframework
-
-Add ``django_grpc_framework`` to ``INSTALLED_APPS`` setting:
+1. Add ``socotec_grpc_framework`` to ``INSTALLED_APPS`` setting:
 
 .. code-block:: python
 
     INSTALLED_APPS = [
         ...
-        'django_grpc_framework',
+        'socotec_grpc_framework',
     ]
 
 
 Demo
 ----
 
-Here is a quick example of using gRPC framework to build a simple
-model-backed service for accessing users, startup a new project:
-
-.. code-block:: bash
-    
-    $ django-admin startproject demo
-    $ python manage.py migrate
-
 Generate ``.proto`` file demo.proto_:
 
-.. _demo.proto: https://github.com/fengsp/django-grpc-framework/blob/master/examples/demo/demo.proto
 
 .. code-block:: bash
 
@@ -74,11 +45,23 @@ Now edit the ``demo/urls.py`` module:
 
 .. code-block:: python
 
+import account_pb2_grpc
+from account.services import UserService
+
+urlpatterns = []
+
+def grpc_handlers(server):
+    demo_pb2_grpc.add_UserControllerServicer_to_server(UserService.as_servicer(), server)
+
+
+Now edit the ``demo/serializers.py`` module:
+
+.. code-block:: python
+
     from django.contrib.auth.models import User
     from django_grpc_framework import generics, proto_serializers
     import demo_pb2
     import demo_pb2_grpc
-
 
     class UserProtoSerializer(proto_serializers.ModelProtoSerializer):
         class Meta:
@@ -87,14 +70,14 @@ Now edit the ``demo/urls.py`` module:
             fields = ['id', 'username', 'email']
 
 
+Then edit the ``demo/services.py`` module:
+
+.. code-block:: python
+
     class UserService(generics.ModelService):
         queryset = User.objects.all()
         serializer_class = UserProtoSerializer
 
-
-    urlpatterns = []
-    def grpc_handlers(server):
-        demo_pb2_grpc.add_UserControllerServicer_to_server(UserService.as_servicer(), server)
 
 That's it, we're done!
 
