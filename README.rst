@@ -15,13 +15,13 @@ Requirements
 Quick start
 -----------
 
-1. Add ``socotec_grpc_framework`` to ``INSTALLED_APPS`` setting:
+1. Add ``django_socio_grpc`` to ``INSTALLED_APPS`` setting:
 
 .. code-block:: python
 
     INSTALLED_APPS = [
         ...
-        'socotec_grpc_framework',
+        'django_socio_grpc',
     ]
 
 
