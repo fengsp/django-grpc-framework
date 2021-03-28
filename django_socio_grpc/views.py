@@ -52,10 +52,7 @@ class grpcClient():
 		if self.method in  self.methodService:
 			self.queryArg = self.methodService[self.method]
 		else:
-			self._statusGRPC = False
-			self.error = 901
-			self.reasonError = 'Invalid Method [%s]' % self.method
-			self.errorProcess(901, custom=True)
+			self.prepareError(901, reason='Invalid Method [%s]' % self.method)
 			return
 	
 		# ------------------------------------
@@ -67,7 +64,8 @@ class grpcClient():
 			self.directoryService   = self.microserviceObject.directory
 			self.modeResult         = self.microserviceObject.result
 		else:
-			self._statusGRPC = False
+			self.prepareError(902, reason='Invalid Service [%s]' % self.service)
+			return
 	
 		# --------------------------------
 		# --  get Service Data Model   ---
@@ -85,22 +83,42 @@ class grpcClient():
 					self.update     = methodObject.is_update
 					self.modeResult = methodObject.result
 					self.queryArg   = methodObject.input
+				else:
+					self.prepareError(904, reason='No Method [%s] defined for Service [%s]' % (self.method, self.service))
+					return
 				# --------------------------------------------
 				# --- Get Query Fields                     ---
 				protoBuffFieldObject = grcpProtoBufFields.objects.filter(database=self.dataBaseObject, is_query=True)
-				for field in protoBuffFieldObject:
-					self.fields.append(field.field)
+				if len(protoBuffFieldObject) > 0:
+					for field in protoBuffFieldObject:
+						self.fields.append(field.field)
+				else:
+					self.prepareError(905, reason='No ProtoBuf Field defined for Service [%s]' % (self.service))
+					return
+			else:
+				self.prepareError(903, reason='No DataBase found for this Service [%s]' % self.service)
+				return
 			
 			# ------------------------------------------------
 			# ---  Get Stub service for this SQL Table     ---
 			# ------------------------------------------------
-			pb2GRPCFile   = '%s.%s_pb2_grpc' % (self.directoryService, self.service)
-			pb2GRPCMethod = '%sControllerStub' % (self.dataModel)
-			self.pb2GRPC  = getattr(importlib.import_module(pb2GRPCFile), pb2GRPCMethod)
+			try:
+				pb2GRPCFile   = '%s.%s_pb2_grpc' % (self.directoryService, self.service)
+				pb2GRPCMethod = '%sControllerStub' % (self.dataModel)
+				self.pb2GRPC  = getattr(importlib.import_module(pb2GRPCFile), pb2GRPCMethod)
+			except:
+				self.prepareError(906, reason='No pb2 grpc python file [%s] found for this Service [%s]' % (pb2GRPCFile, self.service))
+				return
+				
 			
 			# --------------------------------------------------
 			# --- Instantiate grpc Server Handle             ---
-			self.grpcHandle = grpc.insecure_channel('localhost:%s' % GRPC_CHANNEL_PORT) 
+			try:
+				self.grpcHandle = grpc.insecure_channel('localhost:%s' % GRPC_CHANNEL_PORT) 
+			except:
+				self.prepareError(907, reason='No grpc Server has been started or Invalid Port [%s]' % (GRPC_CHANNEL_PORT))
+				return
+				
 	
 
 	def statusGRPC(self):
@@ -129,6 +147,13 @@ class grpcClient():
 		send back microservice Result format
 		"""
 		return self.modeResult
+	
+	def prepareError(self, errCode, reason=''):
+		self._statusGRPC = False
+		self.error = errCode
+		self.reasonError = reason
+		self.errorProcess(errCode, custom=True)
+		
 		
 	# -------------------------------------------------------------------------------------------
 	# ---- P R E P A R E      A C C E S S    T H R O U G H     G R P C     S E R V E R      -----
@@ -173,17 +198,18 @@ class grpcClient():
 		try:
 			self.pb2Service  = getattr(importlib.import_module(pb2StubName), pb2StudMethod)
 		except:
-			self._statusGRPC = False
-			self.error = 900
-			self.reasonError = 'Invalid Method or Service [%s]' % pb2StudMethod
-			self.errorProcess(900, custom=True)
+			self.prepareError(900, reason='Invalid Method or Service [%s]' % pb2StudMethod)
 			return
 		
 		# -----------------------------------------------
 		# ---  Prepare Query for Services if required ---
 		# -----------------------------------------------
 		if self.queryArg == '':
-			self.listMethod = self.pb2Service()    # -- Prepare Stud Method (no Args required) ---
+			try:
+				self.listMethod = self.pb2Service()    # -- Prepare Stud Method (no Args required) ---
+			except:
+				self.prepareError(908, reason='Invalid Stub Request [%s.%s]' % (pb2StubName, pb2StudMethod ))
+				return
 		else:
 			kwargs = {}
 			for col in self.fields:
