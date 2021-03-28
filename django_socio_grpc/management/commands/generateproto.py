@@ -40,7 +40,7 @@ class Command(BaseCommand):
         # ----------------------------------------------
         # --- Proto Generation Process               ---
         # ----------------------------------------------
-        generator = ModelProtoGenerator(model=model, field_names=fields, package=package, path=filepath )
+        generator = ModelProtoGenerator(model=model, field_names=fields, package=package, filepath=filepath )
         if not generator.status_proto():
             self.validProto = False
             print ('**** ERROR   %s     *****' % generator.message_proto())
