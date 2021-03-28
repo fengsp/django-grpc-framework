@@ -10,7 +10,7 @@ from django.utils import autoreload
 from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
 
-from django_grpc_framework.settings import grpc_settings
+from django_grpc_framework.settings import grpc_settings, GRPC_CHANNEL_PORT
 
 
 class Command(BaseCommand):
@@ -21,7 +21,7 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument(
-            'address', nargs='?', default='[::]:50051',
+            'address', nargs='?', default='[::]:%s' % GRPC_CHANNEL_PORT,
             help='Optional address for which to open a port.'
         )
         parser.add_argument(

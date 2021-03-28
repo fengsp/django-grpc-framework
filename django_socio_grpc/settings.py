@@ -30,6 +30,8 @@ IMPORT_STRINGS = [
     'SERVER_INTERCEPTORS',
 ]
 
+GRPC_CHANNEL_PORT = '50051'   # === Main gRPC Server Channel ===
+
 
 def perform_import(val, setting_name):
     """
