@@ -8,7 +8,6 @@ services:
       context: .
 
     command: /bin/bash
-    # command: pipenv lock
     volumes:
       - .:/opt/code
     # ports:

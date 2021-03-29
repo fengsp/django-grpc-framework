@@ -3,11 +3,11 @@ jobs:
     executor: python/default
     steps:
       - checkout
+      - run: sed -i 's/__VERSION__/'$CIRCLE_TAG'/g' pyproject.toml
       - python/install-packages:
           pkg-manager: poetry
       - run: poetry build
       - run: poetry config pypi-token.pypi $PYPI_TOKEN
-      - run: sed -i 's/__VERSION__/$CIRCLE_TAG/g' pyproject.toml
       - run: poetry publish
 orbs:
   python: circleci/python@1.0.0
