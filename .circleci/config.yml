@@ -7,6 +7,7 @@ jobs:
           pkg-manager: poetry
       - run: poetry build
       - run: poetry config pypi-token.pypi $PYPI_TOKEN
+      - run: sed -i 's/__VERSION__/$CIRCLE_TAG/g' pyproject.toml
       - run: poetry publish
 orbs:
   python: circleci/python@1.0.0
@@ -15,8 +16,8 @@ workflows:
   main:
     jobs:
       - build:
-        filters:
-          branches:
-            only:
-              - master
-              - CI/automatiseDeployement
+          filters:
+            branches:
+              ignore: /^.*/
+            tags:
+              only: /^.(?:(\d+)\.)?(?:(\d+)\.)?(\d+)(\-rc)(\d*)$/
