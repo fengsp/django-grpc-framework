@@ -18,7 +18,7 @@ Install our packages::
 
     pip install django
     pip install djangorestframework   # we need the serialization
-    pip install djangogrpcframework
+    pip install django-socio-grpc
     pip install grpcio
     pip install grpcio-tools
 
