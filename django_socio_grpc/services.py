@@ -7,6 +7,10 @@ from django import db
 
 class Service:
     def __init__(self, **kwargs):
+        """
+        Set kwargs as self attributes.
+        """
+        print("only to debug remove before merge", kwargs)
         for key, value in kwargs.items():
             setattr(self, key, value)
 
