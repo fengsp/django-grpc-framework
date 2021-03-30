@@ -30,7 +30,7 @@ one working environment::
 
 It is time to get the django grpc framework::
 
-    $ pip install djangogrpcframework
+    $ pip install django-socio-grpc
     $ pip install django
     $ pip install djangorestframework
     $ pip install grpcio
@@ -42,15 +42,6 @@ System Wide
 
 Install it for all users on the system::
 
-    $ sudo pip install djangogrpcframework
+    $ sudo pip install django-socio-grpc
 
 
-Development Version
--------------------
-
-Try the latest version::
-
-    $ source env/bin/activate
-    $ git clone https://github.com/fengsp/django-grpc-framework.git
-    $ cd django-grpc-framework
-    $ python setup.py develop

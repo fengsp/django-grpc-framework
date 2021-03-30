@@ -1,0 +1,14 @@
+version: "3.1"
+
+services:
+  django-socio-grpc:
+    image: django-socio-grpc
+    tty: true 
+    build:
+      context: .
+
+    command: /bin/bash
+    volumes:
+      - .:/opt/code
+    # ports:
+      # - "7000:80"

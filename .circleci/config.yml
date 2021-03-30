@@ -1,0 +1,23 @@
+jobs:
+  build:
+    executor: python/default
+    steps:
+      - checkout
+      - run: sed -i 's/__VERSION__/'$CIRCLE_TAG'/g' pyproject.toml
+      - python/install-packages:
+          pkg-manager: poetry
+      - run: poetry build
+      - run: poetry config pypi-token.pypi $PYPI_TOKEN
+      - run: poetry publish
+orbs:
+  python: circleci/python@1.0.0
+version: 2.1
+workflows:
+  main:
+    jobs:
+      - build:
+          filters:
+            branches:
+              ignore: /^.*/
+            tags:
+              only: /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$/

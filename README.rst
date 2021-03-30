@@ -33,7 +33,7 @@ Installation
 
 .. code-block:: bash
     
-    $ pip install djangogrpcframework
+    $ pip install django-socio-grpc
 
 Add ``django_grpc_framework`` to ``INSTALLED_APPS`` setting:
 

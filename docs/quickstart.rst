@@ -19,7 +19,7 @@ Create a new Django project named ``quickstart``, then start a new app called
     # Install Django and Django gRPC framework
     pip install django
     pip install djangorestframework
-    pip install djangogrpcframework
+    pip install django-socio-grpc
     pip install grpcio
     pip install grpcio-tools
     # Create a new project and a new application

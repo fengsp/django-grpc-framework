@@ -17,17 +17,17 @@ import sys
 
 # -- Project information -----------------------------------------------------
 
-project = 'django-grpc-framework'
+project = 'django-socio-grpc'
 copyright = '2020, Shipeng Feng'
 author = 'Shipeng Feng'
 
 # The full version, including alpha/beta/rc tags
 import pkg_resources
 try:
-    release = pkg_resources.get_distribution('djangogrpcframework').version
+    release = pkg_resources.get_distribution('django-socio-grpc').version
 except pkg_resources.DistributionNotFound:
     print('To build the documentation, the distribution information of')
-    print('django-grpc-framework has to be available.  Run "setup.py develop"')
+    print('django-socio-grpc has to be available.  Run "setup.py develop"')
     print('to setup the metadata.  A virtualenv is recommended!')
     sys.exit(1)
 del pkg_resources
@@ -62,7 +62,7 @@ html_theme = 'alabaster'
 html_theme_options = {
     'github_button': True,
     'github_user': 'fengsp',
-    'github_repo': 'django-grpc-framework',
+    'github_repo': 'django-socio-grpc,
 }
 
 # Add any paths that contain custom static files (such as style sheets) here,
