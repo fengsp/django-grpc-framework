@@ -6,9 +6,10 @@ services:
     tty: true 
     build:
       context: .
-    command: python runserver.py
+    # command: python test_utils/runserver.py
+    command: /bin/bash
     volumes:
       - .:/opt/code
-      - ./test_utils:/opt/code
+      - ./test_utils:/opt/code/test_utils
     # ports:
       # - "7000:80"
