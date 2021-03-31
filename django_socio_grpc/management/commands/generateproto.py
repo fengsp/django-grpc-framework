@@ -11,22 +11,27 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument(
-            '--model', dest='model', type=str, required=True,
-            help='dotted path to a model class',
+            "--model",
+            dest="model",
+            type=str,
+            required=True,
+            help="dotted path to a model class",
         )
         parser.add_argument(
-            '--fields', dest='fields', default=None, type=str,
-            help='specify which fields to include, comma-seperated'
+            "--fields",
+            dest="fields",
+            default=None,
+            type=str,
+            help="specify which fields to include, comma-seperated",
         )
         parser.add_argument(
-            '--file', dest='file', default=None, type=str,
-            help='the generated proto file path'
+            "--file", dest="file", default=None, type=str, help="the generated proto file path"
         )
 
     def handle(self, *args, **options):
-        model = import_string(options['model'])
-        fields = options['fields'].split(',') if options['fields'] else None
-        filepath = options['file']
+        model = import_string(options["model"])
+        fields = options["fields"].split(",") if options["fields"] else None
+        filepath = options["file"]
         if filepath and os.path.exists(filepath):
             raise CommandError('File "%s" already exists.' % filepath)
         if filepath:
@@ -40,7 +45,7 @@ class Command(BaseCommand):
         )
         proto = generator.get_proto()
         if filepath:
-            with open(filepath, 'w') as f:
+            with open(filepath, "w") as f:
                 f.write(proto)
         else:
             self.stdout.write(proto)

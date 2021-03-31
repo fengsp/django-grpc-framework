@@ -29,13 +29,15 @@ class Service:
                     "accepts arguments that are already attributes of the "
                     "class." % (cls.__name__, key)
                 )
-        if isinstance(getattr(cls, 'queryset', None), QuerySet):
+        if isinstance(getattr(cls, "queryset", None), QuerySet):
+
             def force_evaluation():
                 raise RuntimeError(
-                    'Do not evaluate the `.queryset` attribute directly, '
-                    'as the result will be cached and reused between requests.'
-                    ' Use `.all()` or call `.get_queryset()` instead.'
+                    "Do not evaluate the `.queryset` attribute directly, "
+                    "as the result will be cached and reused between requests."
+                    " Use `.all()` or call `.get_queryset()` instead."
                 )
+
             cls.queryset._fetch_all = force_evaluation
 
         class Servicer:
@@ -55,8 +57,10 @@ class Service:
                         return getattr(self, action)(request, context)
                     finally:
                         db.close_old_connections()
+
                 update_wrapper(handler, getattr(cls, action))
                 return handler
+
         update_wrapper(Servicer, cls, updated=())
         return Servicer()
 
@@ -64,5 +68,5 @@ class Service:
 def not_implemented(request, context):
     """Method not implemented"""
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-    context.set_details('Method not implemented!')
-    raise NotImplementedError('Method not implemented!')
+    context.set_details("Method not implemented!")
+    raise NotImplementedError("Method not implemented!")

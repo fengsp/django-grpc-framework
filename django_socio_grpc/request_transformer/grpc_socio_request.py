@@ -1,11 +1,13 @@
 from urllib.parse import urlencode
 from django.utils.functional import cached_property
 
+
 class GRPCSocioRequest(HttpRequest):
     """
     Transform a grpc_request and a grpc_context into a python object to easily deal with compatibility behavior.
     This is the default behavior. You can override it with the setting GRPC_FRAMEWORK_REQUEST_TRANSFORMER
     """
+
     HEADERS_KEY = "HEADERS"
     FILTERS_KEY = "FILTERS"
     PAGINATION_KEY = "PAGINATION"
@@ -22,7 +24,7 @@ class GRPCSocioRequest(HttpRequest):
 
         self.old_query_params_as_dict = {**self.filters, **self.pagination}
 
-        self.request_data = grpc_request        
+        self.request_data = grpc_request
 
     @cached_property
     def get_as_old_query_params(self):
@@ -32,4 +34,3 @@ class GRPCSocioRequest(HttpRequest):
         if you override it don't forget to specify the GRPC_FRAMEWORK_REQUEST_TRANSFORMER settings.
         """
         return urlencode(self.old_query_params_as_dict)
-
