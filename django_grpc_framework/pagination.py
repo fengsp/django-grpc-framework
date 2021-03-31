@@ -72,8 +72,8 @@ class PageNumberPagination(BasePageNumberPagination):
 
         response = OrderedDict([
             ('count', self.page.paginator.count),
-            ('pageSize', self.page_size),
-            ('totalPages', self.page.paginator.num_pages),
+            ('page_size', self.page_size),
+            ('total_pages', self.page.paginator.num_pages),
             ('results', data),
         ])
         kwargs = {'ignore_unknown_fields': True}
