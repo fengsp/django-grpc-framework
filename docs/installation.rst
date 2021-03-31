@@ -51,6 +51,6 @@ Development Version
 Try the latest version::
 
     $ source env/bin/activate
-    $ git clone https://github.com/fengsp/django-grpc-framework.git
+    $ git clone https://github.com/algori-io/django-grpc-framework.git
     $ cd django-grpc-framework
     $ python setup.py develop

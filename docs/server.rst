@@ -57,3 +57,28 @@ in your ``settings.py`` file::
             'path.to.DoAnotherThingInterceptor',
         ]
     }
+
+Exception handler
+```````````````````
+
+The exception handler must also be configured in your settings, using the
+``EXCEPTION_HANDLER`` setting key, for example set the following in your
+``settings.py`` file::
+
+    GRPC_FRAMEWORK = {
+        ...
+        'EXCEPTION_HANDLER': 'django_grpc_framework.services.exception_handler',
+    }
+
+Setting the pagination page size
+```````````````````
+
+If you need to use default List method with pagination, you can do so by setting the
+
+``PAGE_SIZE`` setting.  For example, have something like this
+in your ``settings.py`` file::
+
+    GRPC_FRAMEWORK = {
+        ...
+        'PAGE_SIZE': 10,
+    }

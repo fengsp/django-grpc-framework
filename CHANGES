@@ -2,6 +2,28 @@ Changelog
 =========
 
 
+Version 0.5
+-----------
+
+- Update pagination response format
+    pageSize -> page_size
+    totalPages -> total_pages
+
+
+Version 0.4
+-----------
+
+- Add docs
+- Fix bugs
+
+
+Version 0.3
+-----------
+
+- Added exception handler
+- Added pagination
+
+
 Version 0.2
 -----------
 
