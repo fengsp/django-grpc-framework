@@ -4,10 +4,8 @@ from django.core.exceptions import ValidationError
 from django.http import Http404
 import grpc
 
-from django_grpc_framework.utils import model_meta
-from django_grpc_framework import mixins, services
-from django_socio_grpc.request_transformer import GRPCToHTTP, GRPCSocioRequest
-from django_grpc_framework.settings import grpc_settings
+from django_socio_grpc.utils import model_meta
+from django_socio_grpc import mixins, services
 
 
 class GenericService(services.Service):
@@ -23,13 +21,11 @@ class GenericService(services.Service):
     lookup_field = None
     lookup_request_field = None
 
-    # authentication_class
-
     # The filter backend classes to use for queryset filtering
-    filter_backends = grpc_settings.DEFAULT_FILTER_BACKENDS
+    # filter_backends = grpc_settings.DEFAULT_FILTER_BACKENDS
 
     # The style to use for queryset pagination.
-    pagination_class = grpc_settings.DEFAULT_PAGINATION_CLASS
+    # pagination_class = grpc_settings.DEFAULT_PAGINATION_CLASS
 
     def get_queryset(self):
         """
@@ -120,18 +116,6 @@ class GenericService(services.Service):
             request = self.get_request_transformer(backend)
             queryset = backend().filter_queryset(request, queryset, self)
         return queryset
-
-    def get_request_transformer(self, class_using_request):
-        """
-        To be able to support library working with http1 we transform the request to an HTTP request by default
-        If the class support GRPC we send them the grpc request and if they support the GRPCSocioRequest we send it.
-        """
-        if not getattr(class_using_request, "GRPC_CLASS_TRANSFORMER", None):
-            return GRPCToHTTP(self.request, self.context, self.action)
-        if getattr(class_using_request, "GRPC_CLASS_TRANSFORMER", None) == "GRPCSocioRequest":
-            return GRPCSocioRequest(self.request, self.context)
-        else:
-            return self.request
 
 
 class CreateService(mixins.CreateModelMixin, GenericService):

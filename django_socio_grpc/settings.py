@@ -23,14 +23,16 @@ from django.utils.module_loading import import_string
 
 
 DEFAULTS = {
-    # Root grpc handlers hook configuration
+    #  Root grpc handlers hook configuration
     "ROOT_HANDLERS_HOOK": None,
-    # gRPC server configuration
+    #  gRPC server configuration
     "SERVER_INTERCEPTORS": None,
+    #  Default servicer uthentication classes
+    "DEFAULT_AUTHENTICATION_CLASSES": [],
     # Default filter class
-    "DEFAULT_FILTER_BACKENDS": [],
+    # "DEFAULT_FILTER_BACKENDS": [],
     # default pagination class
-    "DEFAULT_PAGINATION_CLASS": [],
+    # "DEFAULT_PAGINATION_CLASS": [],
 }
 
 
@@ -38,6 +40,7 @@ DEFAULTS = {
 IMPORT_STRINGS = [
     "ROOT_HANDLERS_HOOK",
     "SERVER_INTERCEPTORS",
+    "DEFAULT_AUTHENTICATION_CLASSES",
 ]
 
 
@@ -50,8 +53,7 @@ def perform_import(val, setting_name):
         # We need the ROOT_URLCONF so we do this lazily
         if setting_name == "ROOT_HANDLERS_HOOK":
             return import_from_string(
-                "%s.grpc_handlers" % settings.ROOT_URLCONF,
-                setting_name,
+                "%s.grpc_handlers" % settings.ROOT_URLCONF, setting_name,
             )
         return None
     elif isinstance(val, str):
@@ -79,7 +81,7 @@ class GRPCSettings:
     A settings object that allows gRPC Framework settings to be accessed as
     properties. For example:
 
-        from django_grpc_framework.settings import grpc_settings
+        from django_socio_grpc.settings import grpc_settings
         print(grpc_settings.ROOT_HANDLERS_HOOK)
 
     Any setting with string import paths will be automatically resolved

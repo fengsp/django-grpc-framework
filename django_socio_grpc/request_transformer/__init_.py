@@ -1,4 +1,3 @@
-from .grpc_to_http_request import GRPCToHTTP
-from .grpc_socio_request import GRPCSocioRequest
+from .grpc_socio_proxy_context import GRPCSocioProxyContext
 
-__all__ = ["GRPCToHTTP", "GRPCSocioRequest"]
+__all__ = ["GRPCSocioProxyContext"]

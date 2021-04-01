@@ -1,18 +1,43 @@
 from functools import update_wrapper
 
 import grpc
+from django_socio_grpc.settings import grpc_settings
 from django.db.models.query import QuerySet
 from django import db
 
+from django_socio_grpc.request_transformer.grpc_socio_proxy_context import (
+    GRPCSocioProxyContext,
+)
+
 
 class Service:
+
+    authentication_classes = grpc_settings.DEFAULT_AUTHENTICATION_CLASSES
+
     def __init__(self, **kwargs):
         """
         Set kwargs as self attributes.
         """
-        print("only to debug remove before merge", kwargs)
         for key, value in kwargs.items():
             setattr(self, key, value)
+
+    def perform_authentication(self):
+        user_auth_tuple = self.resolve_user()
+        self.context.user = user_auth_tuple[0]
+        self.context.token = user_auth_tuple[1]
+
+    def resolve_user(self):
+        auth_responses = [
+            auth().authenticate(self.context) for auth in self.authentication_classes
+        ]
+        return auth_responses[0]
+
+    def before_action(self):
+        """
+        Runs anything that needs to occur prior to calling the method handler.
+        """
+        self.perform_authentication()
+        # self.check_permissions(request)
 
     @classmethod
     def as_servicer(cls, **initkwargs):
@@ -52,8 +77,9 @@ class Service:
                     try:
                         self = cls(**initkwargs)
                         self.request = request
-                        self.context = context
+                        self.context = GRPCSocioProxyContext(context)
                         self.action = action
+                        self.before_action()
                         return getattr(self, action)(request, context)
                     finally:
                         db.close_old_connections()
