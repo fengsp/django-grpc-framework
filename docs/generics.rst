@@ -13,7 +13,7 @@ For example::
 
    from blog.models import Post
    from blog.serializers import PostProtoSerializer
-   from django_grpc_framework import generics
+   from django_socio_grpc import generics
 
 
    class PostService(generics.ModelService):
@@ -51,7 +51,7 @@ The following attributes control the basic service behavior:
 Methods
 ```````
 
-.. currentmodule:: django_grpc_framework.generics
+.. currentmodule:: django_socio_grpc.generics
 
 .. autoclass:: GenericService
    :members:
@@ -62,9 +62,9 @@ Mixins
 
 The mixin classes provide the actions that are used to privide the basic
 service behavior.  The mixin classes can be imported from
-``django_grpc_framework.mixins``.
+``django_socio_grpc.mixins``.
 
-.. currentmodule:: django_grpc_framework.mixins
+.. currentmodule:: django_socio_grpc.mixins
 
 .. autoclass:: ListModelMixin
    :members:
@@ -86,9 +86,9 @@ Concrete service classes
 ------------------------
 
 The following classes are the concrete generic services.  They can be imported
-from ``django_grpc_framework.generics``.
+from ``django_socio_grpc.generics``.
 
-.. currentmodule:: django_grpc_framework.generics
+.. currentmodule:: django_socio_grpc.generics
 
 .. autoclass:: CreateService
    :members:
@@ -115,8 +115,8 @@ You may need to provide custom classes that have certain actions, to create
 a base class that provides ``List()`` and ``Create()`` handlers, inherit from
 ``GenericService`` and mixin the required handlers::
 
-    from django_grpc_framework import mixins
-    from django_grpc_framework import generics
+    from django_socio_grpc import mixins
+    from django_socio_grpc import generics
 
     class ListCreateService(mixins.CreateModelMixin,
                             mixins.ListModelMixin,

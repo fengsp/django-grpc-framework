@@ -35,12 +35,12 @@ Now we can create an app that we'll use to create a simple gRPC Service::
 
     python manage.py startapp blog
 
-We'll need to add our new ``blog`` app and the ``django_grpc_framework`` app to
+We'll need to add our new ``blog`` app and the ``django_socio_grpc`` app to
 ``INSTALLED_APPS``.  Let's edit the ``tutorial/settings.py`` file::
 
     INSTALLED_APPS = [
         ...
-        'django_grpc_framework',
+        'django_socio_grpc',
         'blog',
     ]
 
@@ -125,7 +125,7 @@ and deserializing the post instances into protocol buffer messages.  We can
 do this by declaring serializers, create a file in the ``blog`` directory
 named ``serializers.py`` and add the following::
 
-    from django_grpc_framework import proto_serializerss
+    from django_socio_grpc import proto_serializerss
     from blog.models import Post
     from blog_proto import post_pb2
 
@@ -145,7 +145,7 @@ in the ``blog`` directory named ``services.py`` and add the following::
 
     import grpc
     from google.protobuf import empty_pb2
-    from django_grpc_framework.services import Service
+    from django_socio_grpc.services import Service
     from blog.models import Post
     from blog.serializers import PostProtoSerializer
 

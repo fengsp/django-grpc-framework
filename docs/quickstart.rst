@@ -35,12 +35,12 @@ Now sync the database::
 Update settings
 ---------------
 
-Add ``django_grpc_framework`` to ``INSTALLED_APPS``, settings module is in
+Add ``django_socio_grpc`` to ``INSTALLED_APPS``, settings module is in
 ``quickstart/settings.py``::
 
     INSTALLED_APPS = [
         ...
-        'django_grpc_framework',
+        'django_socio_grpc',
     ]
 
 
@@ -96,7 +96,7 @@ Then we're going to define a serializer, let's create a new module named
 ``account/serializers.py``::
 
     from django.contrib.auth.models import User
-    from django_grpc_framework import proto_serializers
+    from django_socio_grpc import proto_serializers
     import account_pb2
 
 
@@ -113,7 +113,7 @@ Writing services
 Now we'd write some a service, create ``account/services.py``::
 
     from django.contrib.auth.models import User
-    from django_grpc_framework import generics
+    from django_socio_grpc import generics
     from account.serializers import UserProtoSerializer
 
 

@@ -20,8 +20,8 @@ classes, here is our ``blog/services`` file again::
 
     from blog.models import Post
     from blog.serializers import PostProtoSerializer
-    from django_grpc_framework import mixins
-    from django_grpc_framework import generics
+    from django_socio_grpc import mixins
+    from django_socio_grpc import generics
 
 
     class PostService(mixins.ListModelMixin,

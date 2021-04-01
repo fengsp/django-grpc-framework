@@ -12,7 +12,7 @@ Writing tests
 Let's edit the ``blog/tests.py`` file::
 
     import grpc
-    from django_grpc_framework.test import RPCTestCase
+    from django_socio_grpc.test import RPCTestCase
     from blog_proto import post_pb2, post_pb2_grpc
     from blog.models import Post
 
