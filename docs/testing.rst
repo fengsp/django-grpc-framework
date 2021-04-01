@@ -17,7 +17,7 @@ Django shell ``python manage.py shell``:
 
 .. code-block:: pycon
 
-    >>> from django_grpc_framework.test import Channel
+    >>> from django_socio_grpc.test import Channel
     >>> channel = Channel()
     >>> stub = post_pb2_grpc.PostControllerStub(channel)
     >>> response = stub.Retrieve(post_pb2.PostRetrieveRequest(id=post_id))
@@ -39,7 +39,7 @@ instead of ``Client``.
 You can use these test case classes as you would for the regular Django test
 case classes, the ``self.channel`` attribute will be an ``Channel`` instance::
 
-    from django_grpc_framework.test import RPCTestCase
+    from django_socio_grpc.test import RPCTestCase
     from django.contrib.auth.models import User
     import account_pb2
     import account_pb2_grpc

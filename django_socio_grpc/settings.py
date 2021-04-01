@@ -27,7 +27,7 @@ DEFAULTS = {
     "ROOT_HANDLERS_HOOK": None,
     #  gRPC server configuration
     "SERVER_INTERCEPTORS": None,
-    #  Default servicer uthentication classes
+    #  Default servicer authentication classes
     "DEFAULT_AUTHENTICATION_CLASSES": [],
     # Default filter class
     # "DEFAULT_FILTER_BACKENDS": [],

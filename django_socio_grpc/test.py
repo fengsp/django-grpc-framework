@@ -1,7 +1,7 @@
 from django.test import testcases
 import grpc
 
-from django_grpc_framework.settings import grpc_settings
+from django_socio_grpc.settings import grpc_settings
 
 
 class Channel:
