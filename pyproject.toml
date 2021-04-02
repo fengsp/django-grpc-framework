@@ -8,16 +8,10 @@ license = "Apache-2.0"
 [tool.poetry.dependencies]
 python = ">=3.6"
 django = ">=2.2, <4.0"
-<<<<<<< HEAD
-djangorestframework = "^3.10.0"
-grpcio = "^1.16.0"
-grpcio-tools = "^1.16.0"
-asyncio = "^3.4.3"
-=======
 djangorestframework = "*"
 grpcio = "*"
 grpcio-tools = "*"
->>>>>>> 54f373068b56e6c46c95d1398254d2df71021726
+asyncio = "^3.4.3"
 
 [tool.poetry.dev-dependencies]
 pytest = "*"
