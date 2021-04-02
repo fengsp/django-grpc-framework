@@ -7,7 +7,8 @@ services:
     build:
       context: .
     # command: python test_utils/runserver.py
-    command: /bin/bash
+    command: python test_utils/load_tests.py
+    # command: /bin/bash
     volumes:
       - .:/opt/code
       - ./test_utils:/opt/code/test_utils
