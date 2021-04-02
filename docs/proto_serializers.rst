@@ -15,7 +15,7 @@ Declaring a serializer looks very similar to declaring a rest framework
 serializer::
 
     from rest_framework import serializers
-    from django_grpc_framework import proto_serializers
+    from django_socio_grpc import proto_serializers
 
     class PersonProtoSerializer(proto_serializers.ProtoSerializer):
         name = serializers.CharField(max_length=100)
@@ -60,7 +60,7 @@ Here is the default implementation::
 The default behavior requires you to provide ``ProtoSerializer.Meta.proto_class``,
 it is the protobuf class that should be used for create output proto message
 object.  You must either set this attribute, or override the
-``data_to_message()`` method. 
+``data_to_message()`` method.
 
 
 Serializing objects
@@ -93,7 +93,7 @@ ModelProtoSerializer
 
 This is the same as a rest framework ``ModelSerializer``::
 
-    from django_grpc_framework import proto_serializers
+    from django_socio_grpc import proto_serializers
     from hrm.models import Person
     import hrm_pb2
 

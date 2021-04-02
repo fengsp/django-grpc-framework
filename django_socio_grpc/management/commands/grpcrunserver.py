@@ -8,38 +8,45 @@ import os
 import grpc
 from django.utils import autoreload
 from django.conf import settings
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand
 
-from django_grpc_framework.settings import grpc_settings
+from django_socio_grpc.settings import grpc_settings
 
 
 class Command(BaseCommand):
-    help = 'Starts a gRPC server.'
+    help = "Starts a gRPC server."
 
     # Validation is called explicitly each time the server is reloaded.
     requires_system_checks = False
 
     def add_arguments(self, parser):
         parser.add_argument(
-            'address', nargs='?', default='[::]:50051',
-            help='Optional address for which to open a port.'
+            "address",
+            nargs="?",
+            default="[::]:50051",
+            help="Optional address for which to open a port.",
         )
         parser.add_argument(
-            '--max-workers', type=int, default=10, dest='max_workers',
-            help='Number of maximum worker threads.'
+            "--max-workers",
+            type=int,
+            default=10,
+            dest="max_workers",
+            help="Number of maximum worker threads.",
         )
         parser.add_argument(
-            '--dev', action='store_true', dest='development_mode',
+            "--dev",
+            action="store_true",
+            dest="development_mode",
             help=(
-                'Run the server in development mode.  This tells Django to use '
-                'the auto-reloader and run checks.'
-            )
+                "Run the server in development mode.  This tells Django to use "
+                "the auto-reloader and run checks."
+            ),
         )
 
     def handle(self, *args, **options):
-        self.address = options['address']
-        self.development_mode = options['development_mode']
-        self.max_workers = options['max_workers']
+        self.address = options["address"]
+        self.development_mode = options["development_mode"]
+        self.max_workers = options["max_workers"]
         self.run(**options)
 
     def run(self, **options):
@@ -50,16 +57,16 @@ class Command(BaseCommand):
             else:
                 autoreload.main(self.inner_run, None, options)
         else:
-            self.stdout.write((
-                "Starting gRPC server at %(address)s\n"
-            ) % {
-                "address": self.address,
-            })
+            self.stdout.write(
+                ("Starting gRPC server at %(address)s\n") % {"address": self.address}
+            )
             self._serve()
 
     def _serve(self):
-        server = grpc.server(futures.ThreadPoolExecutor(max_workers=self.max_workers),
-                             interceptors=grpc_settings.SERVER_INTERCEPTORS)
+        server = grpc.server(
+            futures.ThreadPoolExecutor(max_workers=self.max_workers),
+            interceptors=grpc_settings.SERVER_INTERCEPTORS,
+        )
         grpc_settings.ROOT_HANDLERS_HOOK(server)
         server.add_insecure_port(self.address)
         server.start()
@@ -75,19 +82,22 @@ class Command(BaseCommand):
         # Need to check migrations here, so can't use the
         # requires_migrations_check attribute.
         self.check_migrations()
-        now = datetime.now().strftime('%B %d, %Y - %X')
+        now = datetime.now().strftime("%B %d, %Y - %X")
         self.stdout.write(now)
-        quit_command = 'CTRL-BREAK' if sys.platform == 'win32' else 'CONTROL-C'
-        self.stdout.write((
-            "Django version %(version)s, using settings %(settings)r\n"
-            "Starting development gRPC server at %(address)s\n"
-            "Quit the server with %(quit_command)s.\n"
-        ) % {
-            "version": self.get_version(),
-            "settings": settings.SETTINGS_MODULE,
-            "address": self.address,
-            "quit_command": quit_command,
-        })
+        quit_command = "CTRL-BREAK" if sys.platform == "win32" else "CONTROL-C"
+        self.stdout.write(
+            (
+                "Django version %(version)s, using settings %(settings)r\n"
+                "Starting development gRPC server at %(address)s\n"
+                "Quit the server with %(quit_command)s.\n"
+            )
+            % {
+                "version": self.get_version(),
+                "settings": settings.SETTINGS_MODULE,
+                "address": self.address,
+                "quit_command": quit_command,
+            }
+        )
         try:
             self._serve()
         except OSError as e:

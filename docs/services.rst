@@ -7,7 +7,7 @@ Django gRPC framework provides an ``Service`` class, which is pretty much the
 same as using a regular gRPC generated servicer interface.  For example::
 
     import grpc
-    from django_grpc_framework.services import Service
+    from django_socio_grpc.services import Service
     from blog.models import Post
     from blog.serializers import PostProtoSerializer
 
@@ -38,6 +38,6 @@ The following attributes are available in a service instance.
 As servicer method
 ------------------
 
-.. currentmodule:: django_grpc_framework.services
+.. currentmodule:: django_socio_grpc.services
 
 .. automethod:: Service.as_servicer

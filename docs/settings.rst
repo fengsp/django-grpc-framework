@@ -18,7 +18,7 @@ Accessing settings
 If you need to access the values of gRPC framework's settings in your project,
 you should use the ``grpc_settings`` object.  For example::
 
-    from django_grpc_framework.settings import grpc_settings
+    from django_socio_grpc.settings import grpc_settings
     print(grpc_settings.ROOT_HANDLERS_HOOK)
 
 The ``grpc_settings`` object will check for any user-defined settings, and

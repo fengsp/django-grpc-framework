@@ -32,16 +32,16 @@ Installation
 ------------
 
 .. code-block:: bash
-    
+
     $ pip install django-socio-grpc
 
-Add ``django_grpc_framework`` to ``INSTALLED_APPS`` setting:
+Add ``django_socio_grpc`` to ``INSTALLED_APPS`` setting:
 
 .. code-block:: python
 
     INSTALLED_APPS = [
         ...
-        'django_grpc_framework',
+        'django_socio_grpc',
     ]
 
 
@@ -52,7 +52,7 @@ Here is a quick example of using gRPC framework to build a simple
 model-backed service for accessing users, startup a new project:
 
 .. code-block:: bash
-    
+
     $ django-admin startproject demo
     $ python manage.py migrate
 
@@ -75,7 +75,7 @@ Now edit the ``demo/urls.py`` module:
 .. code-block:: python
 
     from django.contrib.auth.models import User
-    from django_grpc_framework import generics, proto_serializers
+    from django_socio_grpc import generics, proto_serializers
     import demo_pb2
     import demo_pb2_grpc
 
@@ -99,7 +99,7 @@ Now edit the ``demo/urls.py`` module:
 That's it, we're done!
 
 .. code-block:: bash
-    
+
     $ python manage.py grpcrunserver --dev
 
 You can now run a gRPC client to access the service:
