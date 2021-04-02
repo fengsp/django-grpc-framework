@@ -1,7 +1,7 @@
 from django.test import testcases
 import grpc
 
-from django_grpc_framework.settings import grpc_settings
+from django_socio_grpc.settings import grpc_settings
 
 
 class Channel:
@@ -80,7 +80,7 @@ class FakeRpcError(grpc.RpcError):
         return self._details
 
     def __repr__(self):
-        return '<FakeRpcError code: %s, details: %s>' % (self._code, self._details)
+        return "<FakeRpcError code: %s, details: %s>" % (self._code, self._details)
 
 
 class FakeServer:
@@ -89,6 +89,7 @@ class FakeServer:
 
     def add_generic_rpc_handlers(self, generic_rpc_handlers):
         from grpc._server import _validate_generic_rpc_handlers
+
         _validate_generic_rpc_handlers(generic_rpc_handlers)
         self.rpc_method_handlers.update(generic_rpc_handlers[0]._method_handlers)
 

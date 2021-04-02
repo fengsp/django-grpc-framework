@@ -1,20 +1,49 @@
 [tool.poetry]
 name = "django-socio-grpc"
-version = "__VERSION__"
+version = "0.1.1"
 description = "Fork of django-grpc-framework with more feature maintained by the socio team. Make GRPC with django easy."
 authors = ["Adrien Montagu <adrienmontagu@gmail.com>"]
 license = "Apache-2.0"
 
 [tool.poetry.dependencies]
-python = "^3.5"
+python = ">=3.6"
 django = ">=2.2, <4.0"
+<<<<<<< HEAD
 djangorestframework = "^3.10.0"
 grpcio = "^1.16.0"
 grpcio-tools = "^1.16.0"
 asyncio = "^3.4.3"
+=======
+djangorestframework = "*"
+grpcio = "*"
+grpcio-tools = "*"
+>>>>>>> 54f373068b56e6c46c95d1398254d2df71021726
 
 [tool.poetry.dev-dependencies]
+pytest = "*"
+flake8 = "*"
+black = "*"
+isort = "*"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.black]
+line-length = 95
+include = '\.pyi?$'
+exclude = '''
+/(
+    \.eggs
+  | \.git
+  | \.venv
+  | build
+  | dist
+  | examples
+)/
+'''
+
+[tool.isort]
+include_trailing_comma = true
+line_length = 95
+multi_line_output = 3

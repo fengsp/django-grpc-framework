@@ -11,24 +11,25 @@
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
 # import os
+import pkg_resources
 import sys
+
 # sys.path.insert(0, os.path.abspath('.'))
 
 
 # -- Project information -----------------------------------------------------
 
-project = 'django-socio-grpc'
-copyright = '2020, Shipeng Feng'
-author = 'Shipeng Feng'
+project = "django-socio-grpc"
+copyright = "2020, Shipeng Feng"
+author = "Shipeng Feng"
 
 # The full version, including alpha/beta/rc tags
-import pkg_resources
 try:
-    release = pkg_resources.get_distribution('django-socio-grpc').version
+    release = pkg_resources.get_distribution("django-socio-grpc").version
 except pkg_resources.DistributionNotFound:
-    print('To build the documentation, the distribution information of')
+    print("To build the documentation, the distribution information of")
     print('django-socio-grpc has to be available.  Run "setup.py develop"')
-    print('to setup the metadata.  A virtualenv is recommended!')
+    print("to setup the metadata.  A virtualenv is recommended!")
     sys.exit(1)
 del pkg_resources
 
@@ -39,17 +40,17 @@ del pkg_resources
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-    'sphinx.ext.autodoc',
-    'sphinx.ext.intersphinx',
+    "sphinx.ext.autodoc",
+    "sphinx.ext.intersphinx",
 ]
 
 # Add any paths that contain templates here, relative to this directory.
-templates_path = ['_templates']
+templates_path = ["_templates"]
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
-exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
+exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 
 
 # -- Options for HTML output -------------------------------------------------
@@ -57,18 +58,18 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'alabaster'
+html_theme = "alabaster"
 
 html_theme_options = {
-    'github_button': True,
-    'github_user': 'fengsp',
-    'github_repo': 'django-socio-grpc,
+    "github_button": True,
+    "github_user": "fengsp",
+    "github_repo": "django-socio-grpc",
 }
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['_static']
+html_static_path = ["_static"]
 
 # The master toctree document.
-master_doc = 'index'
+master_doc = "index"
