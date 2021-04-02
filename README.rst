@@ -110,3 +110,10 @@ You can now run a gRPC client to access the service:
         stub = demo_pb2_grpc.UserControllerStub(channel)
         for user in stub.List(demo_pb2.UserListRequest()):
             print(user, end='')
+
+Launch dev environnement
+------------
+
+.. code-block:: python
+    docker-compose up --build
+    docker-compose exec django-socio-grpc python test_utils/load_tests.py
