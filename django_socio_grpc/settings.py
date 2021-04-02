@@ -30,7 +30,7 @@ DEFAULTS = {
     #  Default servicer authentication classes
     "DEFAULT_AUTHENTICATION_CLASSES": [],
     # Default filter class
-    # "DEFAULT_FILTER_BACKENDS": [],
+    "DEFAULT_FILTER_BACKENDS": [],
     # default pagination class
     # "DEFAULT_PAGINATION_CLASS": [],
 }

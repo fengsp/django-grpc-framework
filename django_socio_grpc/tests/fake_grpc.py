@@ -6,7 +6,6 @@ import socket
 from concurrent import futures
 
 import grpc
-import pytest
 from grpc._cython.cygrpc import _Metadatum
 
 
@@ -17,6 +16,7 @@ class FakeServer(object):
 
     def add_generic_rpc_handlers(self, generic_rpc_handlers):
         from grpc._server import _validate_generic_rpc_handlers
+
         _validate_generic_rpc_handlers(generic_rpc_handlers)
 
         self.handlers.update(generic_rpc_handlers[0]._method_handlers)
@@ -76,59 +76,52 @@ class FakeChannel:
 
             def metadata_callbak(metadata, error):
                 context._invocation_metadata.extend((_Metadatum(k, v) for k, v in metadata))
+
             future = self.server.pool.submit(real_method, request, context)
             return future.result()
 
         return fake_handler
 
     def unary_unary(self, *args, **kwargs):
-        return self.fake_method('unary_unary', *args, **kwargs)
+        return self.fake_method("unary_unary", *args, **kwargs)
 
     def unary_stream(self, *args, **kwargs):
-        return self.fake_method('unary_stream', *args, **kwargs)
+        return self.fake_method("unary_stream", *args, **kwargs)
 
     def stream_unary(self, *args, **kwargs):
-        return self.fake_method('stream_unary', *args, **kwargs)
+        return self.fake_method("stream_unary", *args, **kwargs)
 
     def stream_stream(self, *args, **kwargs):
-        return self.fake_method('stream_stream', *args, **kwargs)
+        return self.fake_method("stream_stream", *args, **kwargs)
 
-def get_fake_server():
-  pool = futures.ThreadPoolExecutor(max_workers=1)
-  server = FakeServer(pool)
-  return server
-
-def get_fake_channel():
-  server = get_fake_server()
-  return FakeChannel(grpc_server)
 
 class FakeGRPC:
-  def __init__(self, grpc_add_to_server, grpc_servicer):
-    self.grpc_addr = self.get_grpc_addr()
+    def __init__(self, grpc_add_to_server, grpc_servicer):
+        self.grpc_addr = self.get_grpc_addr()
 
-    self.grpc_server = self.get_fake_server()
+        self.grpc_server = self.get_fake_server()
 
-    grpc_add_to_server(grpc_servicer, self.grpc_server)
-    self.grpc_server.add_insecure_port(self.grpc_addr)
-    self.grpc_server.start()
+        grpc_add_to_server(grpc_servicer, self.grpc_server)
+        self.grpc_server.add_insecure_port(self.grpc_addr)
+        self.grpc_server.start()
 
-    self.grpc_channel = self.get_fake_channel()
+        self.grpc_channel = self.get_fake_channel()
 
-  def close(self):
-    self.grpc_server.stop(grace=None)
+    def close(self):
+        self.grpc_server.stop(grace=None)
 
-  def get_fake_server(self):
-    pool = futures.ThreadPoolExecutor(max_workers=1)
-    grpc_server = FakeServer(pool)
-    return grpc_server
+    def get_fake_server(self):
+        pool = futures.ThreadPoolExecutor(max_workers=1)
+        grpc_server = FakeServer(pool)
+        return grpc_server
 
-  def get_fake_channel(self):
-    return FakeChannel(self.grpc_server)
+    def get_fake_channel(self):
+        return FakeChannel(self.grpc_server)
 
-  def get_grpc_addr(self):
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    sock.bind(('localhost', 0))
-    return f'localhost:{sock.getsockname()[1]}'
+    def get_grpc_addr(self):
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.bind(("localhost", 0))
+        return f"localhost:{sock.getsockname()[1]}"
 
-  def get_fake_stub(self, grpc_stub_cls):
-    return grpc_stub_cls(self.grpc_channel)
+    def get_fake_stub(self, grpc_stub_cls):
+        return grpc_stub_cls(self.grpc_channel)

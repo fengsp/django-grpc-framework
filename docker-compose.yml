@@ -6,11 +6,36 @@ services:
     tty: true 
     build:
       context: .
-    # command: python test_utils/runserver.py
-    command: python test_utils/load_tests.py
+    environment:
+      - DB_NAME=test
+      - DB_USER=test
+      - DB_PASSWORD=test_pw
+      - DB_HOST=test-database
+    command: python test_utils/runserver.py
+    #command: python test_utils/load_tests.py
     # command: /bin/bash
+    links:
+      - test-database
     volumes:
       - .:/opt/code
       - ./test_utils:/opt/code/test_utils
     # ports:
       # - "7000:80"
+    networks:
+      django-socio-grpc-network:
+
+  test-database:
+    image: library/postgres:11.5
+    ports:
+      - "5532:5432"
+    volumes:
+      - /srv/atlasaas/database/atlasaas:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: test
+      POSTGRES_USER: test
+      POSTGRES_PASSWORD: test_pw
+    networks:
+      django-socio-grpc-network:
+
+networks:
+  django-socio-grpc-network:
