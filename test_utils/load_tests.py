@@ -6,7 +6,7 @@ from boot_django import boot_django
 boot_django()
 
 default_labels = [
-    "tests/",
+    "django_socio_grpc/tests/",
 ]
 
 

@@ -2,7 +2,7 @@ FROM python:3.8
 
 WORKDIR /opt/code
 
-RUN pip install poetry
+RUN pip install --no-cache-dir psycopg2 poetry
 
 RUN poetry config virtualenvs.create false
 
