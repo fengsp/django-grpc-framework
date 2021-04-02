@@ -6,7 +6,7 @@ services:
     tty: true 
     build:
       context: .
-    command: python test_utils/runserver.py
+    # command: python test_utils/runserver.py
     # command: /bin/bash
     volumes:
       - .:/opt/code

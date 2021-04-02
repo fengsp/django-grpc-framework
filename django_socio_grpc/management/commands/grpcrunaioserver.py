@@ -9,13 +9,13 @@ import grpc
 import asyncio
 from django.utils import autoreload
 from django.conf import settings
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand
 
 from django_socio_grpc.settings import grpc_settings
 
 
 class Command(BaseCommand):
-    help = " Starts an async gRPC server"
+    help = "Starts an async gRPC server"
     # Validation is called explicitly each time the server is reloaded.
     requires_system_checks = False
 
@@ -58,7 +58,7 @@ class Command(BaseCommand):
                 autoreload.main(self.inner_run, None, options)
         else:
             self.stdout.write(
-                ("Starting gRPC server at %(address)s\n")
+                ("Starting async gRPC server at %(address)s\n")
                 % {
                     "address": self.address,
                 }
