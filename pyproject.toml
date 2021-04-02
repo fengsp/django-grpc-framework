@@ -11,6 +11,7 @@ django = ">=2.2, <4.0"
 djangorestframework = "^3.10.0"
 grpcio = "^1.16.0"
 grpcio-tools = "^1.16.0"
+asyncio = "^3.4.3"
 
 [tool.poetry.dev-dependencies]
 
