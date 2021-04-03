@@ -81,7 +81,7 @@ class Command(BaseCommand):
             # existing RPCs to continue within the grace period.
             await server.stop(0)
 
-    async def inner_run(self, *args, **options):
+    def inner_run(self, *args, **options):
         # If an exception was silenced in ManagementUtility.execute in order
         # to be raised in the child process, raise it now.
         autoreload.raise_last_exception()
@@ -108,7 +108,7 @@ class Command(BaseCommand):
             }
         )
         try:
-            await self._serve()
+            asyncio.run(self._serve())
         except OSError as e:
             # Use helpful error messages instead of ugly tracebacks.
             ERRORS = {
