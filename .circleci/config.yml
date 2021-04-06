@@ -1,9 +1,19 @@
 jobs:
+  test:
+    executor: python/default
+    steps:
+      - checkout
+      - python/install-packages:
+          pkg-manager: poetry
+      - run: poetry build
+      - run: chmod +x test_utils/load_tests.py
+      - run: poetry run test_utils/load_tests.py
+
   build:
     executor: python/default
     steps:
       - checkout
-      - run: sed -i 's/__VERSION__/'$CIRCLE_TAG'/g' pyproject.toml
+      - run: sed -i 's/version = "0.1.1"/version = "'$CIRCLE_TAG'"/g' pyproject.toml
       - python/install-packages:
           pkg-manager: poetry
       - run: poetry build
@@ -15,6 +25,7 @@ version: 2.1
 workflows:
   main:
     jobs:
+      - test
       - build:
           filters:
             branches:

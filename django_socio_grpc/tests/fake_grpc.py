@@ -71,11 +71,9 @@ class FakeChannel:
         handler = self.server.handlers[uri]
         real_method = getattr(handler, method_name)
 
-        def fake_handler(request):
+        def fake_handler(request, metadata):
             context = FakeContext()
-
-            def metadata_callbak(metadata, error):
-                context._invocation_metadata.extend((_Metadatum(k, v) for k, v in metadata))
+            context._invocation_metadata.extend((_Metadatum(k, v) for k, v in metadata))
 
             future = self.server.pool.submit(real_method, request, context)
             return future.result()
