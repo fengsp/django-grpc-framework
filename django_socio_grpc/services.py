@@ -72,7 +72,7 @@ class Service:
                 if not hasattr(cls, action):
                     return not_implemented
 
-                def handler(request, context):
+                async def handler(request, context):
                     # db connection state managed similarly to the wsgi handler
                     db.reset_queries()
                     db.close_old_connections()
@@ -82,7 +82,7 @@ class Service:
                         self.context = GRPCSocioProxyContext(context)
                         self.action = action
                         self.before_action()
-                        return getattr(self, action)(request, context)
+                        return await getattr(self, action)(request, context)
                     finally:
                         db.close_old_connections()
 
