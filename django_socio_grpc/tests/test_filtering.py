@@ -10,6 +10,8 @@ from .filter_test.filter_test_pb2_grpc import (
 from django.db import models
 from django_socio_grpc import proto_serializers
 from django_socio_grpc import generics
+import django_filters.rest_framework
+import json
 
 
 class SearchFilterModel(f.FakeModel):
@@ -28,6 +30,8 @@ class SearchFilterSerializer(proto_serializers.ModelProtoSerializer):
 class SearchFilterService(generics.ModelService):
     queryset = SearchFilterModel.objects.all()
     serializer_class = SearchFilterSerializer
+    filter_backends = [django_filters.rest_framework.DjangoFilterBackend]
+    filterset_fields = ["title", "text"]
 
 
 # class FakeFiltering:
@@ -55,10 +59,12 @@ class TestFiltering(TestCase):
     def test_some(self):
         grpc_stub = self.fake_grpc.get_fake_stub(FilterTestControllerStub)
         request = FilterTestListRequest()
-        responses = grpc_stub.List(request)
+        filter_as_dict = {"title": "zzzzzzz"}
+        metadata = (("FILTERS", (json.dumps(filter_as_dict))),)
+        responses = grpc_stub.List(request=request, metadata=metadata)
 
         responses_as_list = [response for response in responses]
 
-        print(len(responses_as_list))
-
-        self.assertEqual(len(responses_as_list), 10)
+        self.assertEqual(len(responses_as_list), 1)
+        # responses_as_list[0] is type of django_socio_grpc.tests.filter_test.filter_test_pb2.FilterTest
+        self.assertEqual(responses_as_list[0].id, 7)

@@ -4,10 +4,11 @@ import pytest
 class PytestTestRunner:
     """Runs pytest to discover and run tests."""
 
-    def __init__(self, verbosity=1, failfast=False, keepdb=False, **kwargs):
+    def __init__(self, verbosity=1, failfast=False, keepdb=False, show_local=False, **kwargs):
         self.verbosity = verbosity
         self.failfast = failfast
         self.keepdb = keepdb
+        self.show_local = show_local
 
     def run_tests(self, test_labels):
         """Run pytest and return the exitcode.
@@ -26,6 +27,8 @@ class PytestTestRunner:
             argv.append("--exitfirst")
         if self.keepdb:
             argv.append("--reuse-db")
+        if self.show_local:
+            argv.append("-l")
 
         argv.extend(test_labels)
         return pytest.main(argv)

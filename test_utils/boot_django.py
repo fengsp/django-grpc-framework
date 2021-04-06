@@ -28,6 +28,7 @@ def boot_django():
         INSTALLED_APPS=(
             "rest_framework",
             # "django.contrib.contenttypes",
+            "django_filters",
             "django_socio_grpc",
         ),
         TIME_ZONE="UTC",
