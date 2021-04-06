@@ -6,6 +6,7 @@ import grpc
 
 from django_socio_grpc.utils import model_meta
 from django_socio_grpc import mixins, services
+from django_socio_grpc.settings import grpc_settings
 
 
 class GenericService(services.Service):
@@ -22,7 +23,7 @@ class GenericService(services.Service):
     lookup_request_field = None
 
     # The filter backend classes to use for queryset filtering
-    # filter_backends = grpc_settings.DEFAULT_FILTER_BACKENDS
+    filter_backends = grpc_settings.DEFAULT_FILTER_BACKENDS
 
     # The style to use for queryset pagination.
     # pagination_class = grpc_settings.DEFAULT_PAGINATION_CLASS

@@ -22,6 +22,8 @@ class Service:
             setattr(self, key, value)
 
     def perform_authentication(self):
+        if len(self.authentication_classes) == 0:
+            return
         user_auth_tuple = self.resolve_user()
         self.context.user = user_auth_tuple[0]
         self.context.token = user_auth_tuple[1]
