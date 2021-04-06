@@ -71,7 +71,8 @@ class GenericService(services.Service):
         Defaults to using the lookup_field parameter to filter the base
         queryset.
         """
-        queryset = self.filter_queryset(self.get_queryset())
+        queryset = self.get_queryset()
+        # queryset = self.filter_queryset(self.get_queryset())
         lookup_field = (
             self.lookup_field
             or model_meta.get_model_pk(queryset.model).name
