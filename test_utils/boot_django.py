@@ -6,9 +6,11 @@ import django
 from django.conf import settings
 
 APPS_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+TEST_UTILS_DIR = os.path.join(APPS_DIR, "test_utils")
 BASE_DIR = os.path.join(APPS_DIR, "django_socio_grpc")
 
 sys.path.append(APPS_DIR)
+sys.path.append(TEST_UTILS_DIR)
 
 
 def boot_django():
