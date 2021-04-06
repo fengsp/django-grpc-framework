@@ -19,6 +19,7 @@ black = "*"
 isort = "*"
 django-fake-model = "^0.1.4"
 django-filter = "^2.4.0"
+psycopg2-binary = "^2.8.6"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
