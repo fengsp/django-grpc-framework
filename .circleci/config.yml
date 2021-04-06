@@ -1,9 +1,28 @@
 jobs:
+  test:
+    docker:
+      - image: circleci/python:3.8
+      - image: circleci/postgres:11.5-alpine
+        environment:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres_pw
+          POSTGRES_DB: test
+    environment:
+      DB_NAME: test
+      DB_USER: postgres
+      DB_PASSWORD: postgres_pw
+      DB_HOST: localhost
+    steps:
+      - checkout
+      - run: pip install --no-cache-dir poetry psycopg2-binary
+      - run: poetry install
+      - run: poetry run tests
+
   build:
     executor: python/default
     steps:
       - checkout
-      - run: sed -i 's/__VERSION__/'$CIRCLE_TAG'/g' pyproject.toml
+      - run: sed -i 's/version = "0.1.1"/version = "'$CIRCLE_TAG'"/g' pyproject.toml
       - python/install-packages:
           pkg-manager: poetry
       - run: poetry build
@@ -15,7 +34,10 @@ version: 2.1
 workflows:
   main:
     jobs:
+      - test
       - build:
+          requires:
+            - test
           filters:
             branches:
               ignore: /^.*/

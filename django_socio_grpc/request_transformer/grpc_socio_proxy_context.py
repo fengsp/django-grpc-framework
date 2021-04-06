@@ -4,6 +4,7 @@ import json
 class SocioProxyHttpRequest:
     HEADERS_KEY = "HEADERS"
     MAP_HEADERS = {"AUTHORIZATION": "HTTP_AUTHORIZATION"}
+    FILTERS_KEY = "FILTERS"
 
     def __init__(self, grpc_context):
         grpc_request_metadata = dict(grpc_context.invocation_metadata())
@@ -16,6 +17,13 @@ class SocioProxyHttpRequest:
         self.POST = {}
         self.COOKIES = {}
         self.FILES = {}
+
+        # Computed params
+        self.query_params = self.get_query_params(grpc_request_metadata)
+
+    def get_query_params(self, grpc_request_metadata):
+        filters_params = json.loads(grpc_request_metadata.get(self.FILTERS_KEY, "{}"))
+        return filters_params
 
 
 class GRPCSocioProxyContext:

@@ -114,8 +114,7 @@ class GenericService(services.Service):
     def filter_queryset(self, queryset):
         """Given a queryset, filter it, returning a new queryset."""
         for backend in list(self.filter_backends):
-            request = self.get_request_transformer(backend)
-            queryset = backend().filter_queryset(request, queryset, self)
+            queryset = backend().filter_queryset(self.context, queryset, self)
         return queryset
 
 
