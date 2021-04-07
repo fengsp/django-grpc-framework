@@ -53,8 +53,7 @@ def perform_import(val, setting_name):
         # We need the ROOT_URLCONF so we do this lazily
         if setting_name == "ROOT_HANDLERS_HOOK":
             return import_from_string(
-                "%s.grpc_handlers" % settings.ROOT_URLCONF,
-                setting_name,
+                "%s.grpc_handlers" % settings.ROOT_URLCONF, setting_name,
             )
         return None
     elif isinstance(val, str):
