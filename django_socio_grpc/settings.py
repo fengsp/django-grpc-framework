@@ -10,7 +10,7 @@ GRPC_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
 
     # default pagination class
-    'DEFAULT_PAGINATION_CLASS': [rest_framework.pagination.Pagenumberpagination']
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.Pagenumberpagination'
 }
 
 This module provides the `grpc_setting` object, that is used to access
@@ -32,7 +32,7 @@ DEFAULTS = {
     # Default filter class
     "DEFAULT_FILTER_BACKENDS": [],
     # default pagination class
-    # "DEFAULT_PAGINATION_CLASS": [],
+    "DEFAULT_PAGINATION_CLASS": None,
 }
 
 

@@ -37,5 +37,4 @@ class PytestTestRunner:
             
 
         argv.extend(test_labels)
-        print("ICICICIIC ", argv)
         return pytest.main(argv)

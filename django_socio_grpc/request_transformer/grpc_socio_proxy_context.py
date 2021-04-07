@@ -5,6 +5,7 @@ class SocioProxyHttpRequest:
     HEADERS_KEY = "HEADERS"
     MAP_HEADERS = {"AUTHORIZATION": "HTTP_AUTHORIZATION"}
     FILTERS_KEY = "FILTERS"
+    PAGINATION_KEY = "PAGINATION"
 
     def __init__(self, grpc_context):
         grpc_request_metadata = dict(grpc_context.invocation_metadata())
@@ -23,7 +24,11 @@ class SocioProxyHttpRequest:
 
     def get_query_params(self, grpc_request_metadata):
         filters_params = json.loads(grpc_request_metadata.get(self.FILTERS_KEY, "{}"))
-        return filters_params
+        pagination_params = json.loads(grpc_request_metadata.get(self.PAGINATION_KEY, "{}"))
+        return {**filters_params, **pagination_params}
+
+    def build_absolute_uri(self):
+        return "NYI"
 
 
 class GRPCSocioProxyContext:
