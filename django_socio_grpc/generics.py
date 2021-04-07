@@ -116,13 +116,13 @@ class GenericService(services.Service):
         for backend in list(self.filter_backends):
             queryset = backend().filter_queryset(self.context, queryset, self)
         return queryset
-    
+
     @property
     def paginator(self):
         """
         The paginator instance associated with the view, or `None`.
         """
-        if not hasattr(self, '_paginator'):
+        if not hasattr(self, "_paginator"):
             if self.pagination_class is None:
                 self._paginator = None
             else:

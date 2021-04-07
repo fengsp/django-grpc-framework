@@ -32,9 +32,8 @@ class PytestTestRunner:
 
         for ignore_label in ignore_labels:
             # argv.append(f"--ignore={ignore_label}")
-            argv.append(f"--ignore")
+            argv.append("--ignore")
             argv.append(ignore_label)
-            
 
         argv.extend(test_labels)
         return pytest.main(argv)
