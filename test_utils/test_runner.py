@@ -10,7 +10,7 @@ class PytestTestRunner:
         self.keepdb = keepdb
         self.show_local = show_local
 
-    def run_tests(self, test_labels):
+    def run_tests(self, test_labels, ignore_labels=[]):
         """Run pytest and return the exitcode.
 
         It translates some of Django's test command option to pytest's.
@@ -29,6 +29,12 @@ class PytestTestRunner:
             argv.append("--reuse-db")
         if self.show_local:
             argv.append("-l")
+
+        for ignore_label in ignore_labels:
+            # argv.append(f"--ignore={ignore_label}")
+            argv.append(f"--ignore")
+            argv.append(ignore_label)
+            
 
         argv.extend(test_labels)
         return pytest.main(argv)

@@ -14,12 +14,16 @@ default_labels = [
     "django_socio_grpc/tests/",
 ]
 
+ignore_labels = [
+    "django_socio_grpc/tests/grpc_test_utils/"
+]
+
 
 def get_suite(labels=default_labels, verbosity=3):
     from test_utils.test_runner import PytestTestRunner
 
     runner = PytestTestRunner(verbosity=verbosity)
-    failures = runner.run_tests(labels)
+    failures = runner.run_tests(labels, ignore_labels)
     if failures:
         sys.exit(failures)
 
