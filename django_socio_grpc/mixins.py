@@ -31,9 +31,16 @@ class ListModelMixin:
             This is a server streaming RPC.
         """
         queryset = self.filter_queryset(self.get_queryset())
-        serializer = self.get_serializer(queryset, many=True)
-        for message in serializer.message:
-            yield message
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            for message in serializer.message:
+                yield message
+        else:
+            serializer = self.get_serializer(queryset, many=True)
+            for message in serializer.message:
+                yield message
 
 
 class RetrieveModelMixin:

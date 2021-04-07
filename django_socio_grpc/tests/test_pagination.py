@@ -18,7 +18,7 @@ class StandardResultsSetPagination(PageNumberPagination):
     max_page_size = 100
 
 class UnitTestService(generics.ModelService):
-    queryset = UnitTestModel.objects.all()
+    queryset = UnitTestModel.objects.all().order_by("id")
     serializer_class = UnitTestSerializer
     pagination_class = StandardResultsSetPagination
 
@@ -37,9 +37,6 @@ class TestFiltering(TestCase):
     def tearDown(self):
         self.fake_grpc.close()
 
-    def test_sample(self):
-        assert True
-
     def test_page_number_pagination(self):
         grpc_stub = self.fake_grpc.get_fake_stub(UnitTestControllerStub)
         request = UnitTestListRequest()
@@ -47,19 +44,15 @@ class TestFiltering(TestCase):
 
         responses_as_list = [response for response in responses]
 
-        print(responses_as_list)
-
         self.assertEqual(len(responses_as_list), 3)
 
-    # def test_page_number_pagination(self):
-    #     grpc_stub = self.fake_grpc.get_fake_stub(FilterUnitTestControllerStub)
-    #     request = FilterUnitTestListRequest()
-    #     pagination_as_dict = {"title": "zzzzzzz"}
-    #     metadata = (("PAGINATION", (json.dumps(pagination_as_dict))),)
-    #     responses = grpc_stub.List(request=request, metadata=metadata)
+    def test_page_number_pagination(self):
+        grpc_stub = self.fake_grpc.get_fake_stub(UnitTestControllerStub)
+        request = UnitTestListRequest()
+        pagination_as_dict = {"page_size": 6}
+        metadata = (("PAGINATION", (json.dumps(pagination_as_dict))),)
+        responses = grpc_stub.List(request=request, metadata=metadata)
 
-    #     responses_as_list = [response for response in responses]
+        responses_as_list = [response for response in responses]
 
-    #     self.assertEqual(len(responses_as_list), 1)
-    #     # responses_as_list[0] is type of django_socio_grpc.tests.filter_test.filter_unittest_pb2.FilterTest
-    #     self.assertEqual(responses_as_list[0].id, 7)
+        self.assertEqual(len(responses_as_list), 6)
