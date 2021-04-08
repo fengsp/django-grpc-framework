@@ -1,11 +1,13 @@
-from django.test import TestCase
-from .utils import FakeContext
-from django_socio_grpc.services import Service
-from django.test import override_settings
-from django_socio_grpc.settings import grpc_settings
-import mock
 import json
+
+import mock
+from django.test import TestCase, override_settings
 from grpc._cython.cygrpc import _Metadatum
+
+from django_socio_grpc.services import Service
+from django_socio_grpc.settings import grpc_settings
+
+from .utils import FakeContext
 
 
 class FakeAuthentication:

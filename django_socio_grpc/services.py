@@ -1,13 +1,13 @@
 from functools import update_wrapper
 
 import grpc
-from django_socio_grpc.settings import grpc_settings
-from django.db.models.query import QuerySet
 from django import db
+from django.db.models.query import QuerySet
 
 from django_socio_grpc.request_transformer.grpc_socio_proxy_context import (
     GRPCSocioProxyContext,
 )
+from django_socio_grpc.settings import grpc_settings
 
 
 class Service:

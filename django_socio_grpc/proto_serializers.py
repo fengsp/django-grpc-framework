@@ -1,12 +1,13 @@
+from rest_framework.exceptions import ValidationError
 from rest_framework.serializers import (
+    LIST_SERIALIZER_KWARGS,
     BaseSerializer,
-    Serializer,
     ListSerializer,
     ModelSerializer,
-    LIST_SERIALIZER_KWARGS,
+    Serializer,
 )
 from rest_framework.settings import api_settings
-from rest_framework.exceptions import ValidationError
+
 from django_socio_grpc.protobuf.json_format import message_to_dict, parse_dict
 
 

@@ -21,7 +21,6 @@ from django.conf import settings
 from django.test.signals import setting_changed
 from django.utils.module_loading import import_string
 
-
 DEFAULTS = {
     #  Root grpc handlers hook configuration
     "ROOT_HANDLERS_HOOK": None,

@@ -1,6 +1,6 @@
+import hrm_pb2
 from django_socio_grpc import proto_serializers
 from hrm.models import Person
-import hrm_pb2
 
 
 class PersonProtoSerializer(proto_serializers.ModelProtoSerializer):
