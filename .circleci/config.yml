@@ -16,6 +16,9 @@ jobs:
       - checkout
       - run: pip install --no-cache-dir poetry psycopg2-binary
       - run: poetry install
+      - run: poetry run black --diff --check .
+      - run: poetry run flake8 .
+      - run: poetry run isort --check-only --recursive --diff .
       - run: poetry run tests
 
   build:
