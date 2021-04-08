@@ -55,7 +55,8 @@ class TestAuthenticationUnitary(TestCase):
         auth_user_tuple = dummy_service.resolve_user()
         self.assertEqual(auth_user_tuple, ({"email": "john.doe@johndoe.com"}, "faketoken"))
 
-    def test_perform_authentication_called_in_before_enter(self):
+    @mock.patch("django_socio_grpc.services.Service.check_permissions", mock.MagicMock())
+    def test_perform_authentication_called_in_before_action(self):
         dummy_service = DummyService()
         with mock.patch(
             "django_socio_grpc.services.Service.perform_authentication"

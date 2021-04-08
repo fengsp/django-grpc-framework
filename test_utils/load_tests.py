@@ -7,7 +7,6 @@ APPS_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 BASE_DIR = os.path.join(APPS_DIR, "django_socio_grpc")
 sys.path.append(APPS_DIR)
 
-
 # call the django setup routine
 boot_django()
 

@@ -13,6 +13,7 @@ from django_socio_grpc.settings import grpc_settings
 class Service:
 
     authentication_classes = grpc_settings.DEFAULT_AUTHENTICATION_CLASSES
+    permission_classes = grpc_settings.DEFAULT_PERMISSION_CLASSES
 
     def __init__(self, **kwargs):
         """
@@ -22,13 +23,19 @@ class Service:
             setattr(self, key, value)
 
     def perform_authentication(self):
-        user_auth_tuple = self.resolve_user()
-        if user_auth_tuple:
-            self.context.user = user_auth_tuple[0]
-            self.context.token = user_auth_tuple[1]
-        else:
+        user_auth_tuple = None
+        try:
+            user_auth_tuple = self.resolve_user()
+        #  INFO - A.D.B - 04/08/2021 - Need to work on generic exceptions
+        except Exception as e:
+            self.permission_denied(message=e)
+        if not user_auth_tuple:
             self.context.user = None
             self.context.token = None
+            return
+
+        self.context.user = user_auth_tuple[0]
+        self.context.token = user_auth_tuple[1]
 
     def resolve_user(self):
         auth_responses = [
@@ -38,12 +45,41 @@ class Service:
             return auth_responses[0]
         return None
 
+    def check_permissions(self):
+        for permission in self.get_permissions():
+            if not permission.has_permission(self.context, self):
+                self.permission_denied(
+                    message=getattr(permission, "message", None),
+                    code=getattr(permission, "code", None),
+                )
+
+    def check_object_permissions(self, obj):
+        for permission in self.get_permissions():
+            if not permission.has_object_permission(self.context, self, obj):
+                self.permission_denied(
+                    message=getattr(permission, "message", None),
+                    code=getattr(permission, "code", None),
+                )
+
+    def get_permissions(self):
+        return [permission() for permission in self.permission_classes]
+
+    def permission_denied(self, message=None, code=None):
+        #  INFO - A.D.B - 04/08/2021 - Message and code not really used for now
+        #  Need to work on exception classes
+        if len(self.authentication_classes) > 0 and not self.context.user:
+            self.context.abort(
+                grpc.StatusCode.UNAUTHENTICATED, f"Authentication failed {message}"
+            )
+            return
+        self.context.abort(grpc.StatusCode.PERMISSION_DENIED, f"Permission denied {message}")
+
     def before_action(self):
         """
         Runs anything that needs to occur prior to calling the method handler.
         """
         self.perform_authentication()
-        # self.check_permissions(request)
+        self.check_permissions()
 
     @classmethod
     def as_servicer(cls, **initkwargs):
@@ -83,7 +119,7 @@ class Service:
                     try:
                         self = cls(**initkwargs)
                         self.request = request
-                        self.context = GRPCSocioProxyContext(context)
+                        self.context = GRPCSocioProxyContext(context, action)
                         self.action = action
                         self.before_action()
                         return getattr(self, action)(self.request, self.context)
