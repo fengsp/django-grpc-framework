@@ -22,17 +22,21 @@ class Service:
             setattr(self, key, value)
 
     def perform_authentication(self):
-        if len(self.authentication_classes) == 0:
-            return
         user_auth_tuple = self.resolve_user()
-        self.context.user = user_auth_tuple[0]
-        self.context.token = user_auth_tuple[1]
+        if user_auth_tuple:
+            self.context.user = user_auth_tuple[0]
+            self.context.token = user_auth_tuple[1]
+        else:
+            self.context.user = None
+            self.context.token = None
 
     def resolve_user(self):
         auth_responses = [
             auth().authenticate(self.context) for auth in self.authentication_classes
         ]
-        return auth_responses[0]
+        if auth_responses:
+            return auth_responses[0]
+        return None
 
     def before_action(self):
         """
@@ -82,7 +86,7 @@ class Service:
                         self.context = GRPCSocioProxyContext(context)
                         self.action = action
                         self.before_action()
-                        return getattr(self, action)(request, context)
+                        return getattr(self, action)(self.request, self.context)
                     finally:
                         db.close_old_connections()
 
