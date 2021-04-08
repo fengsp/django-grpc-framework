@@ -3,8 +3,9 @@
 import grpc
 from google.protobuf import empty_pb2 as google_dot_protobuf_dot_empty__pb2
 
-from django_socio_grpc.tests.grpc_test_utils import \
-    unittest_pb2 as django__socio__grpc_dot_tests_dot_grpc__test__utils_dot_unittest__pb2
+from django_socio_grpc.tests.grpc_test_utils import (
+    unittest_pb2 as django__socio__grpc_dot_tests_dot_grpc__test__utils_dot_unittest__pb2,
+)
 
 
 class UnitTestControllerStub(object):
