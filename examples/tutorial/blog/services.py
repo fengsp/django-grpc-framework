@@ -1,7 +1,6 @@
 from blog.models import Post
 from blog.serializers import PostProtoSerializer
-from django_socio_grpc import mixins
-from django_socio_grpc import generics
+from django_socio_grpc import generics, mixins
 
 
 """

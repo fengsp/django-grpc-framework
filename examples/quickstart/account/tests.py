@@ -1,7 +1,8 @@
-from django_socio_grpc.test import RPCTestCase
 from django.contrib.auth.models import User
+
 import account_pb2
 import account_pb2_grpc
+from django_socio_grpc.test import RPCTestCase
 
 
 class UserServiceTest(RPCTestCase):

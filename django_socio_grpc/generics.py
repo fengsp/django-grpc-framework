@@ -1,12 +1,12 @@
-from django.db.models.query import QuerySet
-from django.shortcuts import get_object_or_404
-from django.core.exceptions import ValidationError
-from django.http import Http404
 import grpc
+from django.core.exceptions import ValidationError
+from django.db.models.query import QuerySet
+from django.http import Http404
+from django.shortcuts import get_object_or_404
 
-from django_socio_grpc.utils import model_meta
 from django_socio_grpc import mixins, services
 from django_socio_grpc.settings import grpc_settings
+from django_socio_grpc.utils import model_meta
 
 
 class GenericService(services.Service):

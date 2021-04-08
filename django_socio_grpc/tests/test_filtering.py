@@ -1,15 +1,17 @@
-from django.test import TestCase
-from .grpc_test_utils.fake_grpc import FakeGRPC
+import json
 
+from django.test import TestCase
+from django_filters.rest_framework import DjangoFilterBackend
+
+from django_socio_grpc import generics
+
+from .grpc_test_utils.django_classes_for_tests import UnitTestModel, UnitTestSerializer
+from .grpc_test_utils.fake_grpc import FakeGRPC
 from .grpc_test_utils.unittest_pb2 import UnitTestListRequest
 from .grpc_test_utils.unittest_pb2_grpc import (
-    add_UnitTestControllerServicer_to_server,
     UnitTestControllerStub,
+    add_UnitTestControllerServicer_to_server,
 )
-from django_socio_grpc import generics
-from django_filters.rest_framework import DjangoFilterBackend
-import json
-from .grpc_test_utils.django_classes_for_tests import UnitTestModel, UnitTestSerializer
 
 
 class UnitTestService(generics.ModelService):
