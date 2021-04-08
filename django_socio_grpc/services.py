@@ -1,13 +1,17 @@
+import logging
 from functools import update_wrapper
 
 import grpc
 from django import db
 from django.db.models.query import QuerySet
 
+from django_socio_grpc.exceptions import GRPCException
 from django_socio_grpc.request_transformer.grpc_socio_proxy_context import (
     GRPCSocioProxyContext,
 )
 from django_socio_grpc.settings import grpc_settings
+
+logger = logging.getLogger("django_socio_grpc")
 
 
 class Service:
@@ -123,6 +127,11 @@ class Service:
                         self.action = action
                         self.before_action()
                         return getattr(self, action)(self.request, self.context)
+                    except GRPCException as grpc_error:
+                        logger.error(grpc_error)
+                        self.context.abort(
+                            grpc_error.status_code, grpc_error.get_full_details()
+                        )
                     finally:
                         db.close_old_connections()
 
