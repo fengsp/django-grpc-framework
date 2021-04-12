@@ -1,11 +1,12 @@
 import os
 import sys
 
-from test_utils.boot_django import boot_django  # noqa
-
 APPS_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 BASE_DIR = os.path.join(APPS_DIR, "django_socio_grpc")
 sys.path.append(APPS_DIR)
+
+
+from test_utils.boot_django import boot_django  # isort:skip # noqa
 
 
 # call the django setup routine

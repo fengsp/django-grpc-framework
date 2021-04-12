@@ -84,12 +84,14 @@ class GenericService(services.Service):
         lookup_value = getattr(self.request, lookup_request_field)
         filter_kwargs = {lookup_field: lookup_value}
         try:
-            return get_object_or_404(queryset, **filter_kwargs)
+            obj = get_object_or_404(queryset, **filter_kwargs)
         except (TypeError, ValueError, ValidationError, Http404):
             self.context.abort(
                 grpc.StatusCode.NOT_FOUND,
                 ("%s: %s not found!" % (queryset.model.__name__, lookup_value)),
             )
+        self.check_object_permissions(obj)
+        return obj
 
     def get_serializer(self, *args, **kwargs):
         """
