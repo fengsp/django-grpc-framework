@@ -44,10 +44,7 @@ class SocioProxyHttpRequest:
         return "NYI"
 
     def grpc_action_to_http_method_name(self, grpc_action):
-        for k, v in self.METHOD_MAP.items():
-            if grpc_action.lower().startswith(k.lower()):
-                return v
-        return None
+        return self.METHOD_MAP.get(grpc_action, None)
 
 
 class GRPCSocioProxyContext:

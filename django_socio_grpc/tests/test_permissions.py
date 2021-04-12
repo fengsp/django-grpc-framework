@@ -174,31 +174,31 @@ class TestPermissionsIntegration(TestCase):
         self.assertEqual(fake_rpc_error.exception._details, "Permission denied fake message")
 
     def test_method_map_to_http_list(self):
-        self.service.ListDummyMethod = self.dummy_method
-        self.servicer.ListDummyMethod(None, self.fake_context)
+        self.service.List = self.dummy_method
+        self.servicer.List(None, self.fake_context)
         self.assertEqual(self.fake_context.method, "GET")
 
     def test_method_map_to_http_retrieve(self):
-        self.service.RetrieveDummyMethod = self.dummy_method
-        self.servicer.RetrieveDummyMethod(None, self.fake_context)
+        self.service.Retrieve = self.dummy_method
+        self.servicer.Retrieve(None, self.fake_context)
         self.assertEqual(self.fake_context.method, "GET")
 
     def test_method_map_to_http_create(self):
-        self.service.CreateDummyMethod = self.dummy_method
-        self.servicer.CreateDummyMethod(None, self.fake_context)
+        self.service.Create = self.dummy_method
+        self.servicer.Create(None, self.fake_context)
         self.assertEqual(self.fake_context.method, "POST")
 
     def test_method_map_to_http_update(self):
-        self.service.UpdateDummyMethod = self.dummy_method
-        self.servicer.UpdateDummyMethod(None, self.fake_context)
+        self.service.Update = self.dummy_method
+        self.servicer.Update(None, self.fake_context)
         self.assertEqual(self.fake_context.method, "PUT")
 
     def test_method_map_to_http_partial_update(self):
-        self.service.PartialUpdateDummyMethod = self.dummy_method
-        self.servicer.PartialUpdateDummyMethod(None, self.fake_context)
+        self.service.PartialUpdate = self.dummy_method
+        self.servicer.PartialUpdate(None, self.fake_context)
         self.assertEqual(self.fake_context.method, "PATCH")
 
     def test_method_map_to_http_destroy(self):
-        self.service.DestroyDummyMethod = self.dummy_method
-        self.servicer.DestroyDummyMethod(None, self.fake_context)
+        self.service.Destroy = self.dummy_method
+        self.servicer.Destroy(None, self.fake_context)
         self.assertEqual(self.fake_context.method, "DELETE")
