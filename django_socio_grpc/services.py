@@ -10,6 +10,7 @@ from django_socio_grpc.request_transformer.grpc_socio_proxy_context import (
     GRPCSocioProxyContext,
 )
 from django_socio_grpc.settings import grpc_settings
+from django_socio_grpc.exceptions import Unauthenticated, PermissionDenied
 
 logger = logging.getLogger("django_socio_grpc")
 
@@ -32,7 +33,7 @@ class Service:
             user_auth_tuple = self.resolve_user()
         #  INFO - A.D.B - 04/08/2021 - Need to work on generic exceptions
         except Exception as e:
-            self.permission_denied(message=e)
+            raise Unauthenticated(detail=e)
         if not user_auth_tuple:
             self.context.user = None
             self.context.token = None
@@ -52,31 +53,19 @@ class Service:
     def check_permissions(self):
         for permission in self.get_permissions():
             if not permission.has_permission(self.context, self):
-                self.permission_denied(
-                    message=getattr(permission, "message", None),
-                    code=getattr(permission, "code", None),
+                raise PermissionDenied(
+                    detail=getattr(permission, "message", None)
                 )
 
     def check_object_permissions(self, obj):
         for permission in self.get_permissions():
             if not permission.has_object_permission(self.context, self, obj):
-                self.permission_denied(
-                    message=getattr(permission, "message", None),
-                    code=getattr(permission, "code", None),
+                raise PermissionDenied(
+                    detail=getattr(permission, "message", None)
                 )
 
     def get_permissions(self):
         return [permission() for permission in self.permission_classes]
-
-    def permission_denied(self, message=None, code=None):
-        #  INFO - A.D.B - 04/08/2021 - Message and code not really used for now
-        #  Need to work on exception classes
-        if len(self.authentication_classes) > 0 and not self.context.user:
-            self.context.abort(
-                grpc.StatusCode.UNAUTHENTICATED, f"Authentication failed {message}"
-            )
-            return
-        self.context.abort(grpc.StatusCode.PERMISSION_DENIED, f"Permission denied {message}")
 
     def before_action(self):
         """
@@ -128,6 +117,7 @@ class Service:
                         self.before_action()
                         return getattr(self, action)(self.request, self.context)
                     except GRPCException as grpc_error:
+                        print("ICIICICICIIC\n" * 6)
                         logger.error(grpc_error)
                         self.context.abort(
                             grpc_error.status_code, grpc_error.get_full_details()

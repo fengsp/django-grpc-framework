@@ -1,10 +1,12 @@
 import grpc
 import mock
+import pytest
 from django.test import TestCase, override_settings
 
 from django_socio_grpc.services import Service
 from django_socio_grpc.settings import grpc_settings
 from django_socio_grpc.tests.grpc_test_utils.fake_grpc import FakeContext, FakeRpcError
+from django_socio_grpc.exceptions import PermissionDenied
 
 
 class FakePermission:
@@ -48,9 +50,8 @@ class TestPermissionUnitary(TestCase):
             dummy_service.check_permissions()
             mock_has_permissions.assert_called_once_with(dummy_service.context, dummy_service)
 
-    @mock.patch("django_socio_grpc.services.Service.permission_denied")
     @mock.patch("django_socio_grpc.services.Service.get_permissions")
-    def test_check_permissions_not_ok(self, mock_get_permissions, mock_permission_denied):
+    def test_check_permissions_not_ok(self, mock_get_permissions):
         mock_get_permissions.return_value = [FakePermission()]
         mock_get_permissions.return_value = [FakePermission()]
         #   Create a dummyservice for unitary tests
@@ -61,11 +62,9 @@ class TestPermissionUnitary(TestCase):
             "django_socio_grpc.tests.test_permissions.FakePermission.has_permission"
         ) as mock_has_permissions:
             mock_has_permissions.return_value = False
-            dummy_service.check_permissions()
-            mock_has_permissions.assert_called_once_with(dummy_service.context, dummy_service)
-            mock_permission_denied.assert_called_once_with(
-                message="fake message", code="fake code"
-            )
+            with pytest.raises(PermissionDenied):
+                dummy_service.check_permissions()
+                mock_has_permissions.assert_called_once_with(dummy_service.context, dummy_service)
 
     @mock.patch("django_socio_grpc.services.Service.get_permissions")
     def test_check_object_permissions_ok(self, mock_get_permissions):
@@ -83,10 +82,9 @@ class TestPermissionUnitary(TestCase):
                 dummy_service.context, dummy_service, "fake_obj"
             )
 
-    @mock.patch("django_socio_grpc.services.Service.permission_denied")
     @mock.patch("django_socio_grpc.services.Service.get_permissions")
     def test_check_object_permissions_not_ok(
-        self, mock_get_permissions, mock_permission_denied
+        self, mock_get_permissions
     ):
         mock_get_permissions.return_value = [FakePermission()]
         #   Create a dummyservice for unitary tests
@@ -97,13 +95,11 @@ class TestPermissionUnitary(TestCase):
             "django_socio_grpc.tests.test_permissions.FakePermission.has_object_permission"
         ) as mock_has_object_permissions:
             mock_has_object_permissions.return_value = False
-            dummy_service.check_object_permissions("fake_obj")
-            mock_has_object_permissions.assert_called_once_with(
-                dummy_service.context, dummy_service, "fake_obj"
-            )
-            mock_permission_denied.assert_called_once_with(
-                message="fake message", code="fake code"
-            )
+            with pytest.raises(PermissionDenied):
+                dummy_service.check_object_permissions("fake_obj")
+                mock_has_object_permissions.assert_called_once_with(
+                    dummy_service.context, dummy_service, "fake_obj"
+                )
 
     def test_get_permissions(self):
         dummy_service = DummyService()
@@ -112,29 +108,6 @@ class TestPermissionUnitary(TestCase):
         self.assertEqual(len(returned_perms), 1)
         self.assertIsInstance(returned_perms[0], FakePermission)
 
-    def test_permission_denied_not_authenticated(self):
-        dummy_service = DummyService()
-        dummy_service.context = FakeContext()
-        dummy_service.context.user = None
-        dummy_service.context.abort = mock.MagicMock()
-        dummy_service.authentication_classes = ["fake_auth"]
-
-        dummy_service.permission_denied(message="fake_message")
-        dummy_service.context.abort.assert_called_once_with(
-            grpc.StatusCode.UNAUTHENTICATED, "Authentication failed fake_message"
-        )
-
-    def test_permission_denied_no_permission(self):
-        dummy_service = DummyService()
-        dummy_service.context = FakeContext()
-        dummy_service.context.user = "user"
-        dummy_service.context.abort = mock.MagicMock()
-        dummy_service.authentication_classes = ["fake_auth"]
-
-        dummy_service.permission_denied(message="fake_message")
-        dummy_service.context.abort.assert_called_once_with(
-            grpc.StatusCode.PERMISSION_DENIED, "Permission denied fake_message"
-        )
 
     @mock.patch("django_socio_grpc.services.Service.perform_authentication", mock.MagicMock())
     @mock.patch("django_socio_grpc.services.Service.check_permissions")
@@ -170,8 +143,8 @@ class TestPermissionsIntegration(TestCase):
             self.service.permission_classes = [FakePermission]
             self.service.ListDummyMethod = self.dummy_method
             self.servicer.ListDummyMethod(None, self.fake_context)
-        self.assertEqual(fake_rpc_error.exception._code, grpc.StatusCode.PERMISSION_DENIED)
-        self.assertEqual(fake_rpc_error.exception._details, "Permission denied fake message")
+        self.assertEqual(fake_rpc_error.exception._code, grpc.StatusCode.PERMISSION_DENIED.value)
+        self.assertEqual(str(fake_rpc_error.exception._details), "{'message': ErrorDetail(string='fake message', code='permission_denied'), 'code': 'permission_denied'}")
 
     def test_method_map_to_http_list(self):
         self.service.List = self.dummy_method
