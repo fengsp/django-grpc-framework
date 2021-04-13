@@ -1,8 +1,8 @@
 """
-Handled exceptions raised by REST framework.
+Handled exceptions raised by socio grpc framework.
 
-In addition Django's built in 403 and 404 exceptions are handled.
-(`django.http.Http404` and `django.core.exceptions.PermissionDenied`)
+this file is almost identical to https://github.com/encode/django-rest-framework/blob/master/rest_framework/exceptions.py
+But with the grpc code
 """
 from django.utils.encoding import force_str
 from django.utils.translation import gettext_lazy as _
@@ -117,6 +117,12 @@ class GRPCException(Exception):
         Eg. {"name": [{"message": "This field is required.", "code": "required"}]}
         """
         return _get_full_details(self.detail)
+
+
+class Unauthenticated(GRPCException):
+    status_code = StatusCode.UNAUTHENTICATED.value
+    default_detail = _("Authentication credentials were not provided.")
+    default_code = "not_authenticated"
 
 
 class PermissionDenied(GRPCException):
