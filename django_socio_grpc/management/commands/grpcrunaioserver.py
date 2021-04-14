@@ -12,7 +12,7 @@ from django.utils import autoreload
 from django.conf import settings
 from django.core.management.base import BaseCommand
 
-from django_socio_grpc.settings import grpc_settings
+from django_socio_grpc.settings import grpc_settings, GRPC_CHANNEL_PORT
 
 logger = logging.getLogger("django_socio_grpc")
 
@@ -26,7 +26,7 @@ class Command(BaseCommand):
         parser.add_argument(
             "address",
             nargs="?",
-            default="[::]:50051",
+            default=f"[::]:{GRPC_CHANNEL_PORT}",
             help="Optional address for which to open a port.",
         )
         parser.add_argument(
