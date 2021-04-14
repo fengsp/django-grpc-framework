@@ -1,9 +1,14 @@
 import io
+import logging
 from collections import OrderedDict
 
 from django.db import models
 from rest_framework.utils import model_meta
 from rest_framework.utils.field_mapping import ClassLookupDict
+
+from django_socio_grpc.utils.model_extractor import get_app_list
+
+logger = logging.getLogger("django_socio_grpc")
 
 
 class ModelProtoGenerator:
@@ -45,6 +50,14 @@ class ModelProtoGenerator:
             package = model.__name__.lower()
         self.package = package
         self.type_mapping = ClassLookupDict(self.type_mapping)
+        # -----------------------------------------------------
+        # -- check if Package name exist in Django app List ---
+        # -----------------------------------------------------
+        dictApp = get_app_list()
+        if package not in dictApp:
+            logger.error(f"Invalid Django Package {package}")
+            return
+
         # Retrieve metadata about fields & relationships on the model class.
         self.field_info = model_meta.get_field_info(model)
         self._writer = _CodeWriter()

@@ -1,6 +1,7 @@
 from django.contrib.auth.models import User
-from django_socio_grpc import proto_serializers
+
 import account_pb2
+from django_socio_grpc import proto_serializers
 
 
 class UserProtoSerializer(proto_serializers.ModelProtoSerializer):

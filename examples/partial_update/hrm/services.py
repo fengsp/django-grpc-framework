@@ -1,6 +1,6 @@
 from django_socio_grpc import generics, mixins
-from hrm.serializers import PersonProtoSerializer
 from hrm.models import Person
+from hrm.serializers import PersonProtoSerializer
 
 
 """

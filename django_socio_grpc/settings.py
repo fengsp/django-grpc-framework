@@ -10,7 +10,11 @@ GRPC_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
 
     # default pagination class
-    'DEFAULT_PAGINATION_CLASS': [rest_framework.pagination.Pagenumberpagination']
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.Pagenumberpagination'
+
+    'DEFAULT_AUTHENTICATION_CLASSES': ['path.to.AuthenticationClass'],
+
+    'DEFAULT_PERMISSION_CLASSES': ['path.to.DefaultPermissionClass'],
 }
 
 This module provides the `grpc_setting` object, that is used to access
@@ -20,7 +24,6 @@ back to the defaults.
 from django.conf import settings
 from django.test.signals import setting_changed
 from django.utils.module_loading import import_string
-
 
 DEFAULTS = {
     #  Root grpc handlers hook configuration
@@ -32,7 +35,9 @@ DEFAULTS = {
     # Default filter class
     "DEFAULT_FILTER_BACKENDS": [],
     # default pagination class
-    # "DEFAULT_PAGINATION_CLASS": [],
+    "DEFAULT_PAGINATION_CLASS": None,
+    #  Default permission classes
+    "DEFAULT_PERMISSION_CLASSES": [],
 }
 
 
@@ -41,6 +46,7 @@ IMPORT_STRINGS = [
     "ROOT_HANDLERS_HOOK",
     "SERVER_INTERCEPTORS",
     "DEFAULT_AUTHENTICATION_CLASSES",
+    "DEFAULT_PERMISSION_CLASSES",
 ]
 
 

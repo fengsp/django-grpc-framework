@@ -1,8 +1,8 @@
-from django_socio_grpc import generics, mixins
-from django_socio_grpc import proto_serializers
-from snippets.models import Snippet
-import snippets_pb2
 from google.protobuf.struct_pb2 import NullValue
+
+import snippets_pb2
+from django_socio_grpc import generics, mixins, proto_serializers
+from snippets.models import Snippet
 
 
 class SnippetProtoSerializer(proto_serializers.ModelProtoSerializer):

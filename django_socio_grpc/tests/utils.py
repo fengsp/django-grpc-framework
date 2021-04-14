@@ -1,5 +1,5 @@
-from django.test import testcases
 import grpc
+from django.test import testcases
 
 from django_socio_grpc.settings import grpc_settings
 

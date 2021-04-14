@@ -1,12 +1,12 @@
-from django.db.models.query import QuerySet
-from django.shortcuts import get_object_or_404
-from django.core.exceptions import ValidationError
-from django.http import Http404
 import grpc
+from django.core.exceptions import ValidationError
+from django.db.models.query import QuerySet
+from django.http import Http404
+from django.shortcuts import get_object_or_404
 
-from django_socio_grpc.utils import model_meta
 from django_socio_grpc import mixins, services
 from django_socio_grpc.settings import grpc_settings
+from django_socio_grpc.utils import model_meta
 
 
 class GenericService(services.Service):
@@ -26,7 +26,7 @@ class GenericService(services.Service):
     filter_backends = grpc_settings.DEFAULT_FILTER_BACKENDS
 
     # The style to use for queryset pagination.
-    # pagination_class = grpc_settings.DEFAULT_PAGINATION_CLASS
+    pagination_class = grpc_settings.DEFAULT_PAGINATION_CLASS
 
     def get_queryset(self):
         """
@@ -84,12 +84,14 @@ class GenericService(services.Service):
         lookup_value = getattr(self.request, lookup_request_field)
         filter_kwargs = {lookup_field: lookup_value}
         try:
-            return get_object_or_404(queryset, **filter_kwargs)
+            obj = get_object_or_404(queryset, **filter_kwargs)
         except (TypeError, ValueError, ValidationError, Http404):
             self.context.abort(
                 grpc.StatusCode.NOT_FOUND,
                 ("%s: %s not found!" % (queryset.model.__name__, lookup_value)),
             )
+        self.check_object_permissions(obj)
+        return obj
 
     def get_serializer(self, *args, **kwargs):
         """
@@ -114,9 +116,28 @@ class GenericService(services.Service):
     def filter_queryset(self, queryset):
         """Given a queryset, filter it, returning a new queryset."""
         for backend in list(self.filter_backends):
-            request = self.get_request_transformer(backend)
-            queryset = backend().filter_queryset(request, queryset, self)
+            queryset = backend().filter_queryset(self.context, queryset, self)
         return queryset
+
+    @property
+    def paginator(self):
+        """
+        The paginator instance associated with the view, or `None`.
+        """
+        if not hasattr(self, "_paginator"):
+            if self.pagination_class is None:
+                self._paginator = None
+            else:
+                self._paginator = self.pagination_class()
+        return self._paginator
+
+    def paginate_queryset(self, queryset):
+        """
+        Return a single page of results, or `None` if pagination is disabled.
+        """
+        if self.paginator is None:
+            return None
+        return self.paginator.paginate_queryset(queryset, self.context, view=self)
 
 
 class CreateService(mixins.CreateModelMixin, GenericService):
