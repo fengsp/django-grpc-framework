@@ -2,7 +2,8 @@
 Handled exceptions raised by socio grpc framework.
 
 this file is almost identical to https://github.com/encode/django-rest-framework/blob/master/rest_framework/exceptions.py
-But with the grpc code
+But with the grpc code: https://grpc.github.io/grpc/python/grpc.html#grpc-status-code
+This file will grown to support all the gRPC exception when needed
 """
 from django.utils.encoding import force_str
 from django.utils.translation import gettext_lazy as _
@@ -83,7 +84,7 @@ class ErrorDetail(str):
 
 class GRPCException(Exception):
     """
-    Base class for REST framework exceptions.
+    Base class for Socio gRPC framework exceptions.
     Subclasses should provide `.status_code` and `.default_detail` properties.
     """
 

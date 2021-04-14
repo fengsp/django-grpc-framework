@@ -4,7 +4,7 @@ from django.core.management.base import BaseCommand, CommandError
 from django.utils.module_loading import import_string
 
 from django_socio_grpc.protobuf.generators import ModelProtoGenerator
-from django_socio_grpc.utils.model_extractor import getModel, getModelColumn
+from django_socio_grpc.utils.model_extractor import get_model, get_model_column
 
 
 class Command(BaseCommand):
@@ -76,7 +76,7 @@ class Command(BaseCommand):
         # --- extract all available model's Column  ---
         # ---------------------------------------------
         if not modelValid:
-            model = getModel(model)
+            model = get_model(model)
 
         # --------------------------------------------------------
         # ----  AUTO GENERATION OF ALL DATA MODEL FIELDS LIST  ---
@@ -84,7 +84,7 @@ class Command(BaseCommand):
         # --------------------------------------------------------
         if model:
             if fields == "*":
-                arrayFields = getModelColumn(model)
+                arrayFields = get_model_column(model)
                 if len(arrayFields) > 0:
                     for col in arrayFields:
                         fieldsArray.append(col["name"])

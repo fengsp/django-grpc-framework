@@ -30,7 +30,6 @@ class Service:
         user_auth_tuple = None
         try:
             user_auth_tuple = self.resolve_user()
-        #  INFO - A.D.B - 04/08/2021 - Need to work on generic exceptions
         except Exception as e:
             raise Unauthenticated(detail=e)
         if not user_auth_tuple:
@@ -112,7 +111,6 @@ class Service:
                         self.before_action()
                         return getattr(self, action)(self.request, self.context)
                     except GRPCException as grpc_error:
-                        print("ICIICICICIIC\n" * 6)
                         logger.error(grpc_error)
                         self.context.abort(
                             grpc_error.status_code, grpc_error.get_full_details()

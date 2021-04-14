@@ -1,119 +1,72 @@
-def getModelChoice(arrValue, application="", mode=""):
-    """
-    Convert array to Model Choices List
-    """
-    from collections import defaultdict
-
-    ctrValue = 0
-    returnList = defaultdict(list)
-
-    for value in arrValue:
-        if not mode:
-            returnBlock = (value, arrValue[value])
-        else:
-            returnBlock = (value, value)
-        returnList[application].append(returnBlock)
-        ctrValue += 1
-
-    if ctrValue > 0:
-        return returnList.get(application)
-    else:
-        return returnList
-
-
-def getAppList():
+def get_app_list():
     """
     Get list of Django application as List
     """
     from django.apps import apps
 
-    dictApp = {}
+    dict_app = {}
 
     for app in apps.get_app_configs():
-        dictApp[app.name] = app.verbose_name
+        dict_app[app.name] = app.verbose_name
 
-    return dictApp
-
-
-def getModelList(appName=""):
-    """
-    Get list of Django Data Model List
-    """
-    from django.apps import apps
-
-    dicModel = {}
-
-    if not appName:
-        for app in apps.get_app_configs():
-            for model in app.get_models():
-                modelName = model.__name__
-                dicModel[modelName] = app.name
-    else:
-        appTables = apps.get_app_config(appName)
-        if appTables:
-            for model in appTables.models:
-                modelName = model
-                dicModel[modelName] = appName
-
-    dicModel = getModelChoice(dicModel, mode="single")
-    return dicModel
+    return dict_app
 
 
-def getModel(currentModelName):
+def get_model(current_model_name):
     """
     Get Model from name
     """
     from django.apps import apps
     from django.contrib.contenttypes.models import ContentType
 
-    currentModel = None
+    current_model = None
 
-    if currentModelName:
+    if current_model_name:
 
         #  ----------------------------------------------------------
         #  ---  search if this model exist on Django content type ---
         #  ----------------------------------------------------------
-        currentModel = ContentType.objects.filter(model=currentModelName)
+        current_model = ContentType.objects.filter(model=current_model_name)
 
         # -------------------------------
         # ---  This Model is valid    ---
         # -------------------------------
-        if currentModel:
-            app_label = currentModel[0].app_label
-            currentModel = apps.get_model(app_label=app_label, model_name=currentModelName)
-    return currentModel
+        if current_model:
+            app_label = current_model[0].app_label
+            current_model = apps.get_model(app_label=app_label, model_name=current_model_name)
+    return current_model
 
 
-def getModelColumn(modelObject):
+def get_model_column(model_object):
     """
     extract Column List from a Data Model
     """
-    arrayCol = []
+    array_col = []
 
-    colList = modelObject._meta.get_fields(
+    colList = model_object._meta.get_fields(
         include_parents=False
     )  # ---- get column list of the foreignkey Data Model ----
-    for eachCol in colList:
-        dicColInfo = extractColData(eachCol)
-        arrayCol.append(dicColInfo)
+    for each_col in colList:
+        dict_col_info = extract_col_data(each_col)
+        array_col.append(dict_col_info)
 
-    return arrayCol
+    return array_col
 
 
-def extractColData(eachCol):
+def extract_col_data(each_col):
     """
     extract main  characterostic of each column
     """
 
-    dicCol = {}
-    name = eachCol.name
-    typeCol = eachCol.get_internal_type()
+    dict_col = {}
+    name = each_col.name
+    type_col = each_col.get_internal_type()
 
     # --------------------------------------------
     # ----  extractcolumn lenght if available  ---
     # --------------------------------------------
     try:
-        length = eachCol.max_length
+        length = each_col.max_length
         if not length:
             length = ""
     except Exception:
@@ -123,17 +76,17 @@ def extractColData(eachCol):
     # ----  extract verbose Name if available  ---
     # --------------------------------------------
     try:
-        verboseLabel = eachCol.verbose_name
+        verbose_label = each_col.verbose_name
     except Exception:
-        verboseLabel = ""
+        verbose_label = ""
 
     # ----------------------------------------
     #  ---- store characteristic of column ---
     # ----------------------------------------
-    dicCol["column"] = eachCol
-    dicCol["label"] = verboseLabel
-    dicCol["name"] = name
-    dicCol["length"] = length
-    dicCol["type"] = typeCol
+    dict_col["column"] = each_col
+    dict_col["label"] = verbose_label
+    dict_col["name"] = name
+    dict_col["length"] = length
+    dict_col["type"] = type_col
 
-    return dicCol
+    return dict_col

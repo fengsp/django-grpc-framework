@@ -6,7 +6,7 @@ from django.db import models
 from rest_framework.utils import model_meta
 from rest_framework.utils.field_mapping import ClassLookupDict
 
-from django_socio_grpc.utils.model_extractor import getAppList
+from django_socio_grpc.utils.model_extractor import get_app_list
 
 logger = logging.getLogger("django_socio_grpc")
 
@@ -53,7 +53,7 @@ class ModelProtoGenerator:
         # -----------------------------------------------------
         # -- check if Package name exist in Django app List ---
         # -----------------------------------------------------
-        dictApp = getAppList(mode="dic")
+        dictApp = get_app_list()
         if package not in dictApp:
             logger.error(f"Invalid Django Package {package}")
             return
