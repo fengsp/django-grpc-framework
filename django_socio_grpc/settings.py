@@ -38,6 +38,8 @@ DEFAULTS = {
     "DEFAULT_PAGINATION_CLASS": None,
     #  Default permission classes
     "DEFAULT_PERMISSION_CLASSES": [],
+    # gRPC running mode
+    "GRPC_ASYNC": False,
 }
 
 
