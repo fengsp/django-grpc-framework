@@ -125,7 +125,7 @@ and deserializing the post instances into protocol buffer messages.  We can
 do this by declaring serializers, create a file in the ``blog`` directory
 named ``serializers.py`` and add the following::
 
-    from django_grpc_framework import proto_serializerss
+    from django_grpc_framework import proto_serializers
     from blog.models import Post
     from blog_proto import post_pb2
 
@@ -188,7 +188,7 @@ in the ``blog`` directory named ``services.py`` and add the following::
 
 Finally we need to wire there services up, create ``blog/handlers.py`` file::
 
-    from blog._services import PostService
+    from blog.services import PostService
     from blog_proto import post_pb2_grpc
 
 
