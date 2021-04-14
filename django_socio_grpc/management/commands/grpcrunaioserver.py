@@ -4,6 +4,7 @@ from datetime import datetime
 import sys
 import errno
 import os
+import logging
 
 import grpc
 import asyncio
@@ -12,6 +13,8 @@ from django.conf import settings
 from django.core.management.base import BaseCommand
 
 from django_socio_grpc.settings import grpc_settings
+
+logger = logging.getLogger("django_socio_grpc")
 
 
 class Command(BaseCommand):
@@ -57,7 +60,7 @@ class Command(BaseCommand):
             else:
                 autoreload.main(self.inner_run, None, options)
         else:
-            self.stdout.write(
+            logger.info(
                 ("Starting async gRPC server at %(address)s\n")
                 % {
                     "address": self.address,
@@ -82,31 +85,30 @@ class Command(BaseCommand):
             await server.stop(0)
 
     def inner_run(self, *args, **options):
+        # ------------------------------------------------------------------------
         # If an exception was silenced in ManagementUtility.execute in order
         # to be raised in the child process, raise it now.
+        # ------------------------------------------------------------------------
         autoreload.raise_last_exception()
-
-        self.stdout.write("Performing system checks...\n\n")
+        logger.info('"Performing system checks...\n\n')
         self.check(display_num_errors=True)
+
+        # -----------------------------------------------------------
         # Need to check migrations here, so can't use the
         # requires_migrations_check attribute.
+        # -----------------------------------------------------------
         self.check_migrations()
-        now = datetime.now().strftime("%B %d, %Y - %X")
-        self.stdout.write(now)
         quit_command = "CTRL-BREAK" if sys.platform == "win32" else "CONTROL-C"
-        self.stdout.write(
-            (
-                "Django version %(version)s, using settings %(settings)r\n"
-                "Starting development async gRPC server at %(address)s\n"
-                "Quit the async server with %(quit_command)s.\n"
-            )
-            % {
-                "version": self.get_version(),
-                "settings": settings.SETTINGS_MODULE,
-                "address": self.address,
-                "quit_command": quit_command,
-            }
+        serverStartDta = (
+            f"Django version {self.get_version()}, using settings {settings.SETTINGS_MODULE}\n"
+            f"Starting development async gRPC server at {self.address}\n"
+            f"Quit the server with {quit_command}s.\n"
         )
+
+        # --------------------------------------------
+        # ---  START ASYNC GRPC SERVER             ---
+        # --------------------------------------------
+        logger.info(serverStartDta)
         try:
             asyncio.run(self._serve())
         except OSError as e:
@@ -120,8 +122,13 @@ class Command(BaseCommand):
                 error_text = ERRORS[e.errno]
             except KeyError:
                 error_text = e
-            self.stderr.write("Error: %s" % error_text)
+            errorData = f"Error: {error_text}"
+            logger.error(errorData)
             # Need to use an OS exit because sys.exit doesn't work in a thread
             os._exit(1)
+
+        # ---------------------------------------
+        # ----  EXIT OF GRPC SERVER           ---
         except KeyboardInterrupt:
+            logger.warning("Exit gRPC Server")
             sys.exit(0)
