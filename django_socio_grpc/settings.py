@@ -38,6 +38,8 @@ DEFAULTS = {
     "DEFAULT_PAGINATION_CLASS": None,
     #  Default permission classes
     "DEFAULT_PERMISSION_CLASSES": [],
+    #  Default grpc channel port
+    "GRPC_CHANNEL_PORT": 50051,
 }
 
 
