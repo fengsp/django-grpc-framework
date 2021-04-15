@@ -1,3 +1,4 @@
+import errno
 import os
 
 from django.core.management.base import BaseCommand, CommandError
@@ -96,23 +97,23 @@ class Command(BaseCommand):
         # ----------------------------------------------
         # --- Proto Generation Process               ---
         # ----------------------------------------------
-        generator = ModelProtoGenerator(
-            model=model, field_names=fields, package=self.package, filepath=filepath
-        )
-        if not generator.status_proto():
-            self.validProto = False
-            print("**** ERROR   %s     *****" % generator.message_proto())
+        generator = ModelProtoGenerator(model=model, field_names=fields, package=self.package)
 
         # ------------------------------------------------------------
         # ---- Produce a proto file on current filesystem and Path ---
         # ------------------------------------------------------------
-        if self.validProto:
-            proto = generator.get_proto()
-            if generator.status_proto():
-                if filepath:
-                    with open(filepath, "w") as f:
-                        f.write(proto)
-                else:
-                    self.stdout.write(proto)
-            else:
-                print("**** ERROR   %s     *****" % generator.message_proto())
+        proto = generator.get_proto()
+        if filepath:
+            self.create_directory_if_not_exist(filepath)
+            with open(filepath, "w") as f:
+                f.write(proto)
+        else:
+            self.stdout.write(proto)
+
+    def create_directory_if_not_exist(self, filepath):
+        if not os.path.exists(os.path.dirname(filepath)):
+            try:
+                os.makedirs(os.path.dirname(filepath))
+            except OSError as exc:  # Guard against race condition
+                if exc.errno != errno.EEXIST:
+                    raise

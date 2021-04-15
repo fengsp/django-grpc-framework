@@ -82,9 +82,25 @@ class ErrorDetail(str):
         return hash(str(self))
 
 
+class ProtobufGenerationException(Exception):
+    """
+    Class for Socio gRPC framework protobuff generation exceptions.
+    """
+
+    default_detail = "Unknow"
+
+    def __init__(self, app=None, model=None, detail=None):
+        self.app = app
+        self.model = model
+        self.detail = detail if detail is not None else self.default_detail
+
+    def __str__(self):
+        return f"Error on protobuf generation on model {self.model} on app {self.app}: {self.detail}"
+
+
 class GRPCException(Exception):
     """
-    Base class for Socio gRPC framework exceptions.
+    Base class for Socio gRPC framework runtime exceptions.
     Subclasses should provide `.status_code` and `.default_detail` properties.
     """
 
