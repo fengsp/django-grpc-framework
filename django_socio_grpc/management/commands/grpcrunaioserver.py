@@ -1,18 +1,20 @@
 # -*- coding: utf-8 -*-
-from concurrent import futures
-from datetime import datetime
-import sys
+import asyncio
 import errno
+# import logging
 import os
-import logging
+import sys
+from concurrent import futures
 
 import grpc
-import asyncio
-from django.utils import autoreload
 from django.conf import settings
 from django.core.management.base import BaseCommand
+from django.utils import autoreload
 
 from django_socio_grpc.settings import grpc_settings
+
+# from datetime import datetime
+
 
 # logger = logging.getLogger("django_socio_grpc")
 
