@@ -14,13 +14,12 @@ from django.core.management.base import BaseCommand
 
 from django_socio_grpc.settings import grpc_settings
 
-logger = logging.getLogger("django_socio_grpc")
-
-os.environ["GRPC_ASYNC"] = "True"
+# logger = logging.getLogger("django_socio_grpc")
 
 
 class Command(BaseCommand):
     help = "Starts an async gRPC server"
+
     # Validation is called explicitly each time the server is reloaded.
     requires_system_checks = False
 
@@ -52,6 +51,10 @@ class Command(BaseCommand):
         self.address = options["address"]
         self.development_mode = options["development_mode"]
         self.max_workers = options["max_workers"]
+
+        # set GRPC_ASYNC to "true" in order to start server asynchronously
+        os.environ["GRPC_ASYNC"] = "True"
+
         asyncio.run(self.run(**options))
 
     async def run(self, **options):
@@ -62,7 +65,7 @@ class Command(BaseCommand):
             else:
                 autoreload.main(self.inner_run, None, options)
         else:
-            logger.info(
+            self.stdout.write(
                 ("Starting async gRPC server at %(address)s\n")
                 % {
                     "address": self.address,
@@ -92,7 +95,7 @@ class Command(BaseCommand):
         # to be raised in the child process, raise it now.
         # ------------------------------------------------------------------------
         autoreload.raise_last_exception()
-        logger.info('"Performing system checks...\n\n')
+        self.stdout.write('"Performing system checks...\n\n')
         self.check(display_num_errors=True)
 
         # -----------------------------------------------------------
@@ -110,7 +113,7 @@ class Command(BaseCommand):
         # --------------------------------------------
         # ---  START ASYNC GRPC SERVER             ---
         # --------------------------------------------
-        logger.info(serverStartDta)
+        self.stdout.write(serverStartDta)
         try:
             asyncio.run(self._serve())
         except OSError as e:
@@ -125,12 +128,12 @@ class Command(BaseCommand):
             except KeyError:
                 error_text = e
             errorData = f"Error: {error_text}"
-            logger.error(errorData)
+            self.stdout.write(errorData)
             # Need to use an OS exit because sys.exit doesn't work in a thread
             os._exit(1)
 
         # ---------------------------------------
         # ----  EXIT OF GRPC SERVER           ---
         except KeyboardInterrupt:
-            logger.warning("Exit gRPC Server")
+            self.stdout.write("Exit gRPC Server")
             sys.exit(0)
