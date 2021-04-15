@@ -26,8 +26,8 @@ services:
 
   test-database:
     image: library/postgres:11.5
-    ports:
-      - "5532:5432"
+    # ports:
+    #   - "5532:5432"
     volumes:
       - /srv/atlasaas/database/atlasaas:/var/lib/postgresql/data
     environment:

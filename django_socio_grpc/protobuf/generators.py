@@ -6,7 +6,8 @@ from django.db import models
 from rest_framework.utils import model_meta
 from rest_framework.utils.field_mapping import ClassLookupDict
 
-from django_socio_grpc.utils.model_extractor import get_app_list
+# from django_socio_grpc.exceptions import ProtobufGenerationException
+# from django_socio_grpc.utils.model_extractor import get_app_list
 
 logger = logging.getLogger("django_socio_grpc")
 
@@ -46,17 +47,17 @@ class ModelProtoGenerator:
     def __init__(self, model, field_names=None, package=None):
         self.model = model
         self.field_names = field_names
-        if not package:
-            package = model.__name__.lower()
         self.package = package
         self.type_mapping = ClassLookupDict(self.type_mapping)
+        # INFO - AM - 15/04/2021 -not ready yet as original command take the model name as package an not the app name.
         # -----------------------------------------------------
         # -- check if Package name exist in Django app List ---
         # -----------------------------------------------------
-        dictApp = get_app_list()
-        if package not in dictApp:
-            logger.error(f"Invalid Django Package {package}")
-            return
+        # dictApp = get_app_list()
+        # if package and package not in dictApp:
+        #     detail = f"Invalid Django Package {package}"
+        #     logger.error(detail)
+        #     raise ProtobufGenerationException(app=self.package, model=self.model, detail=detail)
 
         # Retrieve metadata about fields & relationships on the model class.
         self.field_info = model_meta.get_field_info(model)
