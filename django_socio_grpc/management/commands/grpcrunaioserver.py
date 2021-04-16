@@ -1,7 +1,6 @@
-# -*- coding: utf-8 -*-
 import asyncio
 import errno
-# import logging
+import logging
 import os
 import sys
 from concurrent import futures
@@ -13,10 +12,7 @@ from django.utils import autoreload
 
 from django_socio_grpc.settings import grpc_settings
 
-# from datetime import datetime
-
-
-# logger = logging.getLogger("django_socio_grpc")
+logger = logging.getLogger("django_socio_grpc")
 
 
 class Command(BaseCommand):
@@ -67,7 +63,7 @@ class Command(BaseCommand):
             else:
                 autoreload.main(self.inner_run, None, options)
         else:
-            self.stdout.write(
+            logger.info(
                 ("Starting async gRPC server at %(address)s\n")
                 % {
                     "address": self.address,
@@ -97,7 +93,7 @@ class Command(BaseCommand):
         # to be raised in the child process, raise it now.
         # ------------------------------------------------------------------------
         autoreload.raise_last_exception()
-        self.stdout.write('"Performing system checks...\n\n')
+        logger.info('"Performing system checks...\n\n')
         self.check(display_num_errors=True)
 
         # -----------------------------------------------------------
@@ -115,7 +111,7 @@ class Command(BaseCommand):
         # --------------------------------------------
         # ---  START ASYNC GRPC SERVER             ---
         # --------------------------------------------
-        self.stdout.write(serverStartDta)
+        logger.info(serverStartDta)
         try:
             asyncio.run(self._serve())
         except OSError as e:
@@ -130,12 +126,12 @@ class Command(BaseCommand):
             except KeyError:
                 error_text = e
             errorData = f"Error: {error_text}"
-            self.stdout.write(errorData)
+            logger.error(errorData)
             # Need to use an OS exit because sys.exit doesn't work in a thread
             os._exit(1)
 
         # ---------------------------------------
         # ----  EXIT OF GRPC SERVER           ---
         except KeyboardInterrupt:
-            self.stdout.write("Exit gRPC Server")
+            logger.warning("Exit gRPC Server")
             sys.exit(0)
