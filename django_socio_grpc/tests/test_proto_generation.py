@@ -45,6 +45,5 @@ class TestProtoGeneration(TestCase):
         m.assert_called_once_with("proto/unittestmodel.proto", "w")
         handle = m()
 
-        # print(handle.write.call_args[0][0])
         called_with_data = handle.write.call_args[0][0]
         self.assertEqual(called_with_data, expected_result)
