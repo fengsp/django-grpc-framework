@@ -107,14 +107,6 @@ argon2 = ["argon2-cffi (>=19.1.0)"]
 bcrypt = ["bcrypt"]
 
 [[package]]
-name = "django-fake-model"
-version = "0.1.4"
-description = "Simple library for creating fake models in the unit tests."
-category = "dev"
-optional = false
-python-versions = "*"
-
-[[package]]
 name = "django-filter"
 version = "2.4.0"
 description = "Django-filter is a reusable Django application for allowing users to filter querysets dynamically."
@@ -435,7 +427,7 @@ testing = ["pytest (>=4.6)", "pytest-checkdocs (>=1.2.3)", "pytest-flake8", "pyt
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.6"
-content-hash = "d6ab3642db5d660ca9e8c29fea6a81e38b84a5355d5a2a7078c8957adb7b792d"
+content-hash = "06e5434f83dc012d3c9a67b75b802779484be1feb85892f0211a7acdf222ec6f"
 
 [metadata.files]
 appdirs = [
@@ -472,10 +464,6 @@ dataclasses = [
 django = [
     {file = "Django-3.2-py3-none-any.whl", hash = "sha256:0604e84c4fb698a5e53e5857b5aea945b2f19a18f25f10b8748dbdf935788927"},
     {file = "Django-3.2.tar.gz", hash = "sha256:21f0f9643722675976004eb683c55d33c05486f94506672df3d6a141546f389d"},
-]
-django-fake-model = [
-    {file = "django-fake-model-0.1.4.tar.gz", hash = "sha256:44940dea141be48ccffeab917c69de3a70c98cb45c3a2a224c2a800b57913965"},
-    {file = "django_fake_model-0.1.4-py2.py3-none-any.whl", hash = "sha256:5f5bd31a8825cb561f6df1dc2d8efbe1ba46f2082aa584d6438862b3e040e5f6"},
 ]
 django-filter = [
     {file = "django-filter-2.4.0.tar.gz", hash = "sha256:84e9d5bb93f237e451db814ed422a3a625751cbc9968b484ecc74964a8696b06"},
