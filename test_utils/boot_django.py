@@ -33,7 +33,7 @@ def boot_django():
             "django.contrib.contenttypes",
             "django_filters",
             "django_socio_grpc",
-            "fakeapp"
+            "fakeapp",
         ),
         TIME_ZONE="UTC",
         USE_TZ=True,

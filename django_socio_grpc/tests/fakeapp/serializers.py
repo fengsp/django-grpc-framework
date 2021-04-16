@@ -1,7 +1,8 @@
-from .models import UnitTestModel
+from django_socio_grpc import proto_serializers
 from django_socio_grpc.tests.grpc_test_utils.unittest_pb2 import UnitTest
 
-from django_socio_grpc import proto_serializers
+from .models import UnitTestModel
+
 
 class UnitTestSerializer(proto_serializers.ModelProtoSerializer):
     class Meta:

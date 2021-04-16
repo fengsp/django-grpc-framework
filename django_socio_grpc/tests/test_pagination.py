@@ -4,9 +4,9 @@ from django.test import TestCase
 from rest_framework.pagination import PageNumberPagination
 
 from django_socio_grpc import generics
-
 from fakeapp.models import UnitTestModel
 from fakeapp.serializers import UnitTestSerializer
+
 from .grpc_test_utils.fake_grpc import FakeGRPC
 from .grpc_test_utils.unittest_pb2 import UnitTestListRequest
 from .grpc_test_utils.unittest_pb2_grpc import (
@@ -25,6 +25,7 @@ class UnitTestService(generics.ModelService):
     queryset = UnitTestModel.objects.all().order_by("id")
     serializer_class = UnitTestSerializer
     pagination_class = StandardResultsSetPagination
+
 
 class TestFiltering(TestCase):
     def setUp(self):

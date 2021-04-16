@@ -107,6 +107,7 @@ class Command(BaseCommand):
         # ---- Produce a proto file on current filesystem and Path ---
         # ------------------------------------------------------------
         proto = generator.get_proto()
+        print("icicic ", filepath)
         if filepath:
             self.create_directory_if_not_exist(filepath)
             with open(filepath, "w") as f:
