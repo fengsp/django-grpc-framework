@@ -8,8 +8,10 @@ from django.conf import settings
 
 APPS_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 BASE_DIR = os.path.join(APPS_DIR, "django_socio_grpc")
+FAKE_APP_DIR = os.path.join(BASE_DIR, "tests")
 
 sys.path.append(APPS_DIR)
+sys.path.append(FAKE_APP_DIR)
 
 
 def boot_django():
@@ -28,9 +30,10 @@ def boot_django():
         },
         INSTALLED_APPS=(
             "rest_framework",
-            # "django.contrib.contenttypes",
+            "django.contrib.contenttypes",
             "django_filters",
             "django_socio_grpc",
+            "fakeapp"
         ),
         TIME_ZONE="UTC",
         USE_TZ=True,

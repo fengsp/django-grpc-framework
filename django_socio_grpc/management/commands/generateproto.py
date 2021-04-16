@@ -49,8 +49,10 @@ class Command(BaseCommand):
         self.package = options["package"]
 
         try:
+            print("3ICICICIICI")
             model = import_string(options["model"])
             modelValid = True
+            print("LALALALALALALALALALALALALALAA")
         except Exception:
             model = options["model"]
         fields = options["fields"]
@@ -77,7 +79,9 @@ class Command(BaseCommand):
         # --- extract all available model's Column  ---
         # ---------------------------------------------
         if not modelValid:
+            print("OOOOOOOOOOOOOOOOOOOOOOOOOOO")
             model = get_model(model)
+            print("UUUUUUUUUUUUUUUUUUUUUUUUUUUUU")
 
         # --------------------------------------------------------
         # ----  AUTO GENERATION OF ALL DATA MODEL FIELDS LIST  ---

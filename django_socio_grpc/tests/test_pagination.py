@@ -5,7 +5,8 @@ from rest_framework.pagination import PageNumberPagination
 
 from django_socio_grpc import generics
 
-from .grpc_test_utils.django_classes_for_tests import UnitTestModel, UnitTestSerializer
+from fakeapp.models import UnitTestModel
+from fakeapp.serializers import UnitTestSerializer
 from .grpc_test_utils.fake_grpc import FakeGRPC
 from .grpc_test_utils.unittest_pb2 import UnitTestListRequest
 from .grpc_test_utils.unittest_pb2_grpc import (
@@ -25,8 +26,6 @@ class UnitTestService(generics.ModelService):
     serializer_class = UnitTestSerializer
     pagination_class = StandardResultsSetPagination
 
-
-@UnitTestModel.fake_me
 class TestFiltering(TestCase):
     def setUp(self):
         for idx in range(10):
