@@ -128,8 +128,7 @@ class GenericService(services.Service):
         keys = self.request.DESCRIPTOR.fields_by_name.keys()
         request = HttpRequest()
         query_params = QueryDict('', mutable=True)
-        query_params.update(dict(zip([k for k in keys if self.request.DESCRIPTOR.fields_by_name[k].type != 5], [getattr(self.request, k) for k in keys])))
-        query_params.update(dict(zip([int(k) for k in keys if self.request.DESCRIPTOR.fields_by_name[k].type == 5], [getattr(self.request, k) for k in keys])))
+        query_params.update(dict(zip([k for k in keys], [getattr(self.request, k) for k in keys])))
         request.query_params = query_params
         for backend in list(self.filter_backends):
             queryset = backend().filter_queryset(request, queryset, self)
