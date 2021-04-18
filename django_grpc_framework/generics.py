@@ -6,6 +6,7 @@ from django.http.request import HttpRequest, QueryDict
 from django.shortcuts import get_object_or_404
 from rest_framework.request import Request
 from rest_framework.settings import api_settings
+from google.protobuf.json_format import MessageToDict
 
 from django_grpc_framework import mixins, services
 from django_grpc_framework.utils import model_meta
@@ -128,7 +129,7 @@ class GenericService(services.Service):
         keys = self.request.DESCRIPTOR.fields_by_name.keys()
         request = HttpRequest()
         query_params = QueryDict('', mutable=True)
-        query_params.update(dict(zip([k for k in keys if str(getattr(self.request, k))], [getattr(self.request, k) for k in keys if getattr(self.request, k)])))
+        query_params.update(MessageToDict(self.request, preserving_proto_field_name=True))
         request.query_params = query_params
         for backend in list(self.filter_backends):
             queryset = backend().filter_queryset(request, queryset, self)
