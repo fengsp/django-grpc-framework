@@ -26,13 +26,13 @@ def get_model(current_model_name):
         #  ----------------------------------------------------------
         #  ---  search if this model exist on Django content type ---
         #  ----------------------------------------------------------
-        current_model = ContentType.objects.filter(model=current_model_name)
+        current_model = ContentType.objects.filter(model=current_model_name).first()
 
         # -------------------------------
         # ---  This Model is valid    ---
         # -------------------------------
         if current_model:
-            app_label = current_model[0].app_label
+            app_label = current_model.app_label
             current_model = apps.get_model(app_label=app_label, model_name=current_model_name)
     return current_model
 
