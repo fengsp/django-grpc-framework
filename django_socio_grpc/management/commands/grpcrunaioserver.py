@@ -51,7 +51,7 @@ class Command(BaseCommand):
         self.max_workers = options["max_workers"]
 
         # set GRPC_ASYNC to "true" in order to start server asynchronously
-        os.environ["GRPC_ASYNC"] = "True"
+        os.environ.setdefault("GRPC_ASYNC", "True")
 
         asyncio.run(self.run(**options))
 

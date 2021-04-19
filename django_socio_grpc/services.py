@@ -1,4 +1,5 @@
 import logging
+import os
 from functools import update_wrapper
 
 import grpc
@@ -96,12 +97,9 @@ class Service:
 
         class Servicer:
 
-            grpc_async = grpc_settings.GRPC_ASYNC
+            grpc_async = os.environ.get("GRPC_ASYNC")
 
-            def __getattr__(self, action):
-                if not hasattr(cls, action):
-                    return not_implemented
-
+            def call_handler(self, action):
                 if self.grpc_async:
 
                     async def async_handler(request, context):
@@ -149,6 +147,12 @@ class Service:
 
                     update_wrapper(handler, getattr(cls, action))
                     return handler
+
+            def __getattr__(self, action):
+                if not hasattr(cls, action):
+                    return not_implemented
+
+                return self.call_handler(action)
 
         update_wrapper(Servicer, cls, updated=())
         return Servicer()
