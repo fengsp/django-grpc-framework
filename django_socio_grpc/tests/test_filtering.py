@@ -4,8 +4,9 @@ from django.test import TestCase
 from django_filters.rest_framework import DjangoFilterBackend
 
 from django_socio_grpc import generics
+from fakeapp.models import UnitTestModel
+from fakeapp.serializers import UnitTestSerializer
 
-from .grpc_test_utils.django_classes_for_tests import UnitTestModel, UnitTestSerializer
 from .grpc_test_utils.fake_grpc import FakeGRPC
 from .grpc_test_utils.unittest_pb2 import UnitTestListRequest
 from .grpc_test_utils.unittest_pb2_grpc import (
@@ -21,7 +22,6 @@ class UnitTestService(generics.ModelService):
     filterset_fields = ["title", "text"]
 
 
-@UnitTestModel.fake_me
 class TestFiltering(TestCase):
     def setUp(self):
         for idx in range(10):

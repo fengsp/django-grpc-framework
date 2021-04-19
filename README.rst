@@ -117,3 +117,5 @@ Launch dev environnement
 .. code-block:: python
     docker-compose up --build
     docker-compose exec django-socio-grpc python test_utils/load_tests.py
+    # single test launch
+    docker-compose exec django-socio-grpc python test_utils/load_tests.py django_socio_grpc/tests/test_proto_generation.py
