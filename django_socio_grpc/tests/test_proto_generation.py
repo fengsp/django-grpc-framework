@@ -5,7 +5,12 @@ from django.test import TestCase
 
 from django_socio_grpc.exceptions import ProtobufGenerationException
 
-from .assets.generated_protobuf_files import SIMPLE_APP_GENERATED, SIMPLE_MODEL_GENERATED
+from .assets.generated_protobuf_files import (
+    ALL_APP_GENERATED,
+    SIMPLE_APP_MODEL_GENERATED,
+    SIMPLE_APP_MODEL_NO_GENERATION,
+    SIMPLE_MODEL_GENERATED,
+)
 
 
 class TestProtoGeneration(TestCase):
@@ -66,7 +71,34 @@ class TestProtoGeneration(TestCase):
             "Error on protobuf generation on model None on app fakeapp: File proto/fakeapp.proto already exist",
         )
 
-    def test_generate_one_app(self):
+    def test_generate_one_app_one_model_no_message_no_methods(self):
+        self.maxDiff = None
+
+        args = []
+        opts = {"app": "fakeapp", "model": "foreignmodel", "file": "proto/fakeapp.proto"}
+        with patch("builtins.open", mock_open()) as m:
+            call_command("generateproto", *args, **opts)
+
+        m.assert_called_once_with("proto/fakeapp.proto", "w")
+        handle = m()
+
+        called_with_data = handle.write.call_args[0][0]
+        self.assertEqual(called_with_data, SIMPLE_APP_MODEL_NO_GENERATION)
+
+    def test_generate_one_app_one_model(self):
+        self.maxDiff = None
+        args = []
+        opts = {"app": "fakeapp", "model": "unittestmodel", "file": "proto/fakeapp.proto"}
+        with patch("builtins.open", mock_open()) as m:
+            call_command("generateproto", *args, **opts)
+
+        m.assert_called_once_with("proto/fakeapp.proto", "w")
+        handle = m()
+
+        called_with_data = handle.write.call_args[0][0]
+        self.assertEqual(called_with_data, SIMPLE_APP_MODEL_GENERATED)
+
+    def test_generate_one_app_all_models(self):
         self.maxDiff = None
 
         args = []
@@ -78,4 +110,4 @@ class TestProtoGeneration(TestCase):
         handle = m()
 
         called_with_data = handle.write.call_args[0][0]
-        self.assertEqual(called_with_data, SIMPLE_APP_GENERATED)
+        self.assertEqual(called_with_data, ALL_APP_GENERATED)

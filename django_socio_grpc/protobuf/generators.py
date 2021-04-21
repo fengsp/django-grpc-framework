@@ -70,7 +70,6 @@ class ModelProtoGenerator:
             if model_meta.is_abstract_model(model):
                 continue
             self._generate_service(model)
-            self._writer.write_line("")
 
         for model in self.models:
             # we do not want generate code for abstract model
@@ -80,45 +79,97 @@ class ModelProtoGenerator:
         return self._writer.get_code()
 
     def _generate_service(self, model):
+        grpc_methods = (
+            model._meta.grpc_methods
+            if hasattr(model, "_meta") and hasattr(model._meta, "grpc_methods")
+            else self.get_default_grpc_methods(model)
+        )
+
+        if not grpc_methods:
+            return
+
         self._writer.write_line(f"service {model.__name__}Controller {{")
         with self._writer.indent():
-            self._writer.write_line(
-                f"rpc List({model.__name__}ListRequest) returns (stream {model.__name__}) {{}}"
-            )
-            self._writer.write_line(
-                f"rpc Create({model.__name__}) returns ({model.__name__}) {{}}"
-            )
-            self._writer.write_line(
-                f"rpc Retrieve({model.__name__}RetrieveRequest) returns ({model.__name__}) {{}}"
-            )
-            self._writer.write_line(
-                f"rpc Update({model.__name__}) returns ({model.__name__}) {{}}"
-            )
-            self._writer.write_line(
-                f"rpc Destroy({model.__name__}) returns (google.protobuf.Empty) {{}}"
-            )
-        self._writer.write_line("}")
-
-    def _generate_message(self, model):
-        self._writer.write_line(f"message {model.__name__} {{")
-        with self._writer.indent():
-            number = 0
-            for field_info in get_model_fields(model):
-                number += 1
+            for method_name, method_data in grpc_methods.items():
+                request_message = self.construct_method_message(
+                    method_data.get("request", dict()), model
+                )
+                response_message = self.construct_method_message(
+                    method_data.get("response", dict()), model
+                )
                 self._writer.write_line(
-                    f"{self.type_mapping.get(field_info.get_internal_type(), 'string')} {field_info.name} = {number};"
+                    f"rpc {method_name}({request_message}) returns ({response_message}) {{}}"
                 )
         self._writer.write_line("}")
         self._writer.write_line("")
-        self._writer.write_line(f"message {model.__name__}ListRequest {{")
-        self._writer.write_line("}")
-        self._writer.write_line("")
-        self._writer.write_line(f"message {model.__name__}RetrieveRequest {{")
-        with self._writer.indent():
-            self._writer.write_line(
-                f"{self.type_mapping.get(model._meta.pk.get_internal_type(), 'string')} {model._meta.pk.name} = 1;"
-            )
-        self._writer.write_line("}")
+
+    def construct_method_message(self, message_info, model):
+        """
+        transform a message_info of type {is_stream: <boolean>, message: <string>} to a rpc parameter or return value.
+
+        return value example: "stream MyModelRetrieveRequest"
+        """
+        return f"{'stream ' if message_info.get('is_stream', False) else ''}{message_info.get('message', model.__name__)}"
+
+    def get_default_grpc_methods(self, model):
+        """
+        return the default grpc methods generated for a django model.
+        """
+        return {
+            "List": {
+                "request": {"is_stream": False, "message": f"{model.__name__}ListRequest"},
+                "response": {"is_stream": True, "message": model.__name__},
+            },
+            "Create": {
+                "request": {"is_stream": False, "message": model.__name__},
+                "response": {"is_stream": False, "message": model.__name__},
+            },
+            "Retrieve": {
+                "request": {"is_stream": False, "message": f"{model.__name__}RetrieveRequest"},
+                "response": {"is_stream": False, "message": model.__name__},
+            },
+            "Update": {
+                "request": {"is_stream": False, "message": model.__name__},
+                "response": {"is_stream": False, "message": model.__name__},
+            },
+            "Destroy": {
+                "request": {"is_stream": False, "message": f"{model.__name__}DestroyRequest"},
+                "response": {"is_stream": False, "message": "google.protobuf.Empty"},
+            },
+        }
+
+    def get_default_grpc_messages(self, model):
+        """
+        return the default protobuff message we want to generate
+        """
+        return {
+            model.__name__: [field_info.name for field_info in get_model_fields(model)],
+            f"{model.__name__}ListRequest": [],
+            f"{model.__name__}RetrieveRequest": [model._meta.pk.name],
+        }
+
+    def _generate_message(self, model):
+        grpc_messages = (
+            model._meta.grpc_messages
+            if hasattr(model, "_meta") and hasattr(model._meta, "grpc_messages")
+            else self.get_default_grpc_messages(model)
+        )
+
+        if not grpc_messages:
+            return
+
+        for grpc_message_name, grpc_message_fields_name in grpc_messages.items():
+            self._writer.write_line(f"message {grpc_message_name} {{")
+            with self._writer.indent():
+                number = 0
+                for field_name in grpc_message_fields_name:
+                    number += 1
+                    field_info = model._meta.get_field(field_name)
+                    self._writer.write_line(
+                        f"{self.type_mapping.get(field_info.get_internal_type(), 'string')} {field_info.name} = {number};"
+                    )
+            self._writer.write_line("}")
+            self._writer.write_line("")
 
 
 class _CodeWriter:
