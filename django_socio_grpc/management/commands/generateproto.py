@@ -18,7 +18,9 @@ class Command(BaseCommand):
         )
         parser.add_argument("--file", help="the generated proto file path")
         parser.add_argument("--app", help="specify Django Application")
-        parser.add_argument("--update", help="Replace the proto file")
+        parser.add_argument(
+            "--update", action="store_true", default=True, help="Replace the proto file"
+        )
 
     def handle(self, *args, **options):
 
@@ -27,6 +29,8 @@ class Command(BaseCommand):
         # ------------------------------------------
         self.app_name = options["app"]
         self.model_name = options["model"]
+        if self.model_name:
+            self.model_name = self.model_name.lower()
         self.update_proto_file = options["update"]
         self.file_path = options["file"]
 

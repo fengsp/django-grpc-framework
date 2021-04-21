@@ -15,7 +15,7 @@ from .assets.generated_protobuf_files import (
 
 class TestProtoGeneration(TestCase):
     def test_generate_one_model(self):
-        # self.maxDiff = None
+        self.maxDiff = None
         args = []
         opts = {"model": "unittestmodel", "file": "proto/unittestmodel.proto"}
         with patch("builtins.open", mock_open()) as m:
@@ -51,7 +51,7 @@ class TestProtoGeneration(TestCase):
 
     def test_raise_when_model_not_found(self):
         args = []
-        opts = {"app": "model_not_existing", "file": "proto/unittestmodel.proto"}
+        opts = {"model": "model_not_existing", "file": "proto/unittestmodel.proto"}
         with self.assertRaises(ProtobufGenerationException) as fake_generation_error:
             call_command("generateproto", *args, **opts)
 
@@ -75,7 +75,7 @@ class TestProtoGeneration(TestCase):
         self.maxDiff = None
 
         args = []
-        opts = {"app": "fakeapp", "model": "foreignmodel", "file": "proto/fakeapp.proto"}
+        opts = {"app": "fakeapp", "model": "NotDisplayedModel", "file": "proto/fakeapp.proto"}
         with patch("builtins.open", mock_open()) as m:
             call_command("generateproto", *args, **opts)
 

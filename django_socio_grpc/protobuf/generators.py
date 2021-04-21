@@ -61,7 +61,9 @@ class ModelProtoGenerator:
     def get_proto(self):
         self._writer.write_line('syntax = "proto3";')
         self._writer.write_line("")
-        self._writer.write_line("package %s;" % self.app_name)
+        self._writer.write_line(
+            f"package {self.app_name if self.app_name else self.model_name};"
+        )
         self._writer.write_line("")
         self._writer.write_line('import "google/protobuf/empty.proto";')
         self._writer.write_line("")
@@ -146,6 +148,7 @@ class ModelProtoGenerator:
             model.__name__: [field_info.name for field_info in get_model_fields(model)],
             f"{model.__name__}ListRequest": [],
             f"{model.__name__}RetrieveRequest": [model._meta.pk.name],
+            f"{model.__name__}DestroyRequest": [model._meta.pk.name],
         }
 
     def _generate_message(self, model):

@@ -95,7 +95,7 @@ class ProtobufGenerationException(Exception):
         self.detail = detail if detail is not None else self.default_detail
 
     def __str__(self):
-        return f"Error on protobuf generation on model {self.model_name} on app_ {self.app_name}: {self.detail}"
+        return f"Error on protobuf generation on model {self.model_name} on app {self.app_name}: {self.detail}"
 
 
 class GRPCException(Exception):
