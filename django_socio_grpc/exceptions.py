@@ -158,3 +158,9 @@ class AlreadyExist(GRPCException):
     status_code = StatusCode.ALREADY_EXISTS
     default_detail = _("Alrerady exist.")
     default_code = "already_exist"
+
+
+class InvalidArgument(GRPCException):
+    status_code = StatusCode.INVALID_ARGUMENT
+    default_detail = _("Invalid argument.")
+    default_code = "invalid_argument"
