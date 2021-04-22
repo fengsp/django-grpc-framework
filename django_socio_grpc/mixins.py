@@ -19,6 +19,21 @@ class CreateModelMixin:
         """Save a new object instance."""
         serializer.save()
 
+    @staticmethod
+    def get_default_method(model_name):
+        return {
+            "Create": {
+                "request": {"is_stream": False, "message": model_name},
+                "response": {"is_stream": False, "message": model_name},
+            },
+        }
+
+    @staticmethod
+    def get_default_message(model_name, fields):
+        return {
+            model_name: fields,
+        }
+
 
 class ListModelMixin:
     def List(self, request, context):
@@ -42,6 +57,23 @@ class ListModelMixin:
             for message in serializer.message:
                 yield message
 
+    @staticmethod
+    def get_default_method(model_name):
+        return {
+            "List": {
+                "request": {"is_stream": False, "message": f"{model_name}ListRequest"},
+                "response": {"is_stream": True, "message": model_name},
+            },
+        }
+
+    @staticmethod
+    def get_default_message(model_name, fields=None):
+        if fields is None:
+            fields = []
+        return {
+            f"{model_name}ListRequest": fields,
+        }
+
 
 class RetrieveModelMixin:
     def Retrieve(self, request, context):
@@ -55,6 +87,21 @@ class RetrieveModelMixin:
         instance = self.get_object()
         serializer = self.get_serializer(instance)
         return serializer.message
+
+    @staticmethod
+    def get_default_method(model_name):
+        return {
+            "Retrieve": {
+                "request": {"is_stream": False, "message": f"{model_name}RetrieveRequest"},
+                "response": {"is_stream": False, "message": model_name},
+            },
+        }
+
+    @staticmethod
+    def get_default_message(model_name, fields):
+        return {
+            f"{model_name}RetrieveRequest": fields,
+        }
 
 
 class UpdateModelMixin:
@@ -81,6 +128,21 @@ class UpdateModelMixin:
     def perform_update(self, serializer):
         """Save an existing object instance."""
         serializer.save()
+
+    @staticmethod
+    def get_default_method(model_name):
+        return {
+            "Update": {
+                "request": {"is_stream": False, "message": model_name},
+                "response": {"is_stream": False, "message": model_name},
+            },
+        }
+
+    @staticmethod
+    def get_default_message(model_name, fields):
+        return {
+            f"{model_name}UpdateRequest": fields,
+        }
 
 
 class PartialUpdateModelMixin:
@@ -109,6 +171,21 @@ class PartialUpdateModelMixin:
         """Save an existing object instance."""
         serializer.save()
 
+    @staticmethod
+    def get_default_method(model_name):
+        return {
+            "Update": {
+                "request": {"is_stream": False, "message": model_name},
+                "response": {"is_stream": False, "message": model_name},
+            },
+        }
+
+    @staticmethod
+    def get_default_message(model_name, fields):
+        return {
+            f"{model_name}PartialUpdateRequest": fields,
+        }
+
 
 class DestroyModelMixin:
     def Destroy(self, request, context):
@@ -126,3 +203,18 @@ class DestroyModelMixin:
     def perform_destroy(self, instance):
         """Delete an object instance."""
         instance.delete()
+
+    @staticmethod
+    def get_default_method(model_name):
+        return {
+            "Destroy": {
+                "request": {"is_stream": False, "message": f"{model_name}DestroyRequest"},
+                "response": {"is_stream": False, "message": "google.protobuf.Empty"},
+            },
+        }
+
+    @staticmethod
+    def get_default_message(model_name, fields):
+        return {
+            f"{model_name}DestroyRequest": fields,
+        }

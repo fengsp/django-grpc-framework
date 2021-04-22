@@ -88,10 +88,7 @@ service UnitTestModelController {
 
 service ForeignModelController {
     rpc List(ForeignModelListRequest) returns (stream ForeignModel) {}
-    rpc Create(ForeignModel) returns (ForeignModel) {}
-    rpc Retrieve(ForeignModelRetrieveRequest) returns (ForeignModel) {}
-    rpc Update(ForeignModel) returns (ForeignModel) {}
-    rpc Destroy(ForeignModelDestroyRequest) returns (google.protobuf.Empty) {}
+    rpc Retrieve(ForeignModelRetrieveRequestCustom) returns (ForeignModelRetrieveRequestCustom) {}
 }
 
 service ManyManyModelController {
@@ -127,21 +124,14 @@ message UnitTestModelDestroyRequest {
     int32 id = 1;
 }
 
-message ForeignModel {
+message ForeignModelListRequest {
     string related = 1;
     string uuid = 2;
     string name = 3;
 }
 
-message ForeignModelListRequest {
-}
-
-message ForeignModelRetrieveRequest {
-    string uuid = 1;
-}
-
-message ForeignModelDestroyRequest {
-    string uuid = 1;
+message ForeignModelRetrieveRequestCustom {
+    string name = 1;
 }
 
 message ManyManyModel {
@@ -176,6 +166,29 @@ message RelatedFieldModelRetrieveRequest {
 
 message RelatedFieldModelDestroyRequest {
     string uuid = 1;
+}
+
+"""
+
+CUSTOM_APP_MODEL_GENERATED = """syntax = "proto3";
+
+package fakeapp;
+
+import "google/protobuf/empty.proto";
+
+service ForeignModelController {
+    rpc List(ForeignModelListRequest) returns (stream ForeignModel) {}
+    rpc Retrieve(ForeignModelRetrieveRequestCustom) returns (ForeignModelRetrieveRequestCustom) {}
+}
+
+message ForeignModelListRequest {
+    string related = 1;
+    string uuid = 2;
+    string name = 3;
+}
+
+message ForeignModelRetrieveRequestCustom {
+    string name = 1;
 }
 
 """

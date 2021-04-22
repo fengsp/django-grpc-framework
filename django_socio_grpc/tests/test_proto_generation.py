@@ -7,6 +7,7 @@ from django_socio_grpc.exceptions import ProtobufGenerationException
 
 from .assets.generated_protobuf_files import (
     ALL_APP_GENERATED,
+    CUSTOM_APP_MODEL_GENERATED,
     SIMPLE_APP_MODEL_GENERATED,
     SIMPLE_APP_MODEL_NO_GENERATION,
     SIMPLE_MODEL_GENERATED,
@@ -111,3 +112,16 @@ class TestProtoGeneration(TestCase):
 
         called_with_data = handle.write.call_args[0][0]
         self.assertEqual(called_with_data, ALL_APP_GENERATED)
+
+    def test_generate_one_app_one_model_customized(self):
+        self.maxDiff = None
+        args = []
+        opts = {"app": "fakeapp", "model": "ForeignModel", "file": "proto/fakeapp.proto"}
+        with patch("builtins.open", mock_open()) as m:
+            call_command("generateproto", *args, **opts)
+
+        m.assert_called_once_with("proto/fakeapp.proto", "w")
+        handle = m()
+
+        called_with_data = handle.write.call_args[0][0]
+        self.assertEqual(called_with_data, CUSTOM_APP_MODEL_GENERATED)

@@ -2,6 +2,8 @@ import uuid
 
 from django.db import models
 
+from django_socio_grpc.mixins import ListModelMixin
+
 
 class UnitTestModel(models.Model):
     id = models.AutoField(primary_key=True)
@@ -13,6 +15,29 @@ class UnitTestModel(models.Model):
 class ForeignModel(models.Model):
     uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=100)
+
+    class Meta:
+        ###################################
+        # Simulate a retrieve by name     #
+        # Simulate a read only model      #
+        ###################################
+        grpc_messages = {
+            **ListModelMixin.get_default_message("ForeignModel", "*"),
+            "ForeignModelRetrieveRequestCustom": ["name"],
+        }
+        grpc_methods = {
+            **ListModelMixin.get_default_method("ForeignModel"),
+            "Retrieve": {
+                "request": {
+                    "is_stream": False,
+                    "message": "ForeignModelRetrieveRequestCustom",
+                },
+                "response": {
+                    "is_stream": False,
+                    "message": "ForeignModelRetrieveRequestCustom",
+                },
+            },
+        }
 
 
 class ManyManyModel(models.Model):
@@ -37,5 +62,5 @@ class NotDisplayedModel(models.Model):
     name = models.CharField(max_length=100)
 
     class Meta:
-        grpc_messages = []
-        grpc_methods = []
+        grpc_messages = {}
+        grpc_methods = {}

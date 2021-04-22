@@ -5,7 +5,13 @@ from django.apps import apps
 from django.db import models
 from rest_framework.utils import model_meta
 
-# from django_socio_grpc.exceptions import ProtobufGenerationException
+from django_socio_grpc.mixins import (
+    CreateModelMixin,
+    DestroyModelMixin,
+    ListModelMixin,
+    RetrieveModelMixin,
+    UpdateModelMixin,
+)
 from django_socio_grpc.utils.model_extractor import get_model, get_model_fields
 
 logger = logging.getLogger("django_socio_grpc")
@@ -118,26 +124,11 @@ class ModelProtoGenerator:
         return the default grpc methods generated for a django model.
         """
         return {
-            "List": {
-                "request": {"is_stream": False, "message": f"{model.__name__}ListRequest"},
-                "response": {"is_stream": True, "message": model.__name__},
-            },
-            "Create": {
-                "request": {"is_stream": False, "message": model.__name__},
-                "response": {"is_stream": False, "message": model.__name__},
-            },
-            "Retrieve": {
-                "request": {"is_stream": False, "message": f"{model.__name__}RetrieveRequest"},
-                "response": {"is_stream": False, "message": model.__name__},
-            },
-            "Update": {
-                "request": {"is_stream": False, "message": model.__name__},
-                "response": {"is_stream": False, "message": model.__name__},
-            },
-            "Destroy": {
-                "request": {"is_stream": False, "message": f"{model.__name__}DestroyRequest"},
-                "response": {"is_stream": False, "message": "google.protobuf.Empty"},
-            },
+            **ListModelMixin.get_default_method(model.__name__),
+            **CreateModelMixin.get_default_method(model.__name__),
+            **RetrieveModelMixin.get_default_method(model.__name__),
+            **UpdateModelMixin.get_default_method(model.__name__),
+            **DestroyModelMixin.get_default_method(model.__name__),
         }
 
     def get_default_grpc_messages(self, model):
@@ -145,10 +136,10 @@ class ModelProtoGenerator:
         return the default protobuff message we want to generate
         """
         return {
-            model.__name__: [field_info.name for field_info in get_model_fields(model)],
-            f"{model.__name__}ListRequest": [],
-            f"{model.__name__}RetrieveRequest": [model._meta.pk.name],
-            f"{model.__name__}DestroyRequest": [model._meta.pk.name],
+            **CreateModelMixin.get_default_message(model.__name__, "*"),
+            **ListModelMixin.get_default_message(model.__name__),
+            **RetrieveModelMixin.get_default_message(model.__name__, [model._meta.pk.name]),
+            **DestroyModelMixin.get_default_message(model.__name__, [model._meta.pk.name]),
         }
 
     def _generate_message(self, model):
@@ -162,9 +153,17 @@ class ModelProtoGenerator:
             return
 
         for grpc_message_name, grpc_message_fields_name in grpc_messages.items():
+            # We support the possibility to use "*" as parameter for fields
+            if grpc_message_fields_name == "*":
+                grpc_message_fields_name = [
+                    field_info.name for field_info in get_model_fields(model)
+                ]
+
+            # Write the name of the message
             self._writer.write_line(f"message {grpc_message_name} {{")
             with self._writer.indent():
                 number = 0
+                # Write all fields as defined in the meta of the model
                 for field_name in grpc_message_fields_name:
                     number += 1
                     field_info = model._meta.get_field(field_name)
