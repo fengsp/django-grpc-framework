@@ -31,7 +31,7 @@ class TestProtoGeneration(TestCase):
 
     def test_raise_when_no_app_and_no_model_options(self):
         args = []
-        opts = {"file": "proto/unittestmodel.proto"}
+        opts = {}
         with self.assertRaises(ProtobufGenerationException) as fake_generation_error:
             call_command("generateproto", *args, **opts)
 
@@ -42,7 +42,7 @@ class TestProtoGeneration(TestCase):
 
     def test_raise_when_app_not_found(self):
         args = []
-        opts = {"app": "app_not_existing", "file": "proto/unittestmodel.proto"}
+        opts = {"app": "app_not_existing"}
         with self.assertRaises(ProtobufGenerationException) as fake_generation_error:
             call_command("generateproto", *args, **opts)
 
@@ -53,7 +53,7 @@ class TestProtoGeneration(TestCase):
 
     def test_raise_when_model_not_found(self):
         args = []
-        opts = {"model": "model_not_existing", "file": "proto/unittestmodel.proto"}
+        opts = {"model": "model_not_existing"}
         with self.assertRaises(ProtobufGenerationException) as fake_generation_error:
             call_command("generateproto", *args, **opts)
 
@@ -77,11 +77,11 @@ class TestProtoGeneration(TestCase):
         self.maxDiff = None
 
         args = []
-        opts = {"app": "fakeapp", "model": "RelatedFieldModel", "file": "proto/fakeapp.proto"}
+        opts = {"app": "fakeapp", "model": "RelatedFieldModel"}
         with patch("builtins.open", mock_open()) as m:
             call_command("generateproto", *args, **opts)
 
-        m.assert_called_once_with("proto/fakeapp.proto", "w")
+        m.assert_called_once_with("fakeapp/grpc/fakeapp.proto", "w")
         handle = m()
 
         called_with_data = handle.write.call_args[0][0]
@@ -91,11 +91,11 @@ class TestProtoGeneration(TestCase):
         self.maxDiff = None
 
         args = []
-        opts = {"app": "fakeapp", "model": "NotDisplayedModel", "file": "proto/fakeapp.proto"}
+        opts = {"app": "fakeapp", "model": "NotDisplayedModel"}
         with patch("builtins.open", mock_open()) as m:
             call_command("generateproto", *args, **opts)
 
-        m.assert_called_once_with("proto/fakeapp.proto", "w")
+        m.assert_called_once_with("fakeapp/grpc/fakeapp.proto", "w")
         handle = m()
 
         called_with_data = handle.write.call_args[0][0]
@@ -104,11 +104,11 @@ class TestProtoGeneration(TestCase):
     def test_generate_one_app_one_model(self):
         self.maxDiff = None
         args = []
-        opts = {"app": "fakeapp", "model": "unittestmodel", "file": "proto/fakeapp.proto"}
+        opts = {"app": "fakeapp", "model": "unittestmodel"}
         with patch("builtins.open", mock_open()) as m:
             call_command("generateproto", *args, **opts)
 
-        m.assert_called_once_with("proto/fakeapp.proto", "w")
+        m.assert_called_once_with("fakeapp/grpc/fakeapp.proto", "w")
         handle = m()
 
         called_with_data = handle.write.call_args[0][0]
@@ -118,11 +118,11 @@ class TestProtoGeneration(TestCase):
         self.maxDiff = None
 
         args = []
-        opts = {"app": "fakeapp", "file": "proto/fakeapp.proto"}
+        opts = {"app": "fakeapp"}
         with patch("builtins.open", mock_open()) as m:
             call_command("generateproto", *args, **opts)
 
-        m.assert_called_once_with("proto/fakeapp.proto", "w")
+        m.assert_called_once_with("fakeapp/grpc/fakeapp.proto", "w")
         handle = m()
 
         called_with_data = handle.write.call_args[0][0]
@@ -131,11 +131,11 @@ class TestProtoGeneration(TestCase):
     def test_generate_one_app_one_model_customized(self):
         self.maxDiff = None
         args = []
-        opts = {"app": "fakeapp", "model": "ForeignModel", "file": "proto/fakeapp.proto"}
+        opts = {"app": "fakeapp", "model": "ForeignModel"}
         with patch("builtins.open", mock_open()) as m:
             call_command("generateproto", *args, **opts)
 
-        m.assert_called_once_with("proto/fakeapp.proto", "w")
+        m.assert_called_once_with("fakeapp/grpc/fakeapp.proto", "w")
         handle = m()
 
         called_with_data = handle.write.call_args[0][0]

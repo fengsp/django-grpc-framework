@@ -21,6 +21,9 @@ class Command(BaseCommand):
         parser.add_argument(
             "--update", action="store_true", default=True, help="Replace the proto file"
         )
+        parser.add_argument(
+            "--dry-run", action="store_true", help="print proto data without writing them"
+        )
 
     def handle(self, *args, **options):
 
@@ -33,6 +36,7 @@ class Command(BaseCommand):
             self.model_name = self.model_name.lower()
         self.update_proto_file = options["update"]
         self.file_path = options["file"]
+        self.dry_run = options["dry_run"]
 
         self.check_options()
 
@@ -45,12 +49,18 @@ class Command(BaseCommand):
         # ---- Produce a proto file on current filesystem and Path ---
         # ------------------------------------------------------------
         proto = generator.get_proto()
-        if self.file_path:
+        if self.dry_run:
+            self.stdout.write(proto)
+        elif self.file_path:
             self.create_directory_if_not_exist(self.file_path)
             with open(self.file_path, "w") as f:
                 f.write(proto)
+        # if no filepath specified we create it in a grpc directory in the app
         else:
-            self.stdout.write(proto)
+            auto_file_path = os.path.join(self.app_name, "grpc", f"{self.app_name}.proto")
+            self.create_directory_if_not_exist(auto_file_path)
+            with open(auto_file_path, "w") as f:
+                f.write(proto)
 
     def check_options(self):
         """
