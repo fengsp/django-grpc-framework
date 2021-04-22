@@ -2,7 +2,11 @@ import uuid
 
 from django.db import models
 
-from django_socio_grpc.mixins import ListModelMixin
+from django_socio_grpc.mixins import (
+    ListModelMixin,
+    get_default_grpc_messages,
+    get_default_grpc_methods,
+)
 
 
 class UnitTestModel(models.Model):
@@ -22,7 +26,7 @@ class ForeignModel(models.Model):
         # Simulate a read only model      #
         ###################################
         grpc_messages = {
-            **ListModelMixin.get_default_message("ForeignModel", "*"),
+            **ListModelMixin.get_default_message("ForeignModel", "__all__"),
             "ForeignModelRetrieveRequestCustom": ["name"],
         }
         grpc_methods = {
@@ -55,6 +59,27 @@ class RelatedFieldModel(models.Model):
         related_name="related",
     )
     many_many = models.ManyToManyField(ManyManyModel, blank=True, related_name="relateds")
+
+    class Meta:
+        ############################################
+        # Manually add many_many to serializer     #
+        ############################################
+        grpc_messages = {
+            **get_default_grpc_messages("RelatedFieldModel"),
+            "RelatedFieldModelListResponse": ["uuid", "foreign", "many_many"],
+        }
+
+        grpc_methods = {
+            **get_default_grpc_methods("RelatedFieldModel"),
+            "List": {
+                "request": {
+                    "message": "RelatedFieldModelListRequest",
+                },
+                "response": {
+                    "message": "RelatedFieldModelListResponse",
+                },
+            },
+        }
 
 
 class NotDisplayedModel(models.Model):

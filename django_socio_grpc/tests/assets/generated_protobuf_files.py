@@ -100,7 +100,7 @@ service ManyManyModelController {
 }
 
 service RelatedFieldModelController {
-    rpc List(RelatedFieldModelListRequest) returns (stream RelatedFieldModel) {}
+    rpc List(RelatedFieldModelListRequest) returns (RelatedFieldModelListResponse) {}
     rpc Create(RelatedFieldModel) returns (RelatedFieldModel) {}
     rpc Retrieve(RelatedFieldModelRetrieveRequest) returns (RelatedFieldModel) {}
     rpc Update(RelatedFieldModel) returns (RelatedFieldModel) {}
@@ -125,9 +125,8 @@ message UnitTestModelDestroyRequest {
 }
 
 message ForeignModelListRequest {
-    string related = 1;
-    string uuid = 2;
-    string name = 3;
+    string uuid = 1;
+    string name = 2;
 }
 
 message ForeignModelRetrieveRequestCustom {
@@ -135,9 +134,8 @@ message ForeignModelRetrieveRequestCustom {
 }
 
 message ManyManyModel {
-    string relateds = 1;
-    string uuid = 2;
-    string name = 3;
+    string uuid = 1;
+    string name = 2;
 }
 
 message ManyManyModelListRequest {
@@ -154,7 +152,6 @@ message ManyManyModelDestroyRequest {
 message RelatedFieldModel {
     string uuid = 1;
     string foreign = 2;
-    string many_many = 3;
 }
 
 message RelatedFieldModelListRequest {
@@ -166,6 +163,12 @@ message RelatedFieldModelRetrieveRequest {
 
 message RelatedFieldModelDestroyRequest {
     string uuid = 1;
+}
+
+message RelatedFieldModelListResponse {
+    string uuid = 1;
+    string foreign = 2;
+    repeated string many_many = 3;
 }
 
 """
@@ -182,13 +185,50 @@ service ForeignModelController {
 }
 
 message ForeignModelListRequest {
-    string related = 1;
-    string uuid = 2;
-    string name = 3;
+    string uuid = 1;
+    string name = 2;
 }
 
 message ForeignModelRetrieveRequestCustom {
     string name = 1;
+}
+
+"""
+
+MODEL_WITH_M2M_GENERATED = """syntax = "proto3";
+
+package fakeapp;
+
+import "google/protobuf/empty.proto";
+
+service RelatedFieldModelController {
+    rpc List(RelatedFieldModelListRequest) returns (RelatedFieldModelListResponse) {}
+    rpc Create(RelatedFieldModel) returns (RelatedFieldModel) {}
+    rpc Retrieve(RelatedFieldModelRetrieveRequest) returns (RelatedFieldModel) {}
+    rpc Update(RelatedFieldModel) returns (RelatedFieldModel) {}
+    rpc Destroy(RelatedFieldModelDestroyRequest) returns (google.protobuf.Empty) {}
+}
+
+message RelatedFieldModel {
+    string uuid = 1;
+    string foreign = 2;
+}
+
+message RelatedFieldModelListRequest {
+}
+
+message RelatedFieldModelRetrieveRequest {
+    string uuid = 1;
+}
+
+message RelatedFieldModelDestroyRequest {
+    string uuid = 1;
+}
+
+message RelatedFieldModelListResponse {
+    string uuid = 1;
+    string foreign = 2;
+    repeated string many_many = 3;
 }
 
 """

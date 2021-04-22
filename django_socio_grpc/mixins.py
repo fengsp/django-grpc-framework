@@ -29,7 +29,7 @@ class CreateModelMixin:
         }
 
     @staticmethod
-    def get_default_message(model_name, fields):
+    def get_default_message(model_name, fields="__all__"):
         return {
             model_name: fields,
         }
@@ -98,7 +98,7 @@ class RetrieveModelMixin:
         }
 
     @staticmethod
-    def get_default_message(model_name, fields):
+    def get_default_message(model_name, fields="__pk__"):
         return {
             f"{model_name}RetrieveRequest": fields,
         }
@@ -139,7 +139,7 @@ class UpdateModelMixin:
         }
 
     @staticmethod
-    def get_default_message(model_name, fields):
+    def get_default_message(model_name, fields="__all__"):
         return {
             f"{model_name}UpdateRequest": fields,
         }
@@ -181,7 +181,7 @@ class PartialUpdateModelMixin:
         }
 
     @staticmethod
-    def get_default_message(model_name, fields):
+    def get_default_message(model_name, fields="__all__"):
         return {
             f"{model_name}PartialUpdateRequest": fields,
         }
@@ -214,7 +214,32 @@ class DestroyModelMixin:
         }
 
     @staticmethod
-    def get_default_message(model_name, fields):
+    def get_default_message(model_name, fields="__pk__"):
         return {
             f"{model_name}DestroyRequest": fields,
         }
+
+
+def get_default_grpc_methods(model_name):
+    """
+    return the default grpc methods generated for a django model.
+    """
+    return {
+        **ListModelMixin.get_default_method(model_name),
+        **CreateModelMixin.get_default_method(model_name),
+        **RetrieveModelMixin.get_default_method(model_name),
+        **UpdateModelMixin.get_default_method(model_name),
+        **DestroyModelMixin.get_default_method(model_name),
+    }
+
+
+def get_default_grpc_messages(model_name):
+    """
+    return the default protobuff message we want to generate
+    """
+    return {
+        **CreateModelMixin.get_default_message(model_name),
+        **ListModelMixin.get_default_message(model_name),
+        **RetrieveModelMixin.get_default_message(model_name),
+        **DestroyModelMixin.get_default_message(model_name),
+    }

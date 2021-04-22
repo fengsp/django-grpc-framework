@@ -5,14 +5,8 @@ from django.apps import apps
 from django.db import models
 from rest_framework.utils import model_meta
 
-from django_socio_grpc.mixins import (
-    CreateModelMixin,
-    DestroyModelMixin,
-    ListModelMixin,
-    RetrieveModelMixin,
-    UpdateModelMixin,
-)
-from django_socio_grpc.utils.model_extractor import get_model, get_model_fields
+from django_socio_grpc.mixins import get_default_grpc_messages, get_default_grpc_methods
+from django_socio_grpc.utils.model_extractor import get_model
 
 logger = logging.getLogger("django_socio_grpc")
 
@@ -83,14 +77,14 @@ class ModelProtoGenerator:
             # we do not want generate code for abstract model
             if model_meta.is_abstract_model(model):
                 continue
-            self._generate_message(model)
+            self._generate_messages(model)
         return self._writer.get_code()
 
     def _generate_service(self, model):
         grpc_methods = (
             model._meta.grpc_methods
             if hasattr(model, "_meta") and hasattr(model._meta, "grpc_methods")
-            else self.get_default_grpc_methods(model)
+            else get_default_grpc_methods(model.__name__)
         )
 
         if not grpc_methods:
@@ -119,59 +113,65 @@ class ModelProtoGenerator:
         """
         return f"{'stream ' if message_info.get('is_stream', False) else ''}{message_info.get('message', model.__name__)}"
 
-    def get_default_grpc_methods(self, model):
+    def _generate_messages(self, model):
         """
-        return the default grpc methods generated for a django model.
+        Take a model and smartly decide why messages and which field for each message to write in the protobuf file.
+        It use the model._meta.grpc_messages if exist or use the default configurations
         """
-        return {
-            **ListModelMixin.get_default_method(model.__name__),
-            **CreateModelMixin.get_default_method(model.__name__),
-            **RetrieveModelMixin.get_default_method(model.__name__),
-            **UpdateModelMixin.get_default_method(model.__name__),
-            **DestroyModelMixin.get_default_method(model.__name__),
-        }
-
-    def get_default_grpc_messages(self, model):
-        """
-        return the default protobuff message we want to generate
-        """
-        return {
-            **CreateModelMixin.get_default_message(model.__name__, "*"),
-            **ListModelMixin.get_default_message(model.__name__),
-            **RetrieveModelMixin.get_default_message(model.__name__, [model._meta.pk.name]),
-            **DestroyModelMixin.get_default_message(model.__name__, [model._meta.pk.name]),
-        }
-
-    def _generate_message(self, model):
         grpc_messages = (
             model._meta.grpc_messages
             if hasattr(model, "_meta") and hasattr(model._meta, "grpc_messages")
-            else self.get_default_grpc_messages(model)
+            else get_default_grpc_messages(model.__name__)
         )
 
         if not grpc_messages:
             return
 
         for grpc_message_name, grpc_message_fields_name in grpc_messages.items():
-            # We support the possibility to use "*" as parameter for fields
-            if grpc_message_fields_name == "*":
+            # We support the possibility to use "__all__" as parameter for fields
+            if grpc_message_fields_name == "__all__":
+
+                # TODO - AM - 22/04/2021 - Add global settings or model settings or both to change this default behavior
+                # Could be by default to include m2m or reverse relaiton
+                # then should use `get_model_fields(model)`
                 grpc_message_fields_name = [
-                    field_info.name for field_info in get_model_fields(model)
+                    field_info.name for field_info in model._meta.concrete_fields
                 ]
 
-            # Write the name of the message
-            self._writer.write_line(f"message {grpc_message_name} {{")
-            with self._writer.indent():
-                number = 0
-                # Write all fields as defined in the meta of the model
-                for field_name in grpc_message_fields_name:
-                    number += 1
-                    field_info = model._meta.get_field(field_name)
-                    self._writer.write_line(
-                        f"{self.type_mapping.get(field_info.get_internal_type(), 'string')} {field_info.name} = {number};"
+            elif grpc_message_fields_name == "__pk__":
+                grpc_message_fields_name = [model._meta.pk.name]
+
+            self._generate_one_message(model, grpc_message_name, grpc_message_fields_name)
+
+    def _generate_one_message(self, model, grpc_message_name, grpc_message_fields_name):
+        # Write the name of the message
+        self._writer.write_line(f"message {grpc_message_name} {{")
+        with self._writer.indent():
+            number = 0
+            # Write all fields as defined in the meta of the model
+            for field_name in grpc_message_fields_name:
+                number += 1
+                # field_info is type of django.db.models.fields
+                # Seethis page for attr list: https://docs.djangoproject.com/fr/3.1/ref/models/fields/#attributes-for-fields
+                field_info = model._meta.get_field(field_name)
+
+                if not field_info.is_relation:
+                    proto_type = self.type_mapping.get(
+                        field_info.get_internal_type(), "string"
                     )
-            self._writer.write_line("}")
-            self._writer.write_line("")
+                else:
+                    remote_field_type = (
+                        field_info.remote_field.model._meta.pk.get_internal_type()
+                    )
+                    proto_type = self.type_mapping.get(remote_field_type, "string")
+
+                # TODO - AM - 22/04/2021 - Add global settings or model settings or both to change this defautl behavior
+                if field_info.get_internal_type() in [models.ManyToManyField.__name__]:
+                    proto_type = f"repeated {proto_type}"
+
+                self._writer.write_line(f"{proto_type} {field_info.name} = {number};")
+        self._writer.write_line("}")
+        self._writer.write_line("")
 
 
 class _CodeWriter:
