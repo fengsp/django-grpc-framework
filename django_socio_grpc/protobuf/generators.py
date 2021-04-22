@@ -151,27 +151,46 @@ class ModelProtoGenerator:
             # Write all fields as defined in the meta of the model
             for field_name in grpc_message_fields_name:
                 number += 1
-                # field_info is type of django.db.models.fields
-                # Seethis page for attr list: https://docs.djangoproject.com/fr/3.1/ref/models/fields/#attributes-for-fields
-                field_info = model._meta.get_field(field_name)
 
-                if not field_info.is_relation:
-                    proto_type = self.type_mapping.get(
-                        field_info.get_internal_type(), "string"
-                    )
+                if field_name.startswith("__repeated-link--"):
+                    field_name = self.get_custom_item_name(field_name)
+                    proto_type = f"repeated {field_name}"
+                    field_name += "s"  # it's more common to add an "s" to a repeated field
+                elif field_name.startswith("__link--"):
+                    field_name = self.get_custom_item_name(field_name)
+                    proto_type = field_name
                 else:
-                    remote_field_type = (
-                        field_info.remote_field.model._meta.pk.get_internal_type()
-                    )
-                    proto_type = self.type_mapping.get(remote_field_type, "string")
+                    # field_info is type of django.db.models.fields
+                    # Seethis page for attr list: https://docs.djangoproject.com/fr/3.1/ref/models/fields/#attributes-for-fields
+                    field_info = model._meta.get_field(field_name)
 
-                # TODO - AM - 22/04/2021 - Add global settings or model settings or both to change this defautl behavior
-                if field_info.get_internal_type() in [models.ManyToManyField.__name__]:
-                    proto_type = f"repeated {proto_type}"
+                    if not field_info.is_relation:
+                        proto_type = self.type_mapping.get(
+                            field_info.get_internal_type(), "string"
+                        )
+                    else:
+                        remote_field_type = (
+                            field_info.remote_field.model._meta.pk.get_internal_type()
+                        )
+                        proto_type = self.type_mapping.get(remote_field_type, "string")
 
-                self._writer.write_line(f"{proto_type} {field_info.name} = {number};")
+                    # TODO - AM - 22/04/2021 - Add global settings or model settings or both to change this defautl behavior
+                    if field_info.get_internal_type() in [models.ManyToManyField.__name__]:
+                        proto_type = f"repeated {proto_type}"
+
+                self._writer.write_line(f"{proto_type} {field_name} = {number};")
         self._writer.write_line("}")
         self._writer.write_line("")
+
+    def get_custom_item_name(self, field_name):
+        """
+        Get the Message name we want to inject to an other message to make nested serializer or repeated serializer
+        field_name should look like:
+        __repeated-link--Test__
+        __link--Test__
+        and the method will return Test
+        """
+        return field_name.split("--")[1][:-2]
 
 
 class _CodeWriter:

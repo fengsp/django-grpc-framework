@@ -157,6 +157,14 @@ class ListService(mixins.ListModelMixin, GenericService):
     pass
 
 
+class StreamService(mixins.StreamModelMixin, GenericService):
+    """
+    Concrete service for listing one by one on streaming a queryset that provides a ``Stream()`` handler.
+    """
+
+    pass
+
+
 class RetrieveService(mixins.RetrieveModelMixin, GenericService):
     """
     Concrete service for retrieving a model instance that provides a

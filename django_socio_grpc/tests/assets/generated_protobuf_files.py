@@ -5,7 +5,7 @@ package unittestmodel;
 import "google/protobuf/empty.proto";
 
 service UnitTestModelController {
-    rpc List(UnitTestModelListRequest) returns (stream UnitTestModel) {}
+    rpc List(UnitTestModelListRequest) returns (UnitTestModelListResponse) {}
     rpc Create(UnitTestModel) returns (UnitTestModel) {}
     rpc Retrieve(UnitTestModelRetrieveRequest) returns (UnitTestModel) {}
     rpc Update(UnitTestModel) returns (UnitTestModel) {}
@@ -19,6 +19,10 @@ message UnitTestModel {
 }
 
 message UnitTestModelListRequest {
+}
+
+message UnitTestModelListResponse {
+    repeated UnitTestModel UnitTestModels = 1;
 }
 
 message UnitTestModelRetrieveRequest {
@@ -46,7 +50,7 @@ package fakeapp;
 import "google/protobuf/empty.proto";
 
 service UnitTestModelController {
-    rpc List(UnitTestModelListRequest) returns (stream UnitTestModel) {}
+    rpc List(UnitTestModelListRequest) returns (UnitTestModelListResponse) {}
     rpc Create(UnitTestModel) returns (UnitTestModel) {}
     rpc Retrieve(UnitTestModelRetrieveRequest) returns (UnitTestModel) {}
     rpc Update(UnitTestModel) returns (UnitTestModel) {}
@@ -60,6 +64,10 @@ message UnitTestModel {
 }
 
 message UnitTestModelListRequest {
+}
+
+message UnitTestModelListResponse {
+    repeated UnitTestModel UnitTestModels = 1;
 }
 
 message UnitTestModelRetrieveRequest {
@@ -79,7 +87,7 @@ package fakeapp;
 import "google/protobuf/empty.proto";
 
 service UnitTestModelController {
-    rpc List(UnitTestModelListRequest) returns (stream UnitTestModel) {}
+    rpc List(UnitTestModelListRequest) returns (UnitTestModelListResponse) {}
     rpc Create(UnitTestModel) returns (UnitTestModel) {}
     rpc Retrieve(UnitTestModelRetrieveRequest) returns (UnitTestModel) {}
     rpc Update(UnitTestModel) returns (UnitTestModel) {}
@@ -87,12 +95,12 @@ service UnitTestModelController {
 }
 
 service ForeignModelController {
-    rpc List(ForeignModelListRequest) returns (stream ForeignModel) {}
+    rpc List(ForeignModelListRequest) returns (ForeignModelListResponse) {}
     rpc Retrieve(ForeignModelRetrieveRequestCustom) returns (ForeignModelRetrieveRequestCustom) {}
 }
 
 service ManyManyModelController {
-    rpc List(ManyManyModelListRequest) returns (stream ManyManyModel) {}
+    rpc List(ManyManyModelListRequest) returns (ManyManyModelListResponse) {}
     rpc Create(ManyManyModel) returns (ManyManyModel) {}
     rpc Retrieve(ManyManyModelRetrieveRequest) returns (ManyManyModel) {}
     rpc Update(ManyManyModel) returns (ManyManyModel) {}
@@ -116,6 +124,10 @@ message UnitTestModel {
 message UnitTestModelListRequest {
 }
 
+message UnitTestModelListResponse {
+    repeated UnitTestModel UnitTestModels = 1;
+}
+
 message UnitTestModelRetrieveRequest {
     int32 id = 1;
 }
@@ -125,8 +137,10 @@ message UnitTestModelDestroyRequest {
 }
 
 message ForeignModelListRequest {
-    string uuid = 1;
-    string name = 2;
+}
+
+message ForeignModelListResponse {
+    repeated ForeignModel ForeignModels = 1;
 }
 
 message ForeignModelRetrieveRequestCustom {
@@ -139,6 +153,10 @@ message ManyManyModel {
 }
 
 message ManyManyModelListRequest {
+}
+
+message ManyManyModelListResponse {
+    repeated ManyManyModel ManyManyModels = 1;
 }
 
 message ManyManyModelRetrieveRequest {
@@ -157,18 +175,18 @@ message RelatedFieldModel {
 message RelatedFieldModelListRequest {
 }
 
+message RelatedFieldModelListResponse {
+    string uuid = 1;
+    string foreign = 2;
+    repeated string many_many = 3;
+}
+
 message RelatedFieldModelRetrieveRequest {
     string uuid = 1;
 }
 
 message RelatedFieldModelDestroyRequest {
     string uuid = 1;
-}
-
-message RelatedFieldModelListResponse {
-    string uuid = 1;
-    string foreign = 2;
-    repeated string many_many = 3;
 }
 
 """
@@ -180,13 +198,15 @@ package fakeapp;
 import "google/protobuf/empty.proto";
 
 service ForeignModelController {
-    rpc List(ForeignModelListRequest) returns (stream ForeignModel) {}
+    rpc List(ForeignModelListRequest) returns (ForeignModelListResponse) {}
     rpc Retrieve(ForeignModelRetrieveRequestCustom) returns (ForeignModelRetrieveRequestCustom) {}
 }
 
 message ForeignModelListRequest {
-    string uuid = 1;
-    string name = 2;
+}
+
+message ForeignModelListResponse {
+    repeated ForeignModel ForeignModels = 1;
 }
 
 message ForeignModelRetrieveRequestCustom {
@@ -217,18 +237,18 @@ message RelatedFieldModel {
 message RelatedFieldModelListRequest {
 }
 
+message RelatedFieldModelListResponse {
+    string uuid = 1;
+    string foreign = 2;
+    repeated string many_many = 3;
+}
+
 message RelatedFieldModelRetrieveRequest {
     string uuid = 1;
 }
 
 message RelatedFieldModelDestroyRequest {
     string uuid = 1;
-}
-
-message RelatedFieldModelListResponse {
-    string uuid = 1;
-    string foreign = 2;
-    repeated string many_many = 3;
 }
 
 """

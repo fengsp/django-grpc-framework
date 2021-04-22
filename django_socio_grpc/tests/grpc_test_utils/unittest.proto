@@ -5,7 +5,7 @@ package unittest;
 import "google/protobuf/empty.proto";
 
 service UnitTestController {
-    rpc List(UnitTestListRequest) returns (stream UnitTest) {}
+    rpc List(UnitTestListRequest) returns (UnitTestListResponse) {}
     rpc Create(UnitTest) returns (UnitTest) {}
     rpc Retrieve(UnitTestRetrieveRequest) returns (UnitTest) {}
     rpc Update(UnitTest) returns (UnitTest) {}
@@ -19,6 +19,10 @@ message UnitTest {
 }
 
 message UnitTestListRequest {
+}
+
+message UnitTestListResponse {
+    repeated UnitTest results = 1;
 }
 
 message UnitTestRetrieveRequest {

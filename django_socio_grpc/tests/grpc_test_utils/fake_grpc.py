@@ -76,8 +76,9 @@ class FakeChannel:
             if metadata:
                 context._invocation_metadata.extend((_Metadatum(k, v) for k, v in metadata))
 
-            future = self.server.pool.submit(real_method, request, context)
-            return future.result()
+            # future = self.server.pool.submit(real_method, request, context)
+            # return future.result()
+            return real_method(request, context)
 
         return fake_handler
 

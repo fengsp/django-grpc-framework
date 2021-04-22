@@ -27,7 +27,7 @@ class UnitTestService(generics.ModelService):
     pagination_class = StandardResultsSetPagination
 
 
-class TestFiltering(TestCase):
+class TestPagination(TestCase):
     def setUp(self):
         for idx in range(10):
             title = "z" * (idx + 1)
@@ -45,9 +45,7 @@ class TestFiltering(TestCase):
         request = UnitTestListRequest()
         responses = grpc_stub.List(request=request)
 
-        responses_as_list = [response for response in responses]
-
-        self.assertEqual(len(responses_as_list), 3)
+        self.assertEqual(len(responses), 3)
 
     def test_another_page_number_pagination(self):
         grpc_stub = self.fake_grpc.get_fake_stub(UnitTestControllerStub)
@@ -56,6 +54,4 @@ class TestFiltering(TestCase):
         metadata = (("PAGINATION", (json.dumps(pagination_as_dict))),)
         responses = grpc_stub.List(request=request, metadata=metadata)
 
-        responses_as_list = [response for response in responses]
-
-        self.assertEqual(len(responses_as_list), 6)
+        self.assertEqual(len(responses), 6)

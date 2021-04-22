@@ -129,7 +129,8 @@ class Service:
                     def handler(request, context):
                         # db connection state managed similarly to the wsgi handler
                         db.reset_queries()
-                        db.close_old_connections()
+                        # INFO - AM - 22/04/2021 - next line break tests. Need to more understand the drowback about memory in production
+                        # db.close_old_connections()
                         try:
                             self = cls(**initkwargs)
                             self.request = request
@@ -143,7 +144,9 @@ class Service:
                                 grpc_error.status_code, grpc_error.get_full_details()
                             )
                         finally:
-                            db.close_old_connections()
+                            # INFO - AM - 22/04/2021 - next line break tests. Need to more understand the drowback about memory in production
+                            # db.close_old_connections()
+                            pass
 
                     update_wrapper(handler, getattr(cls, action))
                     return handler

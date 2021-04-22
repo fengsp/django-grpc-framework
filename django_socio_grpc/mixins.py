@@ -38,6 +38,45 @@ class CreateModelMixin:
 class ListModelMixin:
     def List(self, request, context):
         """
+        List a queryset.  This sends a message array of
+        ``serializer.Meta.proto_class`` to the client.
+
+        .. note::
+
+            This is a server streaming RPC.
+        """
+        queryset = self.filter_queryset(self.get_queryset())
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return serializer.message
+        else:
+            serializer = self.get_serializer(queryset, many=True)
+            return serializer.message
+
+    @staticmethod
+    def get_default_method(model_name):
+        return {
+            "List": {
+                "request": {"is_stream": False, "message": f"{model_name}ListRequest"},
+                "response": {"is_stream": False, "message": f"{model_name}ListResponse"},
+            },
+        }
+
+    @staticmethod
+    def get_default_message(model_name, fields=None):
+        if fields is None:
+            fields = []
+        return {
+            f"{model_name}ListRequest": fields,
+            f"{model_name}ListResponse": [f"__repeated-link--{model_name}__"],
+        }
+
+
+class StreamModelMixin:
+    def Stream(self, request, context):
+        """
         List a queryset.  This sends a sequence of messages of
         ``serializer.Meta.proto_class`` to the client.
 
@@ -60,8 +99,8 @@ class ListModelMixin:
     @staticmethod
     def get_default_method(model_name):
         return {
-            "List": {
-                "request": {"is_stream": False, "message": f"{model_name}ListRequest"},
+            "Stream": {
+                "request": {"is_stream": False, "message": f"{model_name}StreamRequest"},
                 "response": {"is_stream": True, "message": model_name},
             },
         }
@@ -71,7 +110,7 @@ class ListModelMixin:
         if fields is None:
             fields = []
         return {
-            f"{model_name}ListRequest": fields,
+            f"{model_name}StreamRequest": fields,
         }
 
 
