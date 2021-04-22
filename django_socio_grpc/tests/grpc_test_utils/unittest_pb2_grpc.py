@@ -17,10 +17,10 @@ class UnitTestControllerStub(object):
         Args:
             channel: A grpc.Channel.
         """
-        self.List = channel.unary_stream(
+        self.List = channel.unary_unary(
             "/unittest.UnitTestController/List",
             request_serializer=django__socio__grpc_dot_tests_dot_grpc__test__utils_dot_unittest__pb2.UnitTestListRequest.SerializeToString,
-            response_deserializer=django__socio__grpc_dot_tests_dot_grpc__test__utils_dot_unittest__pb2.UnitTest.FromString,
+            response_deserializer=django__socio__grpc_dot_tests_dot_grpc__test__utils_dot_unittest__pb2.UnitTestListResponse.FromString,
         )
         self.Create = channel.unary_unary(
             "/unittest.UnitTestController/Create",
@@ -80,10 +80,10 @@ class UnitTestControllerServicer(object):
 
 def add_UnitTestControllerServicer_to_server(servicer, server):
     rpc_method_handlers = {
-        "List": grpc.unary_stream_rpc_method_handler(
+        "List": grpc.unary_unary_rpc_method_handler(
             servicer.List,
             request_deserializer=django__socio__grpc_dot_tests_dot_grpc__test__utils_dot_unittest__pb2.UnitTestListRequest.FromString,
-            response_serializer=django__socio__grpc_dot_tests_dot_grpc__test__utils_dot_unittest__pb2.UnitTest.SerializeToString,
+            response_serializer=django__socio__grpc_dot_tests_dot_grpc__test__utils_dot_unittest__pb2.UnitTestListResponse.SerializeToString,
         ),
         "Create": grpc.unary_unary_rpc_method_handler(
             servicer.Create,
@@ -129,12 +129,12 @@ class UnitTestController(object):
         timeout=None,
         metadata=None,
     ):
-        return grpc.experimental.unary_stream(
+        return grpc.experimental.unary_unary(
             request,
             target,
             "/unittest.UnitTestController/List",
             django__socio__grpc_dot_tests_dot_grpc__test__utils_dot_unittest__pb2.UnitTestListRequest.SerializeToString,
-            django__socio__grpc_dot_tests_dot_grpc__test__utils_dot_unittest__pb2.UnitTest.FromString,
+            django__socio__grpc_dot_tests_dot_grpc__test__utils_dot_unittest__pb2.UnitTestListResponse.FromString,
             options,
             channel_credentials,
             insecure,

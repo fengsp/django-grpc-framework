@@ -1,3 +1,5 @@
+from collections import OrderedDict
+
 import grpc
 from django.core.exceptions import ValidationError
 from django.db.models.query import QuerySet
@@ -139,6 +141,15 @@ class GenericService(services.Service):
             return None
         return self.paginator.paginate_queryset(queryset, self.context, view=self)
 
+    def get_paginated_response(self, data):
+        """
+        Return a paginated style `Response` object for the given output data.
+        """
+        assert self.paginator is not None
+        # can not use next line because it return a Django Response object so whe have to override it ourselve
+        # return self.paginator.get_paginated_response(data)
+        return OrderedDict([("count", self.paginator.page.paginator.count), ("results", data)])
+
 
 class CreateService(mixins.CreateModelMixin, GenericService):
     """
@@ -152,6 +163,14 @@ class CreateService(mixins.CreateModelMixin, GenericService):
 class ListService(mixins.ListModelMixin, GenericService):
     """
     Concrete service for listing a queryset that provides a ``List()`` handler.
+    """
+
+    pass
+
+
+class StreamService(mixins.StreamModelMixin, GenericService):
+    """
+    Concrete service for listing one by one on streaming a queryset that provides a ``Stream()`` handler.
     """
 
     pass

@@ -6,11 +6,10 @@ import sys
 import django
 from django.conf import settings
 
-APPS_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-BASE_DIR = os.path.join(APPS_DIR, "django_socio_grpc")
-FAKE_APP_DIR = os.path.join(BASE_DIR, "tests")
+BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+FAKE_APP_DIR = os.path.join(BASE_DIR, "django_socio_grpc", "tests")
 
-sys.path.append(APPS_DIR)
+sys.path.append(BASE_DIR)
 sys.path.append(FAKE_APP_DIR)
 
 
