@@ -81,7 +81,9 @@ class TestProtoGeneration(TestCase):
         with patch("builtins.open", mock_open()) as m:
             call_command("generateproto", *args, **opts)
 
-        m.assert_called_once_with("fakeapp/grpc/fakeapp.proto", "w")
+        m.assert_called_once_with(
+            "/opt/code/django_socio_grpc/tests/fakeapp/grpc/fakeapp.proto", "w"
+        )
         handle = m()
 
         called_with_data = handle.write.call_args[0][0]
@@ -95,7 +97,9 @@ class TestProtoGeneration(TestCase):
         with patch("builtins.open", mock_open()) as m:
             call_command("generateproto", *args, **opts)
 
-        m.assert_called_once_with("fakeapp/grpc/fakeapp.proto", "w")
+        m.assert_called_once_with(
+            "/opt/code/django_socio_grpc/tests/fakeapp/grpc/fakeapp.proto", "w"
+        )
         handle = m()
 
         called_with_data = handle.write.call_args[0][0]
@@ -108,7 +112,9 @@ class TestProtoGeneration(TestCase):
         with patch("builtins.open", mock_open()) as m:
             call_command("generateproto", *args, **opts)
 
-        m.assert_called_once_with("fakeapp/grpc/fakeapp.proto", "w")
+        m.assert_called_once_with(
+            "/opt/code/django_socio_grpc/tests/fakeapp/grpc/fakeapp.proto", "w"
+        )
         handle = m()
 
         called_with_data = handle.write.call_args[0][0]
@@ -122,7 +128,9 @@ class TestProtoGeneration(TestCase):
         with patch("builtins.open", mock_open()) as m:
             call_command("generateproto", *args, **opts)
 
-        m.assert_called_once_with("fakeapp/grpc/fakeapp.proto", "w")
+        m.assert_called_once_with(
+            "/opt/code/django_socio_grpc/tests/fakeapp/grpc/fakeapp.proto", "w"
+        )
         handle = m()
 
         called_with_data = handle.write.call_args[0][0]
@@ -135,7 +143,9 @@ class TestProtoGeneration(TestCase):
         with patch("builtins.open", mock_open()) as m:
             call_command("generateproto", *args, **opts)
 
-        m.assert_called_once_with("fakeapp/grpc/fakeapp.proto", "w")
+        m.assert_called_once_with(
+            "/opt/code/django_socio_grpc/tests/fakeapp/grpc/fakeapp.proto", "w"
+        )
         handle = m()
 
         called_with_data = handle.write.call_args[0][0]

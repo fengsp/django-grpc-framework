@@ -1,6 +1,8 @@
 import errno
 import os
 
+from django.apps import apps
+from django.conf import settings
 from django.core.management.base import BaseCommand
 
 from django_socio_grpc.exceptions import ProtobufGenerationException
@@ -24,6 +26,12 @@ class Command(BaseCommand):
         parser.add_argument(
             "--dry-run", action="store_true", help="print proto data without writing them"
         )
+        parser.add_argument(
+            "--generate-python",
+            action="store_true",
+            default=True,
+            help="generate python file too",
+        )
 
     def handle(self, *args, **options):
 
@@ -37,6 +45,7 @@ class Command(BaseCommand):
         self.update_proto_file = options["update"]
         self.file_path = options["file"]
         self.dry_run = options["dry_run"]
+        self.generate_python = options["generate_python"]
 
         self.check_options()
 
@@ -48,6 +57,7 @@ class Command(BaseCommand):
         # ------------------------------------------------------------
         # ---- Produce a proto file on current filesystem and Path ---
         # ------------------------------------------------------------
+        path_used_for_generation = None
         proto = generator.get_proto()
         if self.dry_run:
             self.stdout.write(proto)
@@ -55,12 +65,21 @@ class Command(BaseCommand):
             self.create_directory_if_not_exist(self.file_path)
             with open(self.file_path, "w") as f:
                 f.write(proto)
+            path_used_for_generation = self.file_path
         # if no filepath specified we create it in a grpc directory in the app
         else:
-            auto_file_path = os.path.join(self.app_name, "grpc", f"{self.app_name}.proto")
+            auto_file_path = os.path.join(
+                apps.get_app_config(self.app_name).path, "grpc", f"{self.app_name}.proto"
+            )
             self.create_directory_if_not_exist(auto_file_path)
             with open(auto_file_path, "w") as f:
                 f.write(proto)
+            path_used_for_generation = auto_file_path
+
+        if self.generate_python:
+            os.system(
+                f"python -m grpc_tools.protoc --proto_path={settings.BASE_DIR} --python_out=./ --grpc_python_out=./ {path_used_for_generation}"
+            )
 
     def check_options(self):
         """

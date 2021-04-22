@@ -3,6 +3,7 @@ import uuid
 from django.db import models
 
 from django_socio_grpc.mixins import (
+    CreateModelMixin,
     ListModelMixin,
     get_default_grpc_messages,
     get_default_grpc_methods,
@@ -26,6 +27,7 @@ class ForeignModel(models.Model):
         # Simulate a read only model      #
         ###################################
         grpc_messages = {
+            **CreateModelMixin.get_default_message("ForeignModel"),
             **ListModelMixin.get_default_message("ForeignModel", pagination=True),
             "ForeignModelRetrieveRequestCustom": ["name"],
         }

@@ -136,6 +136,11 @@ message UnitTestModelDestroyRequest {
     int32 id = 1;
 }
 
+message ForeignModel {
+    string uuid = 1;
+    string name = 2;
+}
+
 message ForeignModelListRequest {
 }
 
@@ -201,6 +206,11 @@ import "google/protobuf/empty.proto";
 service ForeignModelController {
     rpc List(ForeignModelListRequest) returns (ForeignModelListResponse) {}
     rpc Retrieve(ForeignModelRetrieveRequestCustom) returns (ForeignModelRetrieveRequestCustom) {}
+}
+
+message ForeignModel {
+    string uuid = 1;
+    string name = 2;
 }
 
 message ForeignModelListRequest {
