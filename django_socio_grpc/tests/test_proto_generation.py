@@ -81,9 +81,10 @@ class TestProtoGeneration(TestCase):
         with patch("builtins.open", mock_open()) as m:
             call_command("generateproto", *args, **opts)
 
-        m.assert_called_once_with(
-            "/opt/code/django_socio_grpc/tests/fakeapp/grpc/fakeapp.proto", "w"
-        )
+        # this is done to avoid error on different absolute path
+        assert m.mock_calls[0].args[0].endswith("fakeapp/grpc/fakeapp.proto")
+        assert m.mock_calls[0].args[1] == "w"
+
         handle = m()
 
         called_with_data = handle.write.call_args[0][0]
@@ -97,9 +98,9 @@ class TestProtoGeneration(TestCase):
         with patch("builtins.open", mock_open()) as m:
             call_command("generateproto", *args, **opts)
 
-        m.assert_called_once_with(
-            "/opt/code/django_socio_grpc/tests/fakeapp/grpc/fakeapp.proto", "w"
-        )
+        # this is done to avoid error on different absolute path
+        assert m.mock_calls[0].args[0].endswith("fakeapp/grpc/fakeapp.proto")
+        assert m.mock_calls[0].args[1] == "w"
         handle = m()
 
         called_with_data = handle.write.call_args[0][0]
@@ -112,9 +113,10 @@ class TestProtoGeneration(TestCase):
         with patch("builtins.open", mock_open()) as m:
             call_command("generateproto", *args, **opts)
 
-        m.assert_called_once_with(
-            "/opt/code/django_socio_grpc/tests/fakeapp/grpc/fakeapp.proto", "w"
-        )
+        # this is done to avoid error on different absolute path
+        assert m.mock_calls[0].args[0].endswith("fakeapp/grpc/fakeapp.proto")
+        assert m.mock_calls[0].args[1] == "w"
+
         handle = m()
 
         called_with_data = handle.write.call_args[0][0]
@@ -128,9 +130,10 @@ class TestProtoGeneration(TestCase):
         with patch("builtins.open", mock_open()) as m:
             call_command("generateproto", *args, **opts)
 
-        m.assert_called_once_with(
-            "/opt/code/django_socio_grpc/tests/fakeapp/grpc/fakeapp.proto", "w"
-        )
+        # this is done to avoid error on different absolute path
+        assert m.mock_calls[0].args[0].endswith("fakeapp/grpc/fakeapp.proto")
+        assert m.mock_calls[0].args[1] == "w"
+
         handle = m()
 
         called_with_data = handle.write.call_args[0][0]
@@ -143,9 +146,10 @@ class TestProtoGeneration(TestCase):
         with patch("builtins.open", mock_open()) as m:
             call_command("generateproto", *args, **opts)
 
-        m.assert_called_once_with(
-            "/opt/code/django_socio_grpc/tests/fakeapp/grpc/fakeapp.proto", "w"
-        )
+        # this is done to avoid error on different absolute path
+        assert m.mock_calls[0].args[0].endswith("fakeapp/grpc/fakeapp.proto")
+        assert m.mock_calls[0].args[1] == "w"
+
         handle = m()
 
         called_with_data = handle.write.call_args[0][0]
