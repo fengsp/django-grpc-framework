@@ -45,7 +45,8 @@ class TestPagination(TestCase):
         request = UnitTestListRequest()
         responses = grpc_stub.List(request=request)
 
-        self.assertEqual(len(responses), 3)
+        self.assertEqual(responses["count"], 10)
+        self.assertEqual(len(responses["results"]), 3)
 
     def test_another_page_number_pagination(self):
         grpc_stub = self.fake_grpc.get_fake_stub(UnitTestControllerStub)
@@ -54,4 +55,5 @@ class TestPagination(TestCase):
         metadata = (("PAGINATION", (json.dumps(pagination_as_dict))),)
         responses = grpc_stub.List(request=request, metadata=metadata)
 
-        self.assertEqual(len(responses), 6)
+        self.assertEqual(responses["count"], 10)
+        self.assertEqual(len(responses["results"]), 6)

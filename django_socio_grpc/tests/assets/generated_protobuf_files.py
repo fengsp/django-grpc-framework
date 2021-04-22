@@ -22,7 +22,7 @@ message UnitTestModelListRequest {
 }
 
 message UnitTestModelListResponse {
-    repeated UnitTestModel UnitTestModels = 1;
+    repeated UnitTestModel results = 1;
 }
 
 message UnitTestModelRetrieveRequest {
@@ -67,7 +67,7 @@ message UnitTestModelListRequest {
 }
 
 message UnitTestModelListResponse {
-    repeated UnitTestModel UnitTestModels = 1;
+    repeated UnitTestModel results = 1;
 }
 
 message UnitTestModelRetrieveRequest {
@@ -125,7 +125,7 @@ message UnitTestModelListRequest {
 }
 
 message UnitTestModelListResponse {
-    repeated UnitTestModel UnitTestModels = 1;
+    repeated UnitTestModel results = 1;
 }
 
 message UnitTestModelRetrieveRequest {
@@ -140,7 +140,8 @@ message ForeignModelListRequest {
 }
 
 message ForeignModelListResponse {
-    repeated ForeignModel ForeignModels = 1;
+    repeated ForeignModel results = 1;
+    int32 count = 2;
 }
 
 message ForeignModelRetrieveRequestCustom {
@@ -156,7 +157,7 @@ message ManyManyModelListRequest {
 }
 
 message ManyManyModelListResponse {
-    repeated ManyManyModel ManyManyModels = 1;
+    repeated ManyManyModel results = 1;
 }
 
 message ManyManyModelRetrieveRequest {
@@ -206,7 +207,8 @@ message ForeignModelListRequest {
 }
 
 message ForeignModelListResponse {
-    repeated ForeignModel ForeignModels = 1;
+    repeated ForeignModel results = 1;
+    int32 count = 2;
 }
 
 message ForeignModelRetrieveRequestCustom {

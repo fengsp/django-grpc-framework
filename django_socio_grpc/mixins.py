@@ -1,5 +1,7 @@
 from google.protobuf import empty_pb2
 
+from django_socio_grpc.settings import grpc_settings
+
 
 class CreateModelMixin:
     def Create(self, request, context):
@@ -50,7 +52,7 @@ class ListModelMixin:
         page = self.paginate_queryset(queryset)
         if page is not None:
             serializer = self.get_serializer(page, many=True)
-            return serializer.message
+            return self.get_paginated_response(serializer.message)
         else:
             serializer = self.get_serializer(queryset, many=True)
             return serializer.message
@@ -65,12 +67,19 @@ class ListModelMixin:
         }
 
     @staticmethod
-    def get_default_message(model_name, fields=None):
+    def get_default_message(model_name, fields=None, pagination=None):
         if fields is None:
             fields = []
+        # If user let default choose for pagination we check if there is a default pagination class setted
+        if pagination is None:
+            pagination = grpc_settings.DEFAULT_PAGINATION_CLASS is not None
+
+        response_fields = [f"__repeated-link--{model_name}--results__"]
+        if pagination:
+            response_fields += ["__count__"]
         return {
             f"{model_name}ListRequest": fields,
-            f"{model_name}ListResponse": [f"__repeated-link--{model_name}__"],
+            f"{model_name}ListResponse": response_fields,
         }
 
 

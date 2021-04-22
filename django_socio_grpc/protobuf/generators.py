@@ -152,13 +152,18 @@ class ModelProtoGenerator:
             for field_name in grpc_message_fields_name:
                 number += 1
 
+                # this is used for m2m
                 if field_name.startswith("__repeated-link--"):
-                    field_name = self.get_custom_item_name(field_name)
-                    proto_type = f"repeated {field_name}"
-                    field_name += "s"  # it's more common to add an "s" to a repeated field
+                    proto_type, field_name = self.get_custom_item_type_and_name(field_name)
+                    proto_type = f"repeated {proto_type}"
+                # this is used for nested serializer
                 elif field_name.startswith("__link--"):
-                    field_name = self.get_custom_item_name(field_name)
+                    proto_type, field_name = self.get_custom_item_type_and_name(field_name)
                     proto_type = field_name
+                # this is used for pagination
+                elif field_name == "__count__":
+                    field_name = "count"
+                    proto_type = "int32"
                 else:
                     # field_info is type of django.db.models.fields
                     # Seethis page for attr list: https://docs.djangoproject.com/fr/3.1/ref/models/fields/#attributes-for-fields
@@ -182,15 +187,21 @@ class ModelProtoGenerator:
         self._writer.write_line("}")
         self._writer.write_line("")
 
-    def get_custom_item_name(self, field_name):
+    def get_custom_item_type_and_name(self, field_name):
         """
         Get the Message name we want to inject to an other message to make nested serializer or repeated serializer
         field_name should look like:
         __repeated-link--Test__
+        __repeated-link--Test--results__
         __link--Test__
-        and the method will return Test
+        __link--Test--results__
+        and the method will return Test, Test or Test, results
         """
-        return field_name.split("--")[1][:-2]
+        field_name_no_underscore = field_name.replace("__", "")
+        field_name_splitted = field_name_no_underscore.split("--")
+        item_type = field_name_splitted[1]
+        item_name = field_name_splitted[2] if len(field_name_splitted) > 1 else item_type
+        return item_type, item_name
 
 
 class _CodeWriter:

@@ -26,7 +26,7 @@ class ForeignModel(models.Model):
         # Simulate a read only model      #
         ###################################
         grpc_messages = {
-            **ListModelMixin.get_default_message("ForeignModel"),
+            **ListModelMixin.get_default_message("ForeignModel", pagination=True),
             "ForeignModelRetrieveRequestCustom": ["name"],
         }
         grpc_methods = {
