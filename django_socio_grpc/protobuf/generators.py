@@ -1,13 +1,12 @@
 import io
 import logging
-from collections import OrderedDict
 
+from django.apps import apps
 from django.db import models
 from rest_framework.utils import model_meta
-from rest_framework.utils.field_mapping import ClassLookupDict
 
-# from django_socio_grpc.exceptions import ProtobufGenerationException
-# from django_socio_grpc.utils.model_extractor import get_app_list
+from django_socio_grpc.mixins import get_default_grpc_messages, get_default_grpc_methods
+from django_socio_grpc.utils.model_extractor import get_model
 
 logger = logging.getLogger("django_socio_grpc")
 
@@ -15,159 +14,164 @@ logger = logging.getLogger("django_socio_grpc")
 class ModelProtoGenerator:
     type_mapping = {
         # Numeric
-        models.AutoField: "int32",
-        models.SmallIntegerField: "int32",
-        models.IntegerField: "int32",
-        models.BigIntegerField: "int64",
-        models.PositiveSmallIntegerField: "int32",
-        models.PositiveIntegerField: "int32",
-        models.FloatField: "float",
-        models.DecimalField: "string",
+        models.AutoField.__name__: "int32",
+        models.SmallIntegerField.__name__: "int32",
+        models.IntegerField.__name__: "int32",
+        models.BigIntegerField.__name__: "int64",
+        models.PositiveSmallIntegerField.__name__: "int32",
+        models.PositiveIntegerField.__name__: "int32",
+        models.FloatField.__name__: "float",
+        models.DecimalField.__name__: "string",
         # Boolean
-        models.BooleanField: "bool",
-        models.NullBooleanField: "bool",
+        models.BooleanField.__name__: "bool",
+        models.NullBooleanField.__name__: "bool",
         # Date and time
-        models.DateField: "string",
-        models.TimeField: "string",
-        models.DateTimeField: "string",
-        models.DurationField: "string",
+        models.DateField.__name__: "string",
+        models.TimeField.__name__: "string",
+        models.DateTimeField.__name__: "string",
+        models.DurationField.__name__: "string",
         # String
-        models.CharField: "string",
-        models.TextField: "string",
-        models.EmailField: "string",
-        models.SlugField: "string",
-        models.URLField: "string",
-        models.UUIDField: "string",
-        models.GenericIPAddressField: "string",
-        models.FilePathField: "string",
+        models.CharField.__name__: "string",
+        models.TextField.__name__: "string",
+        models.EmailField.__name__: "string",
+        models.SlugField.__name__: "string",
+        models.URLField.__name__: "string",
+        models.UUIDField.__name__: "string",
+        models.GenericIPAddressField.__name__: "string",
+        models.FilePathField.__name__: "string",
         # Default
-        models.Field: "string",
+        models.Field.__name__: "string",
     }
 
-    def __init__(self, model, field_names=None, package=None):
-        self.model = model
-        self.field_names = field_names
-        self.package = package
-        self.type_mapping = ClassLookupDict(self.type_mapping)
-        # INFO - AM - 15/04/2021 -not ready yet as original command take the model name as package an not the app name.
-        # -----------------------------------------------------
-        # -- check if Package name exist in Django app List ---
-        # -----------------------------------------------------
-        # dictApp = get_app_list()
-        # if package and package not in dictApp:
-        #     detail = f"Invalid Django Package {package}"
-        #     logger.error(detail)
-        #     raise ProtobufGenerationException(app=self.package, model=self.model, detail=detail)
+    def __init__(self, app_name, model_name=None):
+        self.model_name = model_name
+        self.app_name = app_name
 
-        # Retrieve metadata about fields & relationships on the model class.
-        self.field_info = model_meta.get_field_info(model)
+        # if there is a model_name that mean we want to generate for only one model
+        if self.model_name:
+            self.models = [get_model(self.app_name, self.model_name)]
+        else:
+            app = apps.get_app_config(app_label=self.app_name)
+            # INFO - AM - 20/04/2021 - Convert to list to be able to iterate multiple time
+            # INFO - AM - 20/04/2021 - Can use tee method to duplicate the generator but I don't see the main goal here
+            self.models = list(app.get_models())
+
         self._writer = _CodeWriter()
 
     def get_proto(self):
         self._writer.write_line('syntax = "proto3";')
         self._writer.write_line("")
-        self._writer.write_line("package %s;" % self.package)
+        self._writer.write_line(
+            f"package {self.app_name if self.app_name else self.model_name};"
+        )
         self._writer.write_line("")
         self._writer.write_line('import "google/protobuf/empty.proto";')
         self._writer.write_line("")
-        self._generate_service()
-        self._writer.write_line("")
-        self._generate_message()
+        for model in self.models:
+            # we do not want generate code for abstract model
+            if model_meta.is_abstract_model(model):
+                continue
+            self._generate_service(model)
+
+        for model in self.models:
+            # we do not want generate code for abstract model
+            if model_meta.is_abstract_model(model):
+                continue
+            self._generate_messages(model)
         return self._writer.get_code()
 
-    def _generate_service(self):
-        self._writer.write_line("service %sController {" % self.model.__name__)
-        with self._writer.indent():
-            self._writer.write_line(
-                "rpc List(%sListRequest) returns (stream %s) {}"
-                % (self.model.__name__, self.model.__name__)
-            )
-            self._writer.write_line(
-                "rpc Create(%s) returns (%s) {}" % (self.model.__name__, self.model.__name__)
-            )
-            self._writer.write_line(
-                "rpc Retrieve(%sRetrieveRequest) returns (%s) {}"
-                % (self.model.__name__, self.model.__name__)
-            )
-            self._writer.write_line(
-                "rpc Update(%s) returns (%s) {}" % (self.model.__name__, self.model.__name__)
-            )
-            self._writer.write_line(
-                "rpc Destroy(%s) returns (google.protobuf.Empty) {}" % self.model.__name__
-            )
-        self._writer.write_line("}")
+    def _generate_service(self, model):
+        grpc_methods = (
+            model._meta.grpc_methods
+            if hasattr(model, "_meta") and hasattr(model._meta, "grpc_methods")
+            else get_default_grpc_methods(model.__name__)
+        )
 
-    def _generate_message(self):
-        self._writer.write_line("message %s {" % self.model.__name__)
+        if not grpc_methods:
+            return
+
+        self._writer.write_line(f"service {model.__name__}Controller {{")
+        with self._writer.indent():
+            for method_name, method_data in grpc_methods.items():
+                request_message = self.construct_method_message(
+                    method_data.get("request", dict()), model
+                )
+                response_message = self.construct_method_message(
+                    method_data.get("response", dict()), model
+                )
+                self._writer.write_line(
+                    f"rpc {method_name}({request_message}) returns ({response_message}) {{}}"
+                )
+        self._writer.write_line("}")
+        self._writer.write_line("")
+
+    def construct_method_message(self, message_info, model):
+        """
+        transform a message_info of type {is_stream: <boolean>, message: <string>} to a rpc parameter or return value.
+
+        return value example: "stream MyModelRetrieveRequest"
+        """
+        return f"{'stream ' if message_info.get('is_stream', False) else ''}{message_info.get('message', model.__name__)}"
+
+    def _generate_messages(self, model):
+        """
+        Take a model and smartly decide why messages and which field for each message to write in the protobuf file.
+        It use the model._meta.grpc_messages if exist or use the default configurations
+        """
+        grpc_messages = (
+            model._meta.grpc_messages
+            if hasattr(model, "_meta") and hasattr(model._meta, "grpc_messages")
+            else get_default_grpc_messages(model.__name__)
+        )
+
+        if not grpc_messages:
+            return
+
+        for grpc_message_name, grpc_message_fields_name in grpc_messages.items():
+            # We support the possibility to use "__all__" as parameter for fields
+            if grpc_message_fields_name == "__all__":
+
+                # TODO - AM - 22/04/2021 - Add global settings or model settings or both to change this default behavior
+                # Could be by default to include m2m or reverse relaiton
+                # then should use `get_model_fields(model)`
+                grpc_message_fields_name = [
+                    field_info.name for field_info in model._meta.concrete_fields
+                ]
+
+            elif grpc_message_fields_name == "__pk__":
+                grpc_message_fields_name = [model._meta.pk.name]
+
+            self._generate_one_message(model, grpc_message_name, grpc_message_fields_name)
+
+    def _generate_one_message(self, model, grpc_message_name, grpc_message_fields_name):
+        # Write the name of the message
+        self._writer.write_line(f"message {grpc_message_name} {{")
         with self._writer.indent():
             number = 0
-            for field_name, proto_type in self.get_fields().items():
+            # Write all fields as defined in the meta of the model
+            for field_name in grpc_message_fields_name:
                 number += 1
-                self._writer.write_line("%s %s = %s;" % (proto_type, field_name, number))
+                # field_info is type of django.db.models.fields
+                # Seethis page for attr list: https://docs.djangoproject.com/fr/3.1/ref/models/fields/#attributes-for-fields
+                field_info = model._meta.get_field(field_name)
+
+                if not field_info.is_relation:
+                    proto_type = self.type_mapping.get(
+                        field_info.get_internal_type(), "string"
+                    )
+                else:
+                    remote_field_type = (
+                        field_info.remote_field.model._meta.pk.get_internal_type()
+                    )
+                    proto_type = self.type_mapping.get(remote_field_type, "string")
+
+                # TODO - AM - 22/04/2021 - Add global settings or model settings or both to change this defautl behavior
+                if field_info.get_internal_type() in [models.ManyToManyField.__name__]:
+                    proto_type = f"repeated {proto_type}"
+
+                self._writer.write_line(f"{proto_type} {field_info.name} = {number};")
         self._writer.write_line("}")
         self._writer.write_line("")
-        self._writer.write_line("message %sListRequest {" % self.model.__name__)
-        self._writer.write_line("}")
-        self._writer.write_line("")
-        self._writer.write_line("message %sRetrieveRequest {" % self.model.__name__)
-        with self._writer.indent():
-            pk_field_name = self.field_info.pk.name
-            pk_proto_type = self.build_proto_type(pk_field_name, self.field_info, self.model)
-            self._writer.write_line("%s %s = 1;" % (pk_proto_type, pk_field_name))
-        self._writer.write_line("}")
-
-    def get_fields(self):
-        """
-        Return the dict of field names -> proto types.
-        """
-        if model_meta.is_abstract_model(self.model):
-            raise ValueError("Cannot generate proto for abstract model.")
-        fields = OrderedDict()
-        for field_name in self.get_field_names():
-            if field_name in fields:
-                continue
-            fields[field_name] = self.build_proto_type(field_name, self.field_info, self.model)
-        return fields
-
-    def get_field_names(self):
-        field_names = self.field_names
-        if not field_names:
-            field_names = (
-                [self.field_info.pk.name]
-                + list(self.field_info.fields)
-                + list(self.field_info.forward_relations)
-            )
-        return field_names
-
-    def build_proto_type(self, field_name, field_info, model_class):
-        if field_name in field_info.fields_and_pk:
-            model_field = field_info.fields_and_pk[field_name]
-            return self._build_standard_proto_type(model_field)
-        elif field_name in field_info.relations:
-            relation_info = field_info.relations[field_name]
-            return self._build_relational_proto_type(relation_info)
-        else:
-            raise ValueError(
-                "Field name `%s` is not valid for model `%s`."
-                % (field_name, model_class.__name__)
-            )
-
-    def _build_standard_proto_type(self, model_field):
-        if model_field.one_to_one and model_field.primary_key:
-            info = model_meta.get_field_info(model_field.related_model)
-            return self.build_proto_type(info.pk.name, info, model_field.related_model)
-        else:
-            return self.type_mapping[model_field]
-
-    def _build_relational_proto_type(self, relation_info):
-        info = model_meta.get_field_info(relation_info.related_model)
-        to_field = info.pk.name
-        if relation_info.to_field and not relation_info.reverse:
-            to_field = relation_info.to_field
-        proto_type = self.build_proto_type(to_field, info, relation_info.related_model)
-        if relation_info.to_many:
-            proto_type = "repeated " + proto_type
-        return proto_type
 
 
 class _CodeWriter:

@@ -89,13 +89,13 @@ class ProtobufGenerationException(Exception):
 
     default_detail = "Unknow"
 
-    def __init__(self, app=None, model=None, detail=None):
-        self.app = app
-        self.model = model
+    def __init__(self, app_name=None, model_name=None, detail=None):
+        self.app_name = app_name
+        self.model_name = model_name
         self.detail = detail if detail is not None else self.default_detail
 
     def __str__(self):
-        return f"Error on protobuf generation on model {self.model} on app {self.app}: {self.detail}"
+        return f"Error on protobuf generation on model {self.model_name} on app {self.app_name}: {self.detail}"
 
 
 class GRPCException(Exception):

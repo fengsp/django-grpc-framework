@@ -1,11 +1,11 @@
 import errno
 import os
 
-from django.core.management.base import BaseCommand, CommandError
-from django.utils.module_loading import import_string
+from django.core.management.base import BaseCommand
 
+from django_socio_grpc.exceptions import ProtobufGenerationException
 from django_socio_grpc.protobuf.generators import ModelProtoGenerator
-from django_socio_grpc.utils.model_extractor import get_model, get_model_column
+from django_socio_grpc.utils.model_extractor import is_app_in_installed_app, is_model_exist
 
 
 class Command(BaseCommand):
@@ -14,106 +14,81 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument(
             "--model",
-            dest="model",
-            type=str,
-            required=True,
             help="dotted path to a model class",
         )
+        parser.add_argument("--file", help="the generated proto file path")
+        parser.add_argument("--app", help="specify Django Application")
         parser.add_argument(
-            "--fields",
-            dest="fields",
-            default=None,
-            type=str,
-            help="specify which fields to include, comma-seperated",
-        )
-        parser.add_argument(
-            "--file", dest="file", default=None, type=str, help="the generated proto file path"
-        )
-        parser.add_argument(
-            "--app", dest="package", default=None, type=str, help="specify Django Application"
-        )
-        parser.add_argument(
-            "--update", dest="update", default="", type=str, help="Replace the proto file"
+            "--update", action="store_true", default=True, help="Replace the proto file"
         )
 
     def handle(self, *args, **options):
 
-        self.validProto = True
-        modelValid = False
-        fieldsArray = []
-
         # ------------------------------------------
         # ---- extract protog Gen Parameters     ---
         # ------------------------------------------
-        self.update = options["update"]
-        self.package = options["package"]
+        self.app_name = options["app"]
+        self.model_name = options["model"]
+        if self.model_name:
+            self.model_name = self.model_name.lower()
+        self.update_proto_file = options["update"]
+        self.file_path = options["file"]
 
-        try:
-            model = import_string(options["model"])
-            modelValid = True
-        except Exception:
-            model = options["model"]
-        fields = options["fields"]
-        if fields != "*":
-            fields = options["fields"].split(",") if options["fields"] else None
-        filepath = options["file"]
-
-        # --------------------------------------------------
-        # --- Check Path for generating the protbuf file ---
-        # --------------------------------------------------
-        if filepath and os.path.exists(filepath) and not self.update:
-            raise CommandError('File "%s" already exists.' % filepath)
-
-        # -------------------------------------------------------------------------
-        # -- if no Django app provided, extract the App from protobuf file path ---
-        # -------------------------------------------------------------------------
-        if not self.package:
-            if filepath:
-                self.package = os.path.splitext(os.path.basename(filepath))[0]
-            else:
-                self.package = None
-
-        # ---------------------------------------------
-        # --- extract all available model's Column  ---
-        # ---------------------------------------------
-        if not modelValid:
-            model = get_model(model)
-
-        # --------------------------------------------------------
-        # ----  AUTO GENERATION OF ALL DATA MODEL FIELDS LIST  ---
-        # ----  Valid Model extract Data Fields definition     ---
-        # --------------------------------------------------------
-        if model:
-            if fields == "*":
-                arrayFields = get_model_column(model)
-                if len(arrayFields) > 0:
-                    for col in arrayFields:
-                        fieldsArray.append(col["name"])
-                    fields = fieldsArray
-        else:
-            self.validProto = False
-            print("**** ERROR  : Invalid Data Model [%s]    *****" % model)
+        self.check_options()
 
         # ----------------------------------------------
         # --- Proto Generation Process               ---
         # ----------------------------------------------
-        generator = ModelProtoGenerator(model=model, field_names=fields, package=self.package)
+        generator = ModelProtoGenerator(app_name=self.app_name, model_name=self.model_name)
 
         # ------------------------------------------------------------
         # ---- Produce a proto file on current filesystem and Path ---
         # ------------------------------------------------------------
         proto = generator.get_proto()
-        if filepath:
-            self.create_directory_if_not_exist(filepath)
-            with open(filepath, "w") as f:
+        if self.file_path:
+            self.create_directory_if_not_exist(self.file_path)
+            with open(self.file_path, "w") as f:
                 f.write(proto)
         else:
             self.stdout.write(proto)
 
-    def create_directory_if_not_exist(self, filepath):
-        if not os.path.exists(os.path.dirname(filepath)):
+    def check_options(self):
+        """
+        Verify the user input
+        """
+        if not self.app_name and not self.model_name:
+            raise ProtobufGenerationException(
+                detail="You need to specify at least one app or one model"
+            )
+
+        # INFO - AM - 19/04 - Find if the app passed as argument is correct
+        if self.app_name and not is_app_in_installed_app(self.app_name):
+            raise ProtobufGenerationException(
+                app_name=self.app_name, model_name=self.model_name, detail="Invalid Django app"
+            )
+
+        # INFO - AM - 19/04 - Find if the model passed as argument is correct
+        if self.model_name and not is_model_exist(self.model_name):
+            raise ProtobufGenerationException(
+                app_name=self.app_name,
+                model_name=self.model_name,
+                detail="Invalid Django model",
+            )
+
+        # --------------------------------------------------
+        # --- Check Path for generating the protbuf file ---
+        # --------------------------------------------------
+        if self.file_path and os.path.exists(self.file_path) and not self.update_proto_file:
+            raise ProtobufGenerationException(
+                app_name=self.app_name,
+                model_name=self.model_name,
+                detail=f"File {self.file_path} already exist",
+            )
+
+    def create_directory_if_not_exist(self, file_path):
+        if not os.path.exists(os.path.dirname(file_path)):
             try:
-                os.makedirs(os.path.dirname(filepath))
+                os.makedirs(os.path.dirname(file_path))
             except OSError as exc:  # Guard against race condition
                 if exc.errno != errno.EEXIST:
                     raise
