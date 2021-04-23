@@ -40,10 +40,8 @@ class TestFiltering(TestCase):
         request = UnitTestListRequest()
         filter_as_dict = {"title": "zzzzzzz"}
         metadata = (("FILTERS", (json.dumps(filter_as_dict))),)
-        responses = grpc_stub.List(request=request, metadata=metadata)
+        response = grpc_stub.List(request=request, metadata=metadata)
 
-        responses_as_list = [response for response in responses]
-
-        self.assertEqual(len(responses_as_list), 1)
+        self.assertEqual(len(response.results), 1)
         # responses_as_list[0] is type of django_socio_grpc.tests.grpc_test_utils.unittest_pb2.Test
-        self.assertEqual(responses_as_list[0].id, 7)
+        self.assertEqual(response.results[0].id, 7)

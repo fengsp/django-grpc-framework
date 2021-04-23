@@ -91,7 +91,19 @@ class ListProtoSerializer(BaseProtoSerializer, ListSerializer):
         """
         List of protobuf messages <- List of dicts of python primitive datatypes.
         """
-        return [self.child.data_to_message(item) for item in data]
+        assert hasattr(
+            self.child, "Meta"
+        ), 'Class {serializer_class} missing "Meta" attribute'.format(
+            serializer_class=self.__class__.__name__
+        )
+        assert hasattr(
+            self.child.Meta, "proto_class_list"
+        ), 'Class {serializer_class} missing "Meta.proto_class_list" attribute'.format(
+            serializer_class=self.__class__.__name__
+        )
+        response = self.child.Meta.proto_class_list()
+        response.results.extend([self.child.data_to_message(item) for item in data])
+        return response
 
 
 class ModelProtoSerializer(ProtoSerializer, ModelSerializer):

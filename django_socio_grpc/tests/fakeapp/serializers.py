@@ -1,5 +1,5 @@
+import fakeapp.grpc.fakeapp_pb2 as grpc_model
 from django_socio_grpc import proto_serializers
-from django_socio_grpc.tests.grpc_test_utils.unittest_pb2 import UnitTest
 
 from .models import UnitTestModel
 
@@ -7,5 +7,6 @@ from .models import UnitTestModel
 class UnitTestSerializer(proto_serializers.ModelProtoSerializer):
     class Meta:
         model = UnitTestModel
-        proto_class = UnitTest
+        proto_class = grpc_model.UnitTestModel
+        proto_class_list = grpc_model.UnitTestModelListResponse
         fields = "__all__"
