@@ -23,6 +23,7 @@ message UnitTestModelListRequest {
 
 message UnitTestModelListResponse {
     repeated UnitTestModel results = 1;
+    int32 count = 2;
 }
 
 message UnitTestModelRetrieveRequest {
@@ -68,6 +69,7 @@ message UnitTestModelListRequest {
 
 message UnitTestModelListResponse {
     repeated UnitTestModel results = 1;
+    int32 count = 2;
 }
 
 message UnitTestModelRetrieveRequest {
@@ -126,6 +128,7 @@ message UnitTestModelListRequest {
 
 message UnitTestModelListResponse {
     repeated UnitTestModel results = 1;
+    int32 count = 2;
 }
 
 message UnitTestModelRetrieveRequest {
@@ -163,6 +166,7 @@ message ManyManyModelListRequest {
 
 message ManyManyModelListResponse {
     repeated ManyManyModel results = 1;
+    int32 count = 2;
 }
 
 message ManyManyModelRetrieveRequest {

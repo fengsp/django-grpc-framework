@@ -52,7 +52,9 @@ class ListModelMixin:
         page = self.paginate_queryset(queryset)
         if page is not None:
             serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.message)
+            if hasattr(serializer.message, "count"):
+                serializer.message.count = self.paginator.page.paginator.count
+            return serializer.message
         else:
             serializer = self.get_serializer(queryset, many=True)
             return serializer.message

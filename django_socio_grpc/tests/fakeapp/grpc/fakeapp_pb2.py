@@ -19,7 +19,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
     syntax="proto3",
     serialized_options=None,
     create_key=_descriptor._internal_create_key,
-    serialized_pb=b'\n2django_socio_grpc/tests/fakeapp/grpc/fakeapp.proto\x12\x07\x66\x61keapp\x1a\x1bgoogle/protobuf/empty.proto"8\n\rUnitTestModel\x12\n\n\x02id\x18\x01 \x01(\x05\x12\r\n\x05title\x18\x02 \x01(\t\x12\x0c\n\x04text\x18\x03 \x01(\t"\x1a\n\x18UnitTestModelListRequest"D\n\x19UnitTestModelListResponse\x12\'\n\x07results\x18\x01 \x03(\x0b\x32\x16.fakeapp.UnitTestModel"*\n\x1cUnitTestModelRetrieveRequest\x12\n\n\x02id\x18\x01 \x01(\x05")\n\x1bUnitTestModelDestroyRequest\x12\n\n\x02id\x18\x01 \x01(\x05"*\n\x0c\x46oreignModel\x12\x0c\n\x04uuid\x18\x01 \x01(\t\x12\x0c\n\x04name\x18\x02 \x01(\t"\x19\n\x17\x46oreignModelListRequest"Q\n\x18\x46oreignModelListResponse\x12&\n\x07results\x18\x01 \x03(\x0b\x32\x15.fakeapp.ForeignModel\x12\r\n\x05\x63ount\x18\x02 \x01(\x05"1\n!ForeignModelRetrieveRequestCustom\x12\x0c\n\x04name\x18\x01 \x01(\t"+\n\rManyManyModel\x12\x0c\n\x04uuid\x18\x01 \x01(\t\x12\x0c\n\x04name\x18\x02 \x01(\t"\x1a\n\x18ManyManyModelListRequest"D\n\x19ManyManyModelListResponse\x12\'\n\x07results\x18\x01 \x03(\x0b\x32\x16.fakeapp.ManyManyModel",\n\x1cManyManyModelRetrieveRequest\x12\x0c\n\x04uuid\x18\x01 \x01(\t"+\n\x1bManyManyModelDestroyRequest\x12\x0c\n\x04uuid\x18\x01 \x01(\t"2\n\x11RelatedFieldModel\x12\x0c\n\x04uuid\x18\x01 \x01(\t\x12\x0f\n\x07\x66oreign\x18\x02 \x01(\t"\x1e\n\x1cRelatedFieldModelListRequest"Q\n\x1dRelatedFieldModelListResponse\x12\x0c\n\x04uuid\x18\x01 \x01(\t\x12\x0f\n\x07\x66oreign\x18\x02 \x01(\t\x12\x11\n\tmany_many\x18\x03 \x03(\t"0\n RelatedFieldModelRetrieveRequest\x12\x0c\n\x04uuid\x18\x01 \x01(\t"/\n\x1fRelatedFieldModelDestroyRequest\x12\x0c\n\x04uuid\x18\x01 \x01(\t2\xfa\x02\n\x17UnitTestModelController\x12O\n\x04List\x12!.fakeapp.UnitTestModelListRequest\x1a".fakeapp.UnitTestModelListResponse"\x00\x12:\n\x06\x43reate\x12\x16.fakeapp.UnitTestModel\x1a\x16.fakeapp.UnitTestModel"\x00\x12K\n\x08Retrieve\x12%.fakeapp.UnitTestModelRetrieveRequest\x1a\x16.fakeapp.UnitTestModel"\x00\x12:\n\x06Update\x12\x16.fakeapp.UnitTestModel\x1a\x16.fakeapp.UnitTestModel"\x00\x12I\n\x07\x44\x65stroy\x12$.fakeapp.UnitTestModelDestroyRequest\x1a\x16.google.protobuf.Empty"\x00\x32\xcd\x01\n\x16\x46oreignModelController\x12M\n\x04List\x12 .fakeapp.ForeignModelListRequest\x1a!.fakeapp.ForeignModelListResponse"\x00\x12\x64\n\x08Retrieve\x12*.fakeapp.ForeignModelRetrieveRequestCustom\x1a*.fakeapp.ForeignModelRetrieveRequestCustom"\x00\x32\xfa\x02\n\x17ManyManyModelController\x12O\n\x04List\x12!.fakeapp.ManyManyModelListRequest\x1a".fakeapp.ManyManyModelListResponse"\x00\x12:\n\x06\x43reate\x12\x16.fakeapp.ManyManyModel\x1a\x16.fakeapp.ManyManyModel"\x00\x12K\n\x08Retrieve\x12%.fakeapp.ManyManyModelRetrieveRequest\x1a\x16.fakeapp.ManyManyModel"\x00\x12:\n\x06Update\x12\x16.fakeapp.ManyManyModel\x1a\x16.fakeapp.ManyManyModel"\x00\x12I\n\x07\x44\x65stroy\x12$.fakeapp.ManyManyModelDestroyRequest\x1a\x16.google.protobuf.Empty"\x00\x32\xa2\x03\n\x1bRelatedFieldModelController\x12W\n\x04List\x12%.fakeapp.RelatedFieldModelListRequest\x1a&.fakeapp.RelatedFieldModelListResponse"\x00\x12\x42\n\x06\x43reate\x12\x1a.fakeapp.RelatedFieldModel\x1a\x1a.fakeapp.RelatedFieldModel"\x00\x12S\n\x08Retrieve\x12).fakeapp.RelatedFieldModelRetrieveRequest\x1a\x1a.fakeapp.RelatedFieldModel"\x00\x12\x42\n\x06Update\x12\x1a.fakeapp.RelatedFieldModel\x1a\x1a.fakeapp.RelatedFieldModel"\x00\x12M\n\x07\x44\x65stroy\x12(.fakeapp.RelatedFieldModelDestroyRequest\x1a\x16.google.protobuf.Empty"\x00\x62\x06proto3',
+    serialized_pb=b'\n2django_socio_grpc/tests/fakeapp/grpc/fakeapp.proto\x12\x07\x66\x61keapp\x1a\x1bgoogle/protobuf/empty.proto"8\n\rUnitTestModel\x12\n\n\x02id\x18\x01 \x01(\x05\x12\r\n\x05title\x18\x02 \x01(\t\x12\x0c\n\x04text\x18\x03 \x01(\t"\x1a\n\x18UnitTestModelListRequest"S\n\x19UnitTestModelListResponse\x12\'\n\x07results\x18\x01 \x03(\x0b\x32\x16.fakeapp.UnitTestModel\x12\r\n\x05\x63ount\x18\x02 \x01(\x05"*\n\x1cUnitTestModelRetrieveRequest\x12\n\n\x02id\x18\x01 \x01(\x05")\n\x1bUnitTestModelDestroyRequest\x12\n\n\x02id\x18\x01 \x01(\x05"*\n\x0c\x46oreignModel\x12\x0c\n\x04uuid\x18\x01 \x01(\t\x12\x0c\n\x04name\x18\x02 \x01(\t"\x19\n\x17\x46oreignModelListRequest"Q\n\x18\x46oreignModelListResponse\x12&\n\x07results\x18\x01 \x03(\x0b\x32\x15.fakeapp.ForeignModel\x12\r\n\x05\x63ount\x18\x02 \x01(\x05"1\n!ForeignModelRetrieveRequestCustom\x12\x0c\n\x04name\x18\x01 \x01(\t"+\n\rManyManyModel\x12\x0c\n\x04uuid\x18\x01 \x01(\t\x12\x0c\n\x04name\x18\x02 \x01(\t"\x1a\n\x18ManyManyModelListRequest"S\n\x19ManyManyModelListResponse\x12\'\n\x07results\x18\x01 \x03(\x0b\x32\x16.fakeapp.ManyManyModel\x12\r\n\x05\x63ount\x18\x02 \x01(\x05",\n\x1cManyManyModelRetrieveRequest\x12\x0c\n\x04uuid\x18\x01 \x01(\t"+\n\x1bManyManyModelDestroyRequest\x12\x0c\n\x04uuid\x18\x01 \x01(\t"2\n\x11RelatedFieldModel\x12\x0c\n\x04uuid\x18\x01 \x01(\t\x12\x0f\n\x07\x66oreign\x18\x02 \x01(\t"\x1e\n\x1cRelatedFieldModelListRequest"Q\n\x1dRelatedFieldModelListResponse\x12\x0c\n\x04uuid\x18\x01 \x01(\t\x12\x0f\n\x07\x66oreign\x18\x02 \x01(\t\x12\x11\n\tmany_many\x18\x03 \x03(\t"0\n RelatedFieldModelRetrieveRequest\x12\x0c\n\x04uuid\x18\x01 \x01(\t"/\n\x1fRelatedFieldModelDestroyRequest\x12\x0c\n\x04uuid\x18\x01 \x01(\t2\xfa\x02\n\x17UnitTestModelController\x12O\n\x04List\x12!.fakeapp.UnitTestModelListRequest\x1a".fakeapp.UnitTestModelListResponse"\x00\x12:\n\x06\x43reate\x12\x16.fakeapp.UnitTestModel\x1a\x16.fakeapp.UnitTestModel"\x00\x12K\n\x08Retrieve\x12%.fakeapp.UnitTestModelRetrieveRequest\x1a\x16.fakeapp.UnitTestModel"\x00\x12:\n\x06Update\x12\x16.fakeapp.UnitTestModel\x1a\x16.fakeapp.UnitTestModel"\x00\x12I\n\x07\x44\x65stroy\x12$.fakeapp.UnitTestModelDestroyRequest\x1a\x16.google.protobuf.Empty"\x00\x32\xcd\x01\n\x16\x46oreignModelController\x12M\n\x04List\x12 .fakeapp.ForeignModelListRequest\x1a!.fakeapp.ForeignModelListResponse"\x00\x12\x64\n\x08Retrieve\x12*.fakeapp.ForeignModelRetrieveRequestCustom\x1a*.fakeapp.ForeignModelRetrieveRequestCustom"\x00\x32\xfa\x02\n\x17ManyManyModelController\x12O\n\x04List\x12!.fakeapp.ManyManyModelListRequest\x1a".fakeapp.ManyManyModelListResponse"\x00\x12:\n\x06\x43reate\x12\x16.fakeapp.ManyManyModel\x1a\x16.fakeapp.ManyManyModel"\x00\x12K\n\x08Retrieve\x12%.fakeapp.ManyManyModelRetrieveRequest\x1a\x16.fakeapp.ManyManyModel"\x00\x12:\n\x06Update\x12\x16.fakeapp.ManyManyModel\x1a\x16.fakeapp.ManyManyModel"\x00\x12I\n\x07\x44\x65stroy\x12$.fakeapp.ManyManyModelDestroyRequest\x1a\x16.google.protobuf.Empty"\x00\x32\xa2\x03\n\x1bRelatedFieldModelController\x12W\n\x04List\x12%.fakeapp.RelatedFieldModelListRequest\x1a&.fakeapp.RelatedFieldModelListResponse"\x00\x12\x42\n\x06\x43reate\x12\x1a.fakeapp.RelatedFieldModel\x1a\x1a.fakeapp.RelatedFieldModel"\x00\x12S\n\x08Retrieve\x12).fakeapp.RelatedFieldModelRetrieveRequest\x1a\x1a.fakeapp.RelatedFieldModel"\x00\x12\x42\n\x06Update\x12\x1a.fakeapp.RelatedFieldModel\x1a\x1a.fakeapp.RelatedFieldModel"\x00\x12M\n\x07\x44\x65stroy\x12(.fakeapp.RelatedFieldModelDestroyRequest\x1a\x16.google.protobuf.Empty"\x00\x62\x06proto3',
     dependencies=[
         google_dot_protobuf_dot_empty__pb2.DESCRIPTOR,
     ],
@@ -153,6 +153,25 @@ _UNITTESTMODELLISTRESPONSE = _descriptor.Descriptor(
             file=DESCRIPTOR,
             create_key=_descriptor._internal_create_key,
         ),
+        _descriptor.FieldDescriptor(
+            name="count",
+            full_name="fakeapp.UnitTestModelListResponse.count",
+            index=1,
+            number=2,
+            type=5,
+            cpp_type=1,
+            label=1,
+            has_default_value=False,
+            default_value=0,
+            message_type=None,
+            enum_type=None,
+            containing_type=None,
+            is_extension=False,
+            extension_scope=None,
+            serialized_options=None,
+            file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
+        ),
     ],
     extensions=[],
     nested_types=[],
@@ -163,7 +182,7 @@ _UNITTESTMODELLISTRESPONSE = _descriptor.Descriptor(
     extension_ranges=[],
     oneofs=[],
     serialized_start=178,
-    serialized_end=246,
+    serialized_end=261,
 )
 
 
@@ -203,8 +222,8 @@ _UNITTESTMODELRETRIEVEREQUEST = _descriptor.Descriptor(
     syntax="proto3",
     extension_ranges=[],
     oneofs=[],
-    serialized_start=248,
-    serialized_end=290,
+    serialized_start=263,
+    serialized_end=305,
 )
 
 
@@ -244,8 +263,8 @@ _UNITTESTMODELDESTROYREQUEST = _descriptor.Descriptor(
     syntax="proto3",
     extension_ranges=[],
     oneofs=[],
-    serialized_start=292,
-    serialized_end=333,
+    serialized_start=307,
+    serialized_end=348,
 )
 
 
@@ -304,8 +323,8 @@ _FOREIGNMODEL = _descriptor.Descriptor(
     syntax="proto3",
     extension_ranges=[],
     oneofs=[],
-    serialized_start=335,
-    serialized_end=377,
+    serialized_start=350,
+    serialized_end=392,
 )
 
 
@@ -325,8 +344,8 @@ _FOREIGNMODELLISTREQUEST = _descriptor.Descriptor(
     syntax="proto3",
     extension_ranges=[],
     oneofs=[],
-    serialized_start=379,
-    serialized_end=404,
+    serialized_start=394,
+    serialized_end=419,
 )
 
 
@@ -385,8 +404,8 @@ _FOREIGNMODELLISTRESPONSE = _descriptor.Descriptor(
     syntax="proto3",
     extension_ranges=[],
     oneofs=[],
-    serialized_start=406,
-    serialized_end=487,
+    serialized_start=421,
+    serialized_end=502,
 )
 
 
@@ -426,8 +445,8 @@ _FOREIGNMODELRETRIEVEREQUESTCUSTOM = _descriptor.Descriptor(
     syntax="proto3",
     extension_ranges=[],
     oneofs=[],
-    serialized_start=489,
-    serialized_end=538,
+    serialized_start=504,
+    serialized_end=553,
 )
 
 
@@ -486,8 +505,8 @@ _MANYMANYMODEL = _descriptor.Descriptor(
     syntax="proto3",
     extension_ranges=[],
     oneofs=[],
-    serialized_start=540,
-    serialized_end=583,
+    serialized_start=555,
+    serialized_end=598,
 )
 
 
@@ -507,8 +526,8 @@ _MANYMANYMODELLISTREQUEST = _descriptor.Descriptor(
     syntax="proto3",
     extension_ranges=[],
     oneofs=[],
-    serialized_start=585,
-    serialized_end=611,
+    serialized_start=600,
+    serialized_end=626,
 )
 
 
@@ -539,6 +558,25 @@ _MANYMANYMODELLISTRESPONSE = _descriptor.Descriptor(
             file=DESCRIPTOR,
             create_key=_descriptor._internal_create_key,
         ),
+        _descriptor.FieldDescriptor(
+            name="count",
+            full_name="fakeapp.ManyManyModelListResponse.count",
+            index=1,
+            number=2,
+            type=5,
+            cpp_type=1,
+            label=1,
+            has_default_value=False,
+            default_value=0,
+            message_type=None,
+            enum_type=None,
+            containing_type=None,
+            is_extension=False,
+            extension_scope=None,
+            serialized_options=None,
+            file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
+        ),
     ],
     extensions=[],
     nested_types=[],
@@ -548,8 +586,8 @@ _MANYMANYMODELLISTRESPONSE = _descriptor.Descriptor(
     syntax="proto3",
     extension_ranges=[],
     oneofs=[],
-    serialized_start=613,
-    serialized_end=681,
+    serialized_start=628,
+    serialized_end=711,
 )
 
 
@@ -589,8 +627,8 @@ _MANYMANYMODELRETRIEVEREQUEST = _descriptor.Descriptor(
     syntax="proto3",
     extension_ranges=[],
     oneofs=[],
-    serialized_start=683,
-    serialized_end=727,
+    serialized_start=713,
+    serialized_end=757,
 )
 
 
@@ -630,8 +668,8 @@ _MANYMANYMODELDESTROYREQUEST = _descriptor.Descriptor(
     syntax="proto3",
     extension_ranges=[],
     oneofs=[],
-    serialized_start=729,
-    serialized_end=772,
+    serialized_start=759,
+    serialized_end=802,
 )
 
 
@@ -690,8 +728,8 @@ _RELATEDFIELDMODEL = _descriptor.Descriptor(
     syntax="proto3",
     extension_ranges=[],
     oneofs=[],
-    serialized_start=774,
-    serialized_end=824,
+    serialized_start=804,
+    serialized_end=854,
 )
 
 
@@ -711,8 +749,8 @@ _RELATEDFIELDMODELLISTREQUEST = _descriptor.Descriptor(
     syntax="proto3",
     extension_ranges=[],
     oneofs=[],
-    serialized_start=826,
-    serialized_end=856,
+    serialized_start=856,
+    serialized_end=886,
 )
 
 
@@ -790,8 +828,8 @@ _RELATEDFIELDMODELLISTRESPONSE = _descriptor.Descriptor(
     syntax="proto3",
     extension_ranges=[],
     oneofs=[],
-    serialized_start=858,
-    serialized_end=939,
+    serialized_start=888,
+    serialized_end=969,
 )
 
 
@@ -831,8 +869,8 @@ _RELATEDFIELDMODELRETRIEVEREQUEST = _descriptor.Descriptor(
     syntax="proto3",
     extension_ranges=[],
     oneofs=[],
-    serialized_start=941,
-    serialized_end=989,
+    serialized_start=971,
+    serialized_end=1019,
 )
 
 
@@ -872,8 +910,8 @@ _RELATEDFIELDMODELDESTROYREQUEST = _descriptor.Descriptor(
     syntax="proto3",
     extension_ranges=[],
     oneofs=[],
-    serialized_start=991,
-    serialized_end=1038,
+    serialized_start=1021,
+    serialized_end=1068,
 )
 
 _UNITTESTMODELLISTRESPONSE.fields_by_name["results"].message_type = _UNITTESTMODEL
@@ -1131,8 +1169,8 @@ _UNITTESTMODELCONTROLLER = _descriptor.ServiceDescriptor(
     index=0,
     serialized_options=None,
     create_key=_descriptor._internal_create_key,
-    serialized_start=1041,
-    serialized_end=1419,
+    serialized_start=1071,
+    serialized_end=1449,
     methods=[
         _descriptor.MethodDescriptor(
             name="List",
@@ -1198,8 +1236,8 @@ _FOREIGNMODELCONTROLLER = _descriptor.ServiceDescriptor(
     index=1,
     serialized_options=None,
     create_key=_descriptor._internal_create_key,
-    serialized_start=1422,
-    serialized_end=1627,
+    serialized_start=1452,
+    serialized_end=1657,
     methods=[
         _descriptor.MethodDescriptor(
             name="List",
@@ -1235,8 +1273,8 @@ _MANYMANYMODELCONTROLLER = _descriptor.ServiceDescriptor(
     index=2,
     serialized_options=None,
     create_key=_descriptor._internal_create_key,
-    serialized_start=1630,
-    serialized_end=2008,
+    serialized_start=1660,
+    serialized_end=2038,
     methods=[
         _descriptor.MethodDescriptor(
             name="List",
@@ -1302,8 +1340,8 @@ _RELATEDFIELDMODELCONTROLLER = _descriptor.ServiceDescriptor(
     index=3,
     serialized_options=None,
     create_key=_descriptor._internal_create_key,
-    serialized_start=2011,
-    serialized_end=2429,
+    serialized_start=2041,
+    serialized_end=2459,
     methods=[
         _descriptor.MethodDescriptor(
             name="List",

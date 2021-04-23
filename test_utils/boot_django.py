@@ -17,6 +17,9 @@ def boot_django():
     settings.configure(
         BASE_DIR=BASE_DIR,
         DEBUG=True,
+        GRPC_FRAMEWORK={
+            "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination"
+        },
         DATABASES={
             "default": {
                 "ENGINE": "django.db.backends.postgresql",
