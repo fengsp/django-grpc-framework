@@ -18,8 +18,10 @@ class SocioProxyHttpRequest:
     }
 
     def __init__(self, grpc_context, grpc_action):
-        grpc_request_metadata = dict(grpc_context.invocation_metadata())
-        self.headers = json.loads(grpc_request_metadata.get(self.HEADERS_KEY.lower(), "{}"))
+        grpc_request_metadata = self.convert_metadata_to_dict(
+            grpc_context.invocation_metadata()
+        )
+        self.headers = json.loads(grpc_request_metadata.get(self.HEADERS_KEY, "{}"))
         self.META = {
             self.MAP_HEADERS.get(key.upper()): value for key, value in self.headers.items()
         }
@@ -34,6 +36,12 @@ class SocioProxyHttpRequest:
 
         # Computed params
         self.query_params = self.get_query_params(grpc_request_metadata)
+
+    def convert_metadata_to_dict(self, invocation_metadata):
+        grpc_request_metadata = {}
+        for key, value in dict(invocation_metadata).items():
+            grpc_request_metadata[key.upper()] = value
+        return grpc_request_metadata
 
     def get_query_params(self, grpc_request_metadata):
         filters_params = json.loads(grpc_request_metadata.get(self.FILTERS_KEY, "{}"))
