@@ -146,8 +146,8 @@ class TestPermissionsIntegration(TestCase):
             fake_rpc_error.exception._code, grpc.StatusCode.PERMISSION_DENIED.value
         )
         self.assertEqual(
-            str(fake_rpc_error.exception._details),
-            "{'message': ErrorDetail(string='fake message', code='permission_denied'), 'code': 'permission_denied'}",
+            fake_rpc_error.exception._details,
+            '{"message": "fake message", "code": "permission_denied"}',
         )
 
     def test_method_map_to_http_list(self):

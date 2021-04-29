@@ -5,6 +5,8 @@ this file is almost identical to https://github.com/encode/django-rest-framework
 But with the grpc code: https://grpc.github.io/grpc/python/grpc.html#grpc-status-code
 This file will grown to support all the gRPC exception when needed
 """
+import json
+
 from django.utils.encoding import force_str
 from django.utils.translation import gettext_lazy as _
 from grpc import StatusCode
@@ -42,10 +44,12 @@ def _get_codes(detail):
 
 def _get_full_details(detail):
     if isinstance(detail, list):
-        return [_get_full_details(item) for item in detail]
+        full_details = [_get_full_details(item) for item in detail]
     elif isinstance(detail, dict):
-        return {key: _get_full_details(value) for key, value in detail.items()}
-    return {"message": detail, "code": detail.code}
+        full_details = {key: _get_full_details(value) for key, value in detail.items()}
+    else:
+        full_details = {"message": detail, "code": detail.code}
+    return json.dumps(full_details)
 
 
 class ErrorDetail(str):

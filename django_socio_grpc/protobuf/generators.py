@@ -159,7 +159,6 @@ class ModelProtoGenerator:
                 # this is used for nested serializer
                 elif field_name.startswith("__link--"):
                     proto_type, field_name = self.get_custom_item_type_and_name(field_name)
-                    proto_type = field_name
                 # this is used for pagination
                 elif field_name == "__count__":
                     field_name = "count"
