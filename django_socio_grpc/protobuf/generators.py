@@ -13,6 +13,8 @@ logger = logging.getLogger("django_socio_grpc")
 
 class ModelProtoGenerator:
     type_mapping = {
+        # Special
+        models.JSONField.__name__: "google.protobuf.Struct",
         # Numeric
         models.AutoField.__name__: "int32",
         models.SmallIntegerField.__name__: "int32",
@@ -65,8 +67,7 @@ class ModelProtoGenerator:
             f"package {self.app_name if self.app_name else self.model_name};"
         )
         self._writer.write_line("")
-        self._writer.write_line('import "google/protobuf/empty.proto";')
-        self._writer.write_line("")
+        self._writer.write_line("IMPORT_PLACEHOLDER")
         for model in self.models:
             # we do not want generate code for abstract model
             if model_meta.is_abstract_model(model):
@@ -78,6 +79,8 @@ class ModelProtoGenerator:
             if model_meta.is_abstract_model(model):
                 continue
             self._generate_messages(model)
+
+        # self._writer.write_import()
         return self._writer.get_code()
 
     def _generate_service(self, model):
@@ -111,7 +114,10 @@ class ModelProtoGenerator:
 
         return value example: "stream MyModelRetrieveRequest"
         """
-        return f"{'stream ' if message_info.get('is_stream', False) else ''}{message_info.get('message', model.__name__)}"
+        grpc_message = message_info.get("message", model.__name__)
+        if grpc_message == "google.protobuf.Empty":
+            self._writer.import_empty = True
+        return f"{'stream ' if message_info.get('is_stream', False) else ''}{grpc_message}"
 
     def _generate_messages(self, model):
         """
@@ -182,6 +188,11 @@ class ModelProtoGenerator:
                     if field_info.get_internal_type() in [models.ManyToManyField.__name__]:
                         proto_type = f"repeated {proto_type}"
 
+                    if proto_type == "google.protobuf.Empty":
+                        self._writer.import_empty = True
+                    if proto_type == "google.protobuf.Struct":
+                        self._writer.import_struct = True
+
                 self._writer.write_line(f"{proto_type} {field_name} = {number};")
         self._writer.write_line("}")
         self._writer.write_line("")
@@ -207,6 +218,8 @@ class _CodeWriter:
     def __init__(self):
         self.buffer = io.StringIO()
         self._indent = 0
+        self.import_empty = False
+        self.import_struct = False
 
     def indent(self):
         return self
@@ -224,4 +237,21 @@ class _CodeWriter:
         print(line, file=self.buffer)
 
     def get_code(self):
-        return self.buffer.getvalue()
+        value = self.buffer.getvalue()
+        value = value.replace("IMPORT_PLACEHOLDER\n", self.get_import_string())
+        return value
+
+    def mark_import_index(self):
+        self.import_index = self.buffer.tell()
+        print(self.buffer.tell())
+
+    def get_import_string(self):
+        import_string = ""
+        if self.import_empty:
+            import_string += 'import "google/protobuf/empty.proto";\n'
+        if self.import_struct:
+            import_string += 'import "google/protobuf/struct.proto";\n'
+
+        if import_string:
+            import_string = import_string + "\n"
+        return import_string
