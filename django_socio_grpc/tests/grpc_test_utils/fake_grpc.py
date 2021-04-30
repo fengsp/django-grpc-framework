@@ -3,16 +3,16 @@
 # https://github.com/kataev/pytest-grpc/blob/master/pytest_grpc/plugin.py
 """
 import socket
-from concurrent import futures
 
 import grpc
 from grpc._cython.cygrpc import _Metadatum
 
 
+# from concurrent import futures
 class FakeServer(object):
-    def __init__(self, pool):
+    def __init__(self):
         self.handlers = {}
-        self.pool = pool
+        # self.pool = pool
 
     def add_generic_rpc_handlers(self, generic_rpc_handlers):
         from grpc._server import _validate_generic_rpc_handlers
@@ -111,14 +111,15 @@ class FakeGRPC:
         self.grpc_server.stop(grace=None)
 
     def get_fake_server(self):
-        pool = futures.ThreadPoolExecutor(max_workers=1)
-        grpc_server = FakeServer(pool)
+        # pool = futures.ThreadPoolExecutor(max_workers=1)
+        grpc_server = FakeServer()
         return grpc_server
 
     def get_fake_channel(self):
         return FakeChannel(self.grpc_server)
 
-    def get_grpc_addr(self):
+    @staticmethod
+    def get_grpc_addr():
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.bind(("localhost", 0))
         return f"localhost:{sock.getsockname()[1]}"
