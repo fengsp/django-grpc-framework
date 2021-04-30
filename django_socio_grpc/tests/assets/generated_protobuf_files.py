@@ -196,6 +196,8 @@ message RelatedFieldModelListResponse {
     string uuid = 1;
     string foreign = 2;
     repeated string many_many = 3;
+    string custom_field_name = 4;
+    repeated string custom_field_name = 5;
 }
 
 message RelatedFieldModelRetrieveRequest {
@@ -284,6 +286,8 @@ message RelatedFieldModelListResponse {
     string uuid = 1;
     string foreign = 2;
     repeated string many_many = 3;
+    string custom_field_name = 4;
+    repeated string custom_field_name = 5;
 }
 
 message RelatedFieldModelRetrieveRequest {

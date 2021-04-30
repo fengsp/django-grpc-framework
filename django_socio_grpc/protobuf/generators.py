@@ -6,6 +6,7 @@ from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from rest_framework.utils import model_meta
 
+from django_socio_grpc.exceptions import ProtobufGenerationException
 from django_socio_grpc.mixins import get_default_grpc_messages, get_default_grpc_methods
 from django_socio_grpc.utils.model_extractor import get_model
 
@@ -175,18 +176,9 @@ class ModelProtoGenerator:
 
         this method is the magic method that tranform custom attribute like __repeated-link-- to correct proto buff file
         """
-        # Info - AM - 30/04/2021 - this is used for m2m nested serializer
-        if field_name.startswith("__repeated-link--"):
-            proto_type, field_name = self.get_custom_item_type_and_name(field_name)
-            return f"repeated {proto_type}", field_name
-
-        # Info - AM - 30/04/2021 - this is used for nested serializer
-        if field_name.startswith("__link--"):
+        # Info - AM - 30/04/2021 - this is used for m2m nested serializer, nested serializer, custom field
+        if field_name.startswith("__custom__"):
             return self.get_custom_item_type_and_name(field_name)
-
-        # Info - AM - 30/04/2021 - this is used for pagination
-        if field_name == "__count__":
-            return "int32", "count"
 
         # Info - AM - 30/04/2021 - this is used for field that belong to model
         else:
@@ -217,19 +209,22 @@ class ModelProtoGenerator:
 
     def get_custom_item_type_and_name(self, field_name):
         """
-        Get the Message name we want to inject to an other message to make nested serializer or repeated serializer
+        Get the Message name we want to inject to an other message to make nested serializer, repeated serializer or just custom message
         field_name should look like:
-        __repeated-link--Test__
-        __repeated-link--Test--results__
-        __link--Test__
-        __link--Test--results__
-        and the method will return Test, Test or Test, results
+        __custom__[proto_type]__[proto_field_name]__
+        and the method will return proto_type, proto_field_name
         """
-        field_name_no_underscore = field_name.replace("__", "")
-        field_name_splitted = field_name_no_underscore.split("--")
-        item_type = field_name_splitted[1]
-        item_name = field_name_splitted[2] if len(field_name_splitted) > 1 else item_type
-        return item_type, item_name
+        try:
+            field_name_splitted = field_name.split("__")
+            item_type = field_name_splitted[2]
+            item_name = field_name_splitted[3]
+            return item_type, item_name
+        except Exception:
+            raise ProtobufGenerationException(
+                self.app_name,
+                self.model_name,
+                detail=f"Wrong formated custom field name {field_name}",
+            )
 
 
 class _CodeWriter:

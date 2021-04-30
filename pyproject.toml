@@ -38,6 +38,7 @@ exclude = '''
   | build
   | dist
   | examples
+  | grpc
 )/
 '''
 
