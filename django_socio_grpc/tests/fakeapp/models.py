@@ -64,12 +64,18 @@ class RelatedFieldModel(models.Model):
     many_many = models.ManyToManyField(ManyManyModel, blank=True, related_name="relateds")
 
     class Meta:
-        ############################################
-        # Manually add many_many to serializer     #
-        ############################################
+        ###############################################################
+        # Manually add many_many to serializer and a custom field     #
+        ###############################################################
         grpc_messages = {
             **get_default_grpc_messages("RelatedFieldModel"),
-            "RelatedFieldModelListResponse": ["uuid", "foreign", "many_many"],
+            "RelatedFieldModelListResponse": [
+                "uuid",
+                "foreign",
+                "many_many",
+                "__custom__string__custom_field_name__",
+                "__custom__repeated string__custom_field_name__",
+            ],
         }
 
         grpc_methods = {

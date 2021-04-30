@@ -69,16 +69,18 @@ class ListModelMixin:
         }
 
     @staticmethod
-    def get_default_message(model_name, fields=None, pagination=None):
+    def get_default_message(
+        model_name, fields=None, pagination=None, response_field_name="results"
+    ):
         if fields is None:
             fields = []
         # If user let default choose for pagination we check if there is a default pagination class setted
         if pagination is None:
             pagination = grpc_settings.DEFAULT_PAGINATION_CLASS is not None
 
-        response_fields = [f"__repeated-link--{model_name}--results__"]
+        response_fields = [f"__custom__repeated {model_name}__{response_field_name}__"]
         if pagination:
-            response_fields += ["__count__"]
+            response_fields += ["__custom__int32__count__"]
         return {
             f"{model_name}ListRequest": fields,
             f"{model_name}ListResponse": response_fields,
