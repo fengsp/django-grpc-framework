@@ -40,8 +40,6 @@ SIMPLE_APP_MODEL_NO_GENERATION = """syntax = "proto3";
 
 package fakeapp;
 
-import "google/protobuf/empty.proto";
-
 """
 
 SIMPLE_APP_MODEL_GENERATED = """syntax = "proto3";
@@ -87,6 +85,7 @@ ALL_APP_GENERATED = """syntax = "proto3";
 package fakeapp;
 
 import "google/protobuf/empty.proto";
+import "google/protobuf/struct.proto";
 
 service UnitTestModelController {
     rpc List(UnitTestModelListRequest) returns (UnitTestModelListResponse) {}
@@ -115,6 +114,14 @@ service RelatedFieldModelController {
     rpc Retrieve(RelatedFieldModelRetrieveRequest) returns (RelatedFieldModel) {}
     rpc Update(RelatedFieldModel) returns (RelatedFieldModel) {}
     rpc Destroy(RelatedFieldModelDestroyRequest) returns (google.protobuf.Empty) {}
+}
+
+service SpecialFieldsModelController {
+    rpc List(SpecialFieldsModelListRequest) returns (SpecialFieldsModelListResponse) {}
+    rpc Create(SpecialFieldsModel) returns (SpecialFieldsModel) {}
+    rpc Retrieve(SpecialFieldsModelRetrieveRequest) returns (SpecialFieldsModel) {}
+    rpc Update(SpecialFieldsModel) returns (SpecialFieldsModel) {}
+    rpc Destroy(SpecialFieldsModelDestroyRequest) returns (google.protobuf.Empty) {}
 }
 
 message UnitTestModel {
@@ -199,13 +206,33 @@ message RelatedFieldModelDestroyRequest {
     string uuid = 1;
 }
 
+message SpecialFieldsModel {
+    string uuid = 1;
+    google.protobuf.Struct meta_datas = 2;
+    repeated int32 list_datas = 3;
+}
+
+message SpecialFieldsModelListRequest {
+}
+
+message SpecialFieldsModelListResponse {
+    repeated SpecialFieldsModel results = 1;
+    int32 count = 2;
+}
+
+message SpecialFieldsModelRetrieveRequest {
+    string uuid = 1;
+}
+
+message SpecialFieldsModelDestroyRequest {
+    string uuid = 1;
+}
+
 """
 
 CUSTOM_APP_MODEL_GENERATED = """syntax = "proto3";
 
 package fakeapp;
-
-import "google/protobuf/empty.proto";
 
 service ForeignModelController {
     rpc List(ForeignModelListRequest) returns (ForeignModelListResponse) {}

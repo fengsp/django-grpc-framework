@@ -1,5 +1,6 @@
 import uuid
 
+from django.contrib.postgres.fields import ArrayField
 from django.db import models
 
 from django_socio_grpc.mixins import (
@@ -91,3 +92,16 @@ class NotDisplayedModel(models.Model):
     class Meta:
         grpc_messages = {}
         grpc_methods = {}
+
+
+class SpecialFieldsModel(models.Model):
+    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    meta_datas = models.JSONField(
+        default=dict,
+        blank=True,
+    )
+    list_datas = ArrayField(
+        models.IntegerField(),
+        default=list,
+        blank=True,
+    )

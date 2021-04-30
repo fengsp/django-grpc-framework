@@ -2,6 +2,7 @@ import io
 import logging
 
 from django.apps import apps
+from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from rest_framework.utils import model_meta
 
@@ -13,6 +14,8 @@ logger = logging.getLogger("django_socio_grpc")
 
 class ModelProtoGenerator:
     type_mapping = {
+        # Special
+        models.JSONField.__name__: "google.protobuf.Struct",
         # Numeric
         models.AutoField.__name__: "int32",
         models.SmallIntegerField.__name__: "int32",
@@ -65,8 +68,7 @@ class ModelProtoGenerator:
             f"package {self.app_name if self.app_name else self.model_name};"
         )
         self._writer.write_line("")
-        self._writer.write_line('import "google/protobuf/empty.proto";')
-        self._writer.write_line("")
+        self._writer.write_line("IMPORT_PLACEHOLDER")
         for model in self.models:
             # we do not want generate code for abstract model
             if model_meta.is_abstract_model(model):
@@ -78,6 +80,7 @@ class ModelProtoGenerator:
             if model_meta.is_abstract_model(model):
                 continue
             self._generate_messages(model)
+
         return self._writer.get_code()
 
     def _generate_service(self, model):
@@ -111,7 +114,10 @@ class ModelProtoGenerator:
 
         return value example: "stream MyModelRetrieveRequest"
         """
-        return f"{'stream ' if message_info.get('is_stream', False) else ''}{message_info.get('message', model.__name__)}"
+        grpc_message = message_info.get("message", model.__name__)
+        if grpc_message == "google.protobuf.Empty":
+            self._writer.import_empty = True
+        return f"{'stream ' if message_info.get('is_stream', False) else ''}{grpc_message}"
 
     def _generate_messages(self, model):
         """
@@ -144,47 +150,70 @@ class ModelProtoGenerator:
             self._generate_one_message(model, grpc_message_name, grpc_message_fields_name)
 
     def _generate_one_message(self, model, grpc_message_name, grpc_message_fields_name):
-        # Write the name of the message
+        # Info - AM - 30/04/2021 - Write the name of the message
         self._writer.write_line(f"message {grpc_message_name} {{")
         with self._writer.indent():
             number = 0
-            # Write all fields as defined in the meta of the model
+            # Info - AM - 30/04/2021 - Write all fields as defined in the meta of the model
             for field_name in grpc_message_fields_name:
                 number += 1
 
-                # this is used for m2m
-                if field_name.startswith("__repeated-link--"):
-                    proto_type, field_name = self.get_custom_item_type_and_name(field_name)
-                    proto_type = f"repeated {proto_type}"
-                # this is used for nested serializer
-                elif field_name.startswith("__link--"):
-                    proto_type, field_name = self.get_custom_item_type_and_name(field_name)
-                # this is used for pagination
-                elif field_name == "__count__":
-                    field_name = "count"
-                    proto_type = "int32"
-                else:
-                    # field_info is type of django.db.models.fields
-                    # Seethis page for attr list: https://docs.djangoproject.com/fr/3.1/ref/models/fields/#attributes-for-fields
-                    field_info = model._meta.get_field(field_name)
+                proto_type, field_name = self.get_proto_type_and_field_name(model, field_name)
 
-                    if not field_info.is_relation:
-                        proto_type = self.type_mapping.get(
-                            field_info.get_internal_type(), "string"
-                        )
-                    else:
-                        remote_field_type = (
-                            field_info.remote_field.model._meta.pk.get_internal_type()
-                        )
-                        proto_type = self.type_mapping.get(remote_field_type, "string")
-
-                    # TODO - AM - 22/04/2021 - Add global settings or model settings or both to change this defautl behavior
-                    if field_info.get_internal_type() in [models.ManyToManyField.__name__]:
-                        proto_type = f"repeated {proto_type}"
+                if proto_type == "google.protobuf.Empty":
+                    self._writer.import_empty = True
+                if proto_type == "google.protobuf.Struct":
+                    self._writer.import_struct = True
 
                 self._writer.write_line(f"{proto_type} {field_name} = {number};")
         self._writer.write_line("}")
         self._writer.write_line("")
+
+    def get_proto_type_and_field_name(self, model, field_name):
+        """
+        Return a proto_type and a field_name to use in the proto file from a field_name and a model.
+
+        this method is the magic method that tranform custom attribute like __repeated-link-- to correct proto buff file
+        """
+        # Info - AM - 30/04/2021 - this is used for m2m nested serializer
+        if field_name.startswith("__repeated-link--"):
+            proto_type, field_name = self.get_custom_item_type_and_name(field_name)
+            return f"repeated {proto_type}", field_name
+
+        # Info - AM - 30/04/2021 - this is used for nested serializer
+        if field_name.startswith("__link--"):
+            return self.get_custom_item_type_and_name(field_name)
+
+        # Info - AM - 30/04/2021 - this is used for pagination
+        if field_name == "__count__":
+            return "int32", "count"
+
+        # Info - AM - 30/04/2021 - this is used for field that belong to model
+        else:
+            # Info - AM - 30/04/2021 - field_info is type of django.db.models.fields
+            # Info - AM - 30/04/2021 - Seethis page for attr list: https://docs.djangoproject.com/fr/3.1/ref/models/fields/#attributes-for-fields
+            field_info = model._meta.get_field(field_name)
+
+            # Info - AM - 30/04/2021 - Support arrayfield by getting the type of the data in the array field
+            if field_info.get_internal_type() == ArrayField.__name__:
+                proto_type = self.type_mapping.get(
+                    field_info.base_field.get_internal_type(), "string"
+                )
+            # Info - AM - 30/04/2021 - default behavior for field
+            elif not field_info.is_relation:
+                proto_type = self.type_mapping.get(field_info.get_internal_type(), "string")
+            # Info - AM - 30/04/2021 - support relation field as m2m and FK
+            else:
+                remote_field_type = field_info.remote_field.model._meta.pk.get_internal_type()
+                proto_type = self.type_mapping.get(remote_field_type, "string")
+
+            if field_info.get_internal_type() in [
+                models.ManyToManyField.__name__,
+                ArrayField.__name__,
+            ]:
+                proto_type = f"repeated {proto_type}"
+
+            return proto_type, field_name
 
     def get_custom_item_type_and_name(self, field_name):
         """
@@ -207,6 +236,8 @@ class _CodeWriter:
     def __init__(self):
         self.buffer = io.StringIO()
         self._indent = 0
+        self.import_empty = False
+        self.import_struct = False
 
     def indent(self):
         return self
@@ -224,4 +255,18 @@ class _CodeWriter:
         print(line, file=self.buffer)
 
     def get_code(self):
-        return self.buffer.getvalue()
+        value = self.buffer.getvalue()
+        value = value.replace("IMPORT_PLACEHOLDER\n", self.get_import_string())
+        return value
+
+    def get_import_string(self):
+        import_string = ""
+        if self.import_empty:
+            import_string += 'import "google/protobuf/empty.proto";\n'
+        if self.import_struct:
+            import_string += 'import "google/protobuf/struct.proto";\n'
+
+        # Info - AM - 30/04/2021 - if there is at least one import we need to put back the line break replaced by the replace function
+        if import_string:
+            import_string = import_string + "\n"
+        return import_string
