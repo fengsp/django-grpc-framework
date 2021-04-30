@@ -100,3 +100,8 @@ class SpecialFieldsModel(models.Model):
         default=dict,
         blank=True,
     )
+    list_datas = ArrayField(
+        models.IntegerField(),
+        default=list,
+        blank=True,
+    )

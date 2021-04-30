@@ -2,6 +2,7 @@ import io
 import logging
 
 from django.apps import apps
+from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from rest_framework.utils import model_meta
 
@@ -150,34 +151,43 @@ class ModelProtoGenerator:
             self._generate_one_message(model, grpc_message_name, grpc_message_fields_name)
 
     def _generate_one_message(self, model, grpc_message_name, grpc_message_fields_name):
-        # Write the name of the message
+        # Info - AM - 30/04/2021 - Write the name of the message
         self._writer.write_line(f"message {grpc_message_name} {{")
         with self._writer.indent():
             number = 0
-            # Write all fields as defined in the meta of the model
+            # Info - AM - 30/04/2021 - Write all fields as defined in the meta of the model
             for field_name in grpc_message_fields_name:
                 number += 1
 
-                # this is used for m2m
+                # Info - AM - 30/04/2021 - this is used for m2m nested serializer
                 if field_name.startswith("__repeated-link--"):
                     proto_type, field_name = self.get_custom_item_type_and_name(field_name)
                     proto_type = f"repeated {proto_type}"
-                # this is used for nested serializer
+                # Info - AM - 30/04/2021 - this is used for nested serializer
                 elif field_name.startswith("__link--"):
                     proto_type, field_name = self.get_custom_item_type_and_name(field_name)
-                # this is used for pagination
+                # Info - AM - 30/04/2021 - this is used for pagination
                 elif field_name == "__count__":
                     field_name = "count"
                     proto_type = "int32"
                 else:
-                    # field_info is type of django.db.models.fields
-                    # Seethis page for attr list: https://docs.djangoproject.com/fr/3.1/ref/models/fields/#attributes-for-fields
+                    # Info - AM - 30/04/2021 - field_info is type of django.db.models.fields
+                    # Info - AM - 30/04/2021 - Seethis page for attr list: https://docs.djangoproject.com/fr/3.1/ref/models/fields/#attributes-for-fields
                     field_info = model._meta.get_field(field_name)
 
-                    if not field_info.is_relation:
+                    # Info - AM - 30/04/2021 - Support arrayfield by getting the type of the data in the array field
+                    if field_info.get_internal_type() == ArrayField.__name__:
+                        print(field_info.get_internal_type())
+                        print(field_info.base_field.get_internal_type())
+                        proto_type = self.type_mapping.get(
+                            field_info.base_field.get_internal_type(), "string"
+                        )
+                    # Info - AM - 30/04/2021 - default behavior for field
+                    elif not field_info.is_relation:
                         proto_type = self.type_mapping.get(
                             field_info.get_internal_type(), "string"
                         )
+                    # Info - AM - 30/04/2021 - support relation field as m2m and FK
                     else:
                         remote_field_type = (
                             field_info.remote_field.model._meta.pk.get_internal_type()
@@ -185,7 +195,10 @@ class ModelProtoGenerator:
                         proto_type = self.type_mapping.get(remote_field_type, "string")
 
                     # TODO - AM - 22/04/2021 - Add global settings or model settings or both to change this defautl behavior
-                    if field_info.get_internal_type() in [models.ManyToManyField.__name__]:
+                    if field_info.get_internal_type() in [
+                        models.ManyToManyField.__name__,
+                        ArrayField.__name__,
+                    ]:
                         proto_type = f"repeated {proto_type}"
 
                     if proto_type == "google.protobuf.Empty":
