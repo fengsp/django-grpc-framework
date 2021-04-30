@@ -74,7 +74,7 @@ class RelatedFieldModel(models.Model):
                 "foreign",
                 "many_many",
                 "__custom__string__custom_field_name__",
-                "__custom__repeated string__custom_field_name__",
+                "__custom__repeated string__list_custom_field_name__",
             ],
         }
 
