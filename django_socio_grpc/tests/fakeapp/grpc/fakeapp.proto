@@ -148,3 +148,8 @@ message SpecialFieldsModelDestroyRequest {
     string uuid = 1;
 }
 
+message ImportStructEvenInArrayModel {
+    string id = 1;
+    repeated google.protobuf.Struct this_is_crazy = 2;
+}
+

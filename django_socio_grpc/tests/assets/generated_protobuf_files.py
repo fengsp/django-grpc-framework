@@ -230,6 +230,11 @@ message SpecialFieldsModelDestroyRequest {
     string uuid = 1;
 }
 
+message ImportStructEvenInArrayModel {
+    string id = 1;
+    repeated google.protobuf.Struct this_is_crazy = 2;
+}
+
 """
 
 CUSTOM_APP_MODEL_GENERATED = """syntax = "proto3";
@@ -296,6 +301,19 @@ message RelatedFieldModelRetrieveRequest {
 
 message RelatedFieldModelDestroyRequest {
     string uuid = 1;
+}
+
+"""
+
+MODEL_WITH_STRUCT_IMORT_IN_ARRAY = """syntax = "proto3";
+
+package fakeapp;
+
+import "google/protobuf/struct.proto";
+
+message ImportStructEvenInArrayModel {
+    string id = 1;
+    repeated google.protobuf.Struct this_is_crazy = 2;
 }
 
 """

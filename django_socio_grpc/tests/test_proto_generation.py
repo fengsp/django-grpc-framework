@@ -9,6 +9,7 @@ from .assets.generated_protobuf_files import (
     ALL_APP_GENERATED,
     CUSTOM_APP_MODEL_GENERATED,
     MODEL_WITH_M2M_GENERATED,
+    MODEL_WITH_STRUCT_IMORT_IN_ARRAY,
     SIMPLE_APP_MODEL_GENERATED,
     SIMPLE_APP_MODEL_NO_GENERATION,
     SIMPLE_MODEL_GENERATED,
@@ -154,3 +155,19 @@ class TestProtoGeneration(TestCase):
 
         called_with_data = handle.write.call_args[0][0]
         self.assertEqual(called_with_data, CUSTOM_APP_MODEL_GENERATED)
+
+    def test_generate_one_app_one_model_import_struct_in_array(self):
+        self.maxDiff = None
+        args = []
+        opts = {"app": "fakeapp", "model": "ImportStructEvenInArrayModel"}
+        with patch("builtins.open", mock_open()) as m:
+            call_command("generateproto", *args, **opts)
+
+        # this is done to avoid error on different absolute path
+        assert m.mock_calls[0].args[0].endswith("fakeapp/grpc/fakeapp.proto")
+        assert m.mock_calls[0].args[1] == "w"
+
+        handle = m()
+
+        called_with_data = handle.write.call_args[0][0]
+        self.assertEqual(called_with_data, MODEL_WITH_STRUCT_IMORT_IN_ARRAY)

@@ -111,3 +111,18 @@ class SpecialFieldsModel(models.Model):
         default=list,
         blank=True,
     )
+
+
+class ImportStructEvenInArrayModel(models.Model):
+    this_is_crazy = ArrayField(
+        models.JSONField(
+            default=dict,
+            blank=True,
+        ),
+        default=list,
+        blank=True,
+    )
+
+    class Meta:
+        grpc_messages = {"ImportStructEvenInArrayModel": "__all__"}
+        grpc_methods = {}

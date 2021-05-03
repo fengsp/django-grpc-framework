@@ -161,9 +161,9 @@ class ModelProtoGenerator:
 
                 proto_type, field_name = self.get_proto_type_and_field_name(model, field_name)
 
-                if proto_type == "google.protobuf.Empty":
+                if "google.protobuf.Empty" in proto_type:
                     self._writer.import_empty = True
-                if proto_type == "google.protobuf.Struct":
+                if "google.protobuf.Struct" in proto_type:
                     self._writer.import_struct = True
 
                 self._writer.write_line(f"{proto_type} {field_name} = {number};")
