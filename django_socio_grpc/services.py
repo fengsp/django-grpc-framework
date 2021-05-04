@@ -35,11 +35,11 @@ class Service:
             raise Unauthenticated(detail=e)
         if not user_auth_tuple:
             self.context.user = None
-            self.context.token = None
+            self.context.auth = None
             return
 
         self.context.user = user_auth_tuple[0]
-        self.context.token = user_auth_tuple[1]
+        self.context.auth = user_auth_tuple[1]
 
     def resolve_user(self):
         auth_responses = [
