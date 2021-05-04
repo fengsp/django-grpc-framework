@@ -44,7 +44,7 @@ class TestAuthenticationUnitary(TestCase):
             mock_resolve_user.assert_called_once_with()
 
         self.assertEqual(dummy_service.context.user, {"email": "john.doe@johndoe.com"})
-        self.assertEqual(dummy_service.context.token, {})
+        self.assertEqual(dummy_service.context.auth, {})
 
     def test_resolve_user(self):
         dummy_service = DummyService()
@@ -80,7 +80,7 @@ class TestAuthenticationIntegration(TestCase):
     def test_user_and_token_none_if_no_auth_class(self):
         self.servicer.DummyMethod(None, self.fake_context)
         self.assertIsNone(self.fake_context.user)
-        self.assertIsNone(self.fake_context.token)
+        self.assertIsNone(self.fake_context.auth)
 
     def test_user_and_token_set(self):
         self.service.authentication_classes = [FakeAuthentication]
@@ -90,4 +90,4 @@ class TestAuthenticationIntegration(TestCase):
 
         self.assertEqual(self.fake_context.META, {"HTTP_AUTHORIZATION": "faketoken"})
         self.assertEqual(self.fake_context.user, {"email": "john.doe@johndoe.com"})
-        self.assertEqual(self.fake_context.token, "faketoken")
+        self.assertEqual(self.fake_context.auth, "faketoken")
