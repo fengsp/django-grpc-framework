@@ -82,25 +82,18 @@ class FakeChannel:
         handler = self.server.handlers[uri]
         real_method = getattr(handler, method_name)
 
-        async def async_fake_handler(request, metadata=None):
-            context = FakeContext()
-            if metadata:
-                context._invocation_metadata.extend((_Metadatum(k, v) for k, v in metadata))
-
-            return await real_method(request, context)
-
         def fake_handler(request, metadata=None):
+            nonlocal real_method
             context = FakeContext()
             if metadata:
                 context._invocation_metadata.extend((_Metadatum(k, v) for k, v in metadata))
+            
+            if asyncio.iscoroutinefunction(real_method):
+                real_method = async_to_sync(real_method)
 
             return real_method(request, context)
 
-        if asyncio.iscoroutinefunction(real_method):
-            print("lalalalalalalala")
-            return async_to_sync(async_fake_handler)
-        else:
-            return fake_handler
+        return fake_handler
 
     def unary_unary(self, *args, **kwargs):
         return self.fake_method("unary_unary", *args, **kwargs)
