@@ -4,6 +4,7 @@
 """
 import socket
 import asyncio
+from asgiref.sync import sync_to_async, async_to_sync
 
 import grpc
 from grpc._cython.cygrpc import _Metadatum
@@ -95,8 +96,9 @@ class FakeChannel:
 
             return real_method(request, context)
 
-        if asyncio.iscoroutinefunction(real_method):            
-            return async_fake_handler
+        if asyncio.iscoroutinefunction(real_method):
+            print("lalalalalalalala")
+            return async_to_sync(async_fake_handler)
         else:
             return fake_handler
 

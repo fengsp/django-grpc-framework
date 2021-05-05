@@ -2,7 +2,7 @@ import os
 import unittest
 
 import pytest
-from asgiref.sync import sync_to_async
+from asgiref.sync import sync_to_async, async_to_sync
 from django.test import TestCase
 
 from django_socio_grpc import generics
@@ -22,8 +22,8 @@ class UnitTestService(generics.ModelService):
     serializer_class = UnitTestModelSerializer
 
 
-class TestAsyncMixins(unittest.IsolatedAsyncioTestCase, TestCase):
-    async def asyncSetUp(self):
+class TestAsyncMixins(TestCase):
+    def setUp(self):
         os.environ["GRPC_ASYNC"] = "True"
         self.fake_grpc = FakeGRPC(
             add_UnitTestModelControllerServicer_to_server, UnitTestService.as_servicer()
@@ -32,18 +32,16 @@ class TestAsyncMixins(unittest.IsolatedAsyncioTestCase, TestCase):
     def tearDown(self):
         self.fake_grpc.close()
 
-    @sync_to_async
     def create_instances(self):
         for idx in range(10):
             title = "z" * (idx + 1)
             text = chr(idx + ord("a")) + chr(idx + ord("b")) + chr(idx + ord("c"))
             UnitTestModel(title=title, text=text).save()
 
-    @pytest.mark.django_db
-    async def test_async_list(self):
-        await self.create_instances()
+    def test_async_list(self):
+        self.create_instances()
         grpc_stub = self.fake_grpc.get_fake_stub(UnitTestModelControllerStub)
         request = UnitTestModelListRequest()
-        response = await grpc_stub.List(request=request)
+        response = grpc_stub.List(request=request)
 
         self.assertEqual(len(response.results), 10)
