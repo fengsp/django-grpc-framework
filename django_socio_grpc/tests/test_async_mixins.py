@@ -25,7 +25,6 @@ class UnitTestService(generics.ModelService):
 class TestAsyncMixins(unittest.IsolatedAsyncioTestCase, TestCase):
     async def asyncSetUp(self):
         os.environ["GRPC_ASYNC"] = "True"
-        await self.create_instances()
         self.fake_grpc = FakeGRPC(
             add_UnitTestModelControllerServicer_to_server, UnitTestService.as_servicer()
         )
@@ -42,6 +41,7 @@ class TestAsyncMixins(unittest.IsolatedAsyncioTestCase, TestCase):
 
     @pytest.mark.django_db
     async def test_async_list(self):
+        await self.create_instances()
         grpc_stub = self.fake_grpc.get_fake_stub(UnitTestModelControllerStub)
         request = UnitTestModelListRequest()
         response = await grpc_stub.List(request=request)

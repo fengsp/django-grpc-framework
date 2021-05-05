@@ -30,6 +30,8 @@ class PytestTestRunner:
         if self.show_local:
             argv.append("-l")
 
+        argv.append("--no-migrations")
+
         # argv.append("--create-db")
 
         for ignore_label in ignore_labels:
