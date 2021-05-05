@@ -1,4 +1,5 @@
 import grpc
+from asgiref.sync import sync_to_async
 from django.core.exceptions import ValidationError
 from django.db.models.query import QuerySet
 from django.http import Http404
@@ -27,6 +28,34 @@ class GenericService(services.Service):
 
     # The style to use for queryset pagination.
     pagination_class = grpc_settings.DEFAULT_PAGINATION_CLASS
+
+    @sync_to_async
+    def get_queryset_async(self):
+        """
+        Get the list of items for this service.
+        This must be an iterable, and may be a queryset.
+        Defaults to using ``self.queryset``.
+
+        If you are overriding a handler method, it is important that you call
+        ``get_queryset()`` instead of accessing the ``queryset`` attribute as
+        ``queryset`` will get evaluated only once.
+
+        Override this to provide dynamic behavior, for example::
+
+            def get_queryset(self):
+                if self.action == 'ListSpecialUser':
+                    return SpecialUser.objects.all()
+                return super().get_queryset()
+        """
+        assert self.queryset is not None, (
+            "'%s' should either include a ``queryset`` attribute, "
+            "or override the ``get_queryset()`` method." % self.__class__.__name__
+        )
+        queryset = self.queryset
+        if isinstance(queryset, QuerySet):
+            # Ensure queryset is re-evaluated on each request.
+            queryset = queryset.all()
+        return queryset
 
     def get_queryset(self):
         """

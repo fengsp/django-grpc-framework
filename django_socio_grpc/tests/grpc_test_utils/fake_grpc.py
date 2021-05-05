@@ -3,16 +3,15 @@
 # https://github.com/kataev/pytest-grpc/blob/master/pytest_grpc/plugin.py
 """
 import socket
+import asyncio
 
 import grpc
 from grpc._cython.cygrpc import _Metadatum
 
 
-# from concurrent import futures
 class FakeServer(object):
     def __init__(self):
         self.handlers = {}
-        # self.pool = pool
 
     def add_generic_rpc_handlers(self, generic_rpc_handlers):
         from grpc._server import _validate_generic_rpc_handlers
@@ -56,6 +55,17 @@ class FakeContext(object):
     def invocation_metadata(self):
         return self._invocation_metadata
 
+def get_brand_new_default_event_loop():
+    try:
+        old_loop = asyncio.get_event_loop()
+        if not old_loop.is_closed():
+            old_loop.close()
+    except RuntimeError:
+        # no default event loop, ignore exception
+        pass
+    _loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(_loop)
+    return _loop
 
 class FakeChannel:
     def __init__(self, fake_server):
@@ -71,16 +81,24 @@ class FakeChannel:
         handler = self.server.handlers[uri]
         real_method = getattr(handler, method_name)
 
+        async def async_fake_handler(request, metadata=None):
+            context = FakeContext()
+            if metadata:
+                context._invocation_metadata.extend((_Metadatum(k, v) for k, v in metadata))
+
+            return await real_method(request, context)
+
         def fake_handler(request, metadata=None):
             context = FakeContext()
             if metadata:
                 context._invocation_metadata.extend((_Metadatum(k, v) for k, v in metadata))
 
-            # future = self.server.pool.submit(real_method, request, context)
-            # return future.result()
             return real_method(request, context)
 
-        return fake_handler
+        if asyncio.iscoroutinefunction(real_method):            
+            return async_fake_handler
+        else:
+            return fake_handler
 
     def unary_unary(self, *args, **kwargs):
         return self.fake_method("unary_unary", *args, **kwargs)
@@ -111,7 +129,6 @@ class FakeGRPC:
         self.grpc_server.stop(grace=None)
 
     def get_fake_server(self):
-        # pool = futures.ThreadPoolExecutor(max_workers=1)
         grpc_server = FakeServer()
         return grpc_server
 

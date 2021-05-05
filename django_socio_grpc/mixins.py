@@ -1,3 +1,4 @@
+from asgiref.sync import sync_to_async
 from google.protobuf import empty_pb2
 
 from django_socio_grpc.settings import grpc_settings
@@ -38,17 +39,8 @@ class CreateModelMixin:
 
 
 class ListModelMixin:
-    def List(self, request, context):
-        """
-        List a queryset.  This sends a message array of
-        ``serializer.Meta.proto_class`` to the client.
-
-        .. note::
-
-            This is a server streaming RPC.
-        """
-        queryset = self.filter_queryset(self.get_queryset())
-
+    @sync_to_async
+    def _get_list_data(self, queryset):
         page = self.paginate_queryset(queryset)
         if page is not None:
             serializer = self.get_serializer(page, many=True)
@@ -58,6 +50,19 @@ class ListModelMixin:
         else:
             serializer = self.get_serializer(queryset, many=True)
             return serializer.message
+
+    async def List(self, request, context):
+        """
+        List a queryset.  This sends a message array of
+        ``serializer.Meta.proto_class`` to the client.
+
+        .. note::
+
+            This is a server streaming RPC.
+        """
+        queryset = self.filter_queryset(await self.get_queryset_async())
+
+        return await self._get_list_data(queryset)
 
     @staticmethod
     def get_default_method(model_name):
