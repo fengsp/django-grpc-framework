@@ -16,56 +16,34 @@ class Servicer:
 
 
     def call_handler(self, action):
-        grpc_async = os.environ.get("GRPC_ASYNC")
 
-        if self.grpc_async:
+        def handler(request, context):
+            # db connection state managed similarly to the wsgi handler
+            db.reset_queries()
+            # INFO - AM - 22/04/2021 - next line break tests. Need to more understand the drowback about memory in production
+            # db.close_old_connections()
+            try:
+                self.service_instance.request = request
+                self.service_instance.context = GRPCSocioProxyContext(context, action)
+                self.service_instance.action = action
+                self.service_instance.before_action()
 
-            async def async_handler(request, context):
-                print("lalalal\n"*6)
-                # db connection state managed similarly to the wsgi handler
-                db.reset_queries()
-                db.close_old_connections()
-                try:
-                    self.service_instance.request = request
-                    self.service_instance.context = GRPCSocioProxyContext(context, action)
-                    self.service_instance.action = action
-                    self.service_instance.before_action()
-                    return await getattr(self.service_instance, action)(self.service_instance.request, self.service_instance)
-                except GRPCException as grpc_error:
-                    logger.error(grpc_error)
-                    context.abort(
-                        grpc_error.status_code, grpc_error.get_full_details()
-                    )
-                finally:
-                    db.close_old_connections()
-
-            return async_handler
-
-        else:
-
-            def handler(request, context):
-                print("iicicic\n"*6)
-                # db connection state managed similarly to the wsgi handler
-                db.reset_queries()
+                # INFO - AM - 05/05/2021 - getting the real function in the service and then calling it if necessary
+                instance_action = getattr(self.service_instance, action)
+                if asyncio.iscoroutinefunction(instance_action):
+                    instance_action = async_to_sync(instance_action)
+                return instance_action(self.service_instance.request, self.service_instance)
+            except GRPCException as grpc_error:
+                logger.error(grpc_error)
+                context.abort(
+                    grpc_error.status_code, grpc_error.get_full_details()
+                )
+            finally:
                 # INFO - AM - 22/04/2021 - next line break tests. Need to more understand the drowback about memory in production
                 # db.close_old_connections()
-                try:
-                    self.service_instance.request = request
-                    self.service_instance.context = GRPCSocioProxyContext(context, action)
-                    self.service_instance.action = action
-                    self.service_instance.before_action()
-                    return getattr(self.service_instance, action)(self.service_instance.request, self.service_instance)
-                except GRPCException as grpc_error:
-                    logger.error(grpc_error)
-                    context.abort(
-                        grpc_error.status_code, grpc_error.get_full_details()
-                    )
-                finally:
-                    # INFO - AM - 22/04/2021 - next line break tests. Need to more understand the drowback about memory in production
-                    # db.close_old_connections()
-                    pass
+                pass
 
-            return handler
+        return handler
 
     def __getattr__(self, action):
         print(action)
