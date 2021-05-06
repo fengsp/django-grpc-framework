@@ -1,5 +1,18 @@
 ## Changelog
 
+#### version 0.8.0
+
+- Refacto the servicer to be a proxy instead of a wrapper to help code structuration
+- Write async mixins
+- Support async method in FakeGrpc for testing
+- Add test for sync mixins and async mixins
+
+### version 0.7.2
+
+- change context key for the auth token from `token` to `auth`
+#### version 0.7.1
+
+- Support for array field of json field
 #### version 0.7.0
 
 - Support JsonField and ArrayField in proto generation
