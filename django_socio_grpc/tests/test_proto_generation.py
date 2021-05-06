@@ -20,7 +20,11 @@ class TestProtoGeneration(TestCase):
     def test_generate_one_model(self):
         self.maxDiff = None
         args = []
-        opts = {"model": "unittestmodel", "file": "proto/unittestmodel.proto"}
+        opts = {
+            "model": "unittestmodel",
+            "file": "proto/unittestmodel.proto",
+            "generate_python": False,
+        }
         with patch("builtins.open", mock_open()) as m:
             call_command("generateproto", *args, **opts)
 
@@ -78,7 +82,7 @@ class TestProtoGeneration(TestCase):
         self.maxDiff = None
 
         args = []
-        opts = {"app": "fakeapp", "model": "RelatedFieldModel"}
+        opts = {"app": "fakeapp", "model": "RelatedFieldModel", "generate_python": False}
         with patch("builtins.open", mock_open()) as m:
             call_command("generateproto", *args, **opts)
 
@@ -95,7 +99,7 @@ class TestProtoGeneration(TestCase):
         self.maxDiff = None
 
         args = []
-        opts = {"app": "fakeapp", "model": "NotDisplayedModel"}
+        opts = {"app": "fakeapp", "model": "NotDisplayedModel", "generate_python": False}
         with patch("builtins.open", mock_open()) as m:
             call_command("generateproto", *args, **opts)
 
@@ -110,7 +114,7 @@ class TestProtoGeneration(TestCase):
     def test_generate_one_app_one_model(self):
         self.maxDiff = None
         args = []
-        opts = {"app": "fakeapp", "model": "unittestmodel"}
+        opts = {"app": "fakeapp", "model": "unittestmodel", "generate_python": False}
         with patch("builtins.open", mock_open()) as m:
             call_command("generateproto", *args, **opts)
 
@@ -127,7 +131,7 @@ class TestProtoGeneration(TestCase):
         self.maxDiff = None
 
         args = []
-        opts = {"app": "fakeapp"}
+        opts = {"app": "fakeapp", "generate_python": False}
         with patch("builtins.open", mock_open()) as m:
             call_command("generateproto", *args, **opts)
 
@@ -143,7 +147,7 @@ class TestProtoGeneration(TestCase):
     def test_generate_one_app_one_model_customized(self):
         self.maxDiff = None
         args = []
-        opts = {"app": "fakeapp", "model": "ForeignModel"}
+        opts = {"app": "fakeapp", "model": "ForeignModel", "generate_python": False}
         with patch("builtins.open", mock_open()) as m:
             call_command("generateproto", *args, **opts)
 
@@ -159,7 +163,11 @@ class TestProtoGeneration(TestCase):
     def test_generate_one_app_one_model_import_struct_in_array(self):
         self.maxDiff = None
         args = []
-        opts = {"app": "fakeapp", "model": "ImportStructEvenInArrayModel"}
+        opts = {
+            "app": "fakeapp",
+            "model": "ImportStructEvenInArrayModel",
+            "generate_python": False,
+        }
         with patch("builtins.open", mock_open()) as m:
             call_command("generateproto", *args, **opts)
 

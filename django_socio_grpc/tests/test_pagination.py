@@ -3,7 +3,7 @@ import json
 from django.test import TestCase
 from rest_framework.pagination import PageNumberPagination
 
-from django_socio_grpc import generics
+from django_socio_grpc import generics, mixins
 from fakeapp.grpc.fakeapp_pb2 import UnitTestModelListRequest
 from fakeapp.grpc.fakeapp_pb2_grpc import (
     UnitTestModelControllerStub,
@@ -21,7 +21,7 @@ class StandardResultsSetPagination(PageNumberPagination):
     max_page_size = 100
 
 
-class UnitTestService(generics.ModelService):
+class UnitTestService(generics.ModelService, mixins.StreamModelMixin):
     queryset = UnitTestModel.objects.all().order_by("id")
     serializer_class = UnitTestModelSerializer
     pagination_class = StandardResultsSetPagination

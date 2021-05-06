@@ -140,6 +140,11 @@ class GenericService(services.Service):
         return self.paginator.paginate_queryset(queryset, self.context, view=self)
 
 
+############################################################
+#   Synchronous Service                                    #
+############################################################
+
+
 class CreateService(mixins.CreateModelMixin, GenericService):
     """
     Concrete service for creating a model instance that provides a ``Create()``
@@ -207,6 +212,88 @@ class ModelService(
     mixins.UpdateModelMixin,
     mixins.DestroyModelMixin,
     mixins.ListModelMixin,
+    GenericService,
+):
+    """
+    Concrete service that provides default ``Create()``, ``Retrieve()``,
+    ``Update()``, ``Destroy()`` and ``List()`` handlers.
+    """
+
+    pass
+
+
+############################################################
+#   Asynchronous Services                                  #
+############################################################
+class AsyncCreateService(mixins.AsyncCreateModelMixin, GenericService):
+    """
+    Concrete service for creating a model instance that provides a ``Create()``
+    handler.
+    """
+
+    pass
+
+
+class AsyncListService(mixins.AsyncListModelMixin, GenericService):
+    """
+    Concrete service for listing a queryset that provides a ``List()`` handler.
+    """
+
+    pass
+
+
+class AsyncStreamService(mixins.AsyncStreamModelMixin, GenericService):
+    """
+    Concrete service for listing one by one on streaming a queryset that provides a ``Stream()`` handler.
+    """
+
+    pass
+
+
+class AsyncRetrieveService(mixins.AsyncRetrieveModelMixin, GenericService):
+    """
+    Concrete service for retrieving a model instance that provides a
+    ``Retrieve()`` handler.
+    """
+
+    pass
+
+
+class AsyncDestroyService(mixins.AsyncDestroyModelMixin, GenericService):
+    """
+    Concrete service for deleting a model instance that provides a ``Destroy()``
+    handler.
+    """
+
+    pass
+
+
+class AsyncUpdateService(mixins.AsyncUpdateModelMixin, GenericService):
+    """
+    Concrete service for updating a model instance that provides a
+    ``Update()`` handler.
+    """
+
+    pass
+
+
+class AsyncReadOnlyModelService(
+    mixins.AsyncRetrieveModelMixin, mixins.AsyncListModelMixin, GenericService
+):
+    """
+    Concrete service that provides default ``List()`` and ``Retrieve()``
+    handlers.
+    """
+
+    pass
+
+
+class AsyncModelService(
+    mixins.AsyncCreateModelMixin,
+    mixins.AsyncRetrieveModelMixin,
+    mixins.AsyncUpdateModelMixin,
+    mixins.AsyncDestroyModelMixin,
+    mixins.AsyncListModelMixin,
     GenericService,
 ):
     """

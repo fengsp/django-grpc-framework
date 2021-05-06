@@ -2,17 +2,17 @@
 # this file is inspirated by pytest-grpc to be able to use django TestCase
 # https://github.com/kataev/pytest-grpc/blob/master/pytest_grpc/plugin.py
 """
+import asyncio
 import socket
 
 import grpc
+from asgiref.sync import async_to_sync
 from grpc._cython.cygrpc import _Metadatum
 
 
-# from concurrent import futures
 class FakeServer(object):
     def __init__(self):
         self.handlers = {}
-        # self.pool = pool
 
     def add_generic_rpc_handlers(self, generic_rpc_handlers):
         from grpc._server import _validate_generic_rpc_handlers
@@ -48,6 +48,7 @@ class FakeRpcError(RuntimeError, grpc.RpcError):
 
 class FakeContext(object):
     def __init__(self):
+        self.stream_pipe = []
         self._invocation_metadata = []
 
     def abort(self, code, details):
@@ -56,10 +57,31 @@ class FakeContext(object):
     def invocation_metadata(self):
         return self._invocation_metadata
 
+    def write(self, data):
+        self.stream_pipe.append(data)
+
+    def read(self):
+        for data in self.stream_pipe:
+            yield data
+
+
+def get_brand_new_default_event_loop():
+    try:
+        old_loop = asyncio.get_event_loop()
+        if not old_loop.is_closed():
+            old_loop.close()
+    except RuntimeError:
+        # no default event loop, ignore exception
+        pass
+    _loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(_loop)
+    return _loop
+
 
 class FakeChannel:
     def __init__(self, fake_server):
         self.server = fake_server
+        self.context = FakeContext()
 
     def __enter__(self):
         return self
@@ -72,13 +94,17 @@ class FakeChannel:
         real_method = getattr(handler, method_name)
 
         def fake_handler(request, metadata=None):
-            context = FakeContext()
+            nonlocal real_method
+            self.context = FakeContext()
             if metadata:
-                context._invocation_metadata.extend((_Metadatum(k, v) for k, v in metadata))
+                self.context._invocation_metadata.extend(
+                    (_Metadatum(k, v) for k, v in metadata)
+                )
 
-            # future = self.server.pool.submit(real_method, request, context)
-            # return future.result()
-            return real_method(request, context)
+            if asyncio.iscoroutinefunction(real_method):
+                real_method = async_to_sync(real_method)
+
+            return real_method(request, self.context)
 
         return fake_handler
 
@@ -111,7 +137,6 @@ class FakeGRPC:
         self.grpc_server.stop(grace=None)
 
     def get_fake_server(self):
-        # pool = futures.ThreadPoolExecutor(max_workers=1)
         grpc_server = FakeServer()
         return grpc_server
 

@@ -1,10 +1,11 @@
+import asyncio
 import logging
 import os
 
-import grpc
+from asgiref.sync import async_to_sync
 from django import db
 
-from django_socio_grpc.exceptions import GRPCException
+from django_socio_grpc.exceptions import GRPCException, Unimplemented
 from django_socio_grpc.request_transformer.grpc_socio_proxy_context import (
     GRPCSocioProxyContext,
 )
@@ -12,21 +13,14 @@ from django_socio_grpc.request_transformer.grpc_socio_proxy_context import (
 logger = logging.getLogger("django_socio_grpc")
 
 
-def not_implemented(request, context):
-    """Method not implemented"""
-    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-    context.set_details("Method not implemented!")
-    raise NotImplementedError("Method not implemented!")
-
-
 class ServicerProxy:
     def __init__(self, ServiceClass, **initkwargs):
         self.service_instance = ServiceClass(**initkwargs)
-        self.grpc_async = os.environ.get("GRPC_ASYNC")
+        # TODO - AM - 06/05 - convert to boolean ?
+        self.grpc_async = os.environ.get("GRPC_ASYNC", False)
 
     def call_handler(self, action):
         if self.grpc_async:
-            print("async_handler")
 
             async def async_handler(request, context):
                 # db connection state managed similarly to the wsgi handler
@@ -68,6 +62,8 @@ class ServicerProxy:
 
                     # INFO - AM - 05/05/2021 - getting the real function in the service and then calling it if necessary
                     instance_action = getattr(self.service_instance, action)
+                    if asyncio.iscoroutinefunction(instance_action):
+                        instance_action = async_to_sync(instance_action)
                     return instance_action(
                         self.service_instance.request, self.service_instance.context
                     )
@@ -82,8 +78,7 @@ class ServicerProxy:
             return handler
 
     def __getattr__(self, action):
-        print(action)
         if not hasattr(self.service_instance, action):
-            return not_implemented
+            raise Unimplemented()
 
         return self.call_handler(action)

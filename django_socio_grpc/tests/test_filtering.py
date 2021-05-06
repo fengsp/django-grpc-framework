@@ -3,7 +3,7 @@ import json
 from django.test import TestCase
 from django_filters.rest_framework import DjangoFilterBackend
 
-from django_socio_grpc import generics
+from django_socio_grpc import generics, mixins
 from fakeapp.grpc.fakeapp_pb2 import UnitTestModelListRequest
 from fakeapp.grpc.fakeapp_pb2_grpc import (
     UnitTestModelControllerStub,
@@ -15,7 +15,7 @@ from fakeapp.serializers import UnitTestModelSerializer
 from .grpc_test_utils.fake_grpc import FakeGRPC
 
 
-class UnitTestService(generics.ModelService):
+class UnitTestService(generics.ModelService, mixins.StreamModelMixin):
     queryset = UnitTestModel.objects.all()
     serializer_class = UnitTestModelSerializer
     filter_backends = [DjangoFilterBackend]

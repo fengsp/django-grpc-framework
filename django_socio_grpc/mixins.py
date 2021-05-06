@@ -1,8 +1,12 @@
+from asgiref.sync import sync_to_async
 from google.protobuf import empty_pb2
 
 from django_socio_grpc.settings import grpc_settings
 
 
+############################################################
+#   Synchronous mixins                                     #
+############################################################
 class CreateModelMixin:
     def Create(self, request, context):
         """
@@ -48,7 +52,6 @@ class ListModelMixin:
             This is a server streaming RPC.
         """
         queryset = self.filter_queryset(self.get_queryset())
-
         page = self.paginate_queryset(queryset)
         if page is not None:
             serializer = self.get_serializer(page, many=True)
@@ -101,13 +104,12 @@ class StreamModelMixin:
 
         page = self.paginate_queryset(queryset)
         if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            for message in serializer.message:
-                yield message
+            serializer = self.get_serializer(page, many=True, stream=True)
         else:
-            serializer = self.get_serializer(queryset, many=True)
-            for message in serializer.message:
-                yield message
+            serializer = self.get_serializer(queryset, many=True, stream=True)
+
+        for message in serializer.message:
+            yield message
 
     @staticmethod
     def get_default_method(model_name):
@@ -270,6 +272,79 @@ class DestroyModelMixin:
         return {
             f"{model_name}DestroyRequest": fields,
         }
+
+
+############################################################
+#   Asynchronous mixins                                    #
+############################################################
+
+
+class AsyncCreateModelMixin(CreateModelMixin):
+    async def Create(self, request, context):
+        async_parent_method = sync_to_async(super().Create)
+        return await async_parent_method(request, context)
+
+
+class AsyncListModelMixin(ListModelMixin):
+    async def List(self, request, context):
+        async_parent_method = sync_to_async(super().List)
+        return await async_parent_method(request, context)
+
+
+class AsyncStreamModelMixin(StreamModelMixin):
+    @sync_to_async
+    def _get_list_data(self):
+        queryset = self.filter_queryset(self.get_queryset())
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True, stream=True)
+        else:
+            serializer = self.get_serializer(queryset, many=True, stream=True)
+
+        return serializer.message
+
+    async def Stream(self, request, context):
+        """
+        List a queryset.  This sends a sequence of messages of
+        ``serializer.Meta.proto_class`` to the client.
+
+        .. note::
+
+            This is a server streaming RPC.
+        """
+        messages = await self._get_list_data()
+        for message in messages:
+            context.write(message)
+
+
+class AsyncRetrieveModelMixin(RetrieveModelMixin):
+    async def Retrieve(self, request, context):
+        async_parent_method = sync_to_async(super().Retrieve)
+        return await async_parent_method(request, context)
+
+
+class AsyncUpdateModelMixin(UpdateModelMixin):
+    async def Update(self, request, context):
+        async_parent_method = sync_to_async(super().Update)
+        return await async_parent_method(request, context)
+
+
+class AsyncPartialUpdateModelMixin(PartialUpdateModelMixin):
+    async def PartialUpdate(self, request, context):
+        async_parent_method = sync_to_async(super().PartialUpdate)
+        return await async_parent_method(request, context)
+
+
+class AsyncDestroyModelMixin(DestroyModelMixin):
+    async def Destroy(self, request, context):
+        async_parent_method = sync_to_async(super().Destroy)
+        return await async_parent_method(request, context)
+
+
+############################################################
+#   Default grpc messages                                  #
+############################################################
 
 
 def get_default_grpc_methods(model_name):
