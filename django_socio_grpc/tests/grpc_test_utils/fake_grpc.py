@@ -2,11 +2,11 @@
 # this file is inspirated by pytest-grpc to be able to use django TestCase
 # https://github.com/kataev/pytest-grpc/blob/master/pytest_grpc/plugin.py
 """
-import socket
 import asyncio
-from asgiref.sync import sync_to_async, async_to_sync
+import socket
 
 import grpc
+from asgiref.sync import async_to_sync
 from grpc._cython.cygrpc import _Metadatum
 
 
@@ -56,6 +56,7 @@ class FakeContext(object):
     def invocation_metadata(self):
         return self._invocation_metadata
 
+
 def get_brand_new_default_event_loop():
     try:
         old_loop = asyncio.get_event_loop()
@@ -67,6 +68,7 @@ def get_brand_new_default_event_loop():
     _loop = asyncio.new_event_loop()
     asyncio.set_event_loop(_loop)
     return _loop
+
 
 class FakeChannel:
     def __init__(self, fake_server):
@@ -87,7 +89,7 @@ class FakeChannel:
             context = FakeContext()
             if metadata:
                 context._invocation_metadata.extend((_Metadatum(k, v) for k, v in metadata))
-            
+
             if asyncio.iscoroutinefunction(real_method):
                 real_method = async_to_sync(real_method)
 

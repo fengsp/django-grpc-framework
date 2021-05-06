@@ -1,8 +1,5 @@
 import os
-import unittest
 
-import pytest
-from asgiref.sync import sync_to_async, async_to_sync
 from django.test import TestCase
 
 from django_socio_grpc import generics
