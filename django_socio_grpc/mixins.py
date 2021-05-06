@@ -104,9 +104,9 @@ class StreamModelMixin:
 
         page = self.paginate_queryset(queryset)
         if page is not None:
-            serializer = self.get_serializer(page, many=True)
+            serializer = self.get_serializer(page, many=True, stream=True)
         else:
-            serializer = self.get_serializer(queryset, many=True)
+            serializer = self.get_serializer(queryset, many=True, stream=True)
 
         for message in serializer.message:
             yield message

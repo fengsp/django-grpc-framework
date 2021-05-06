@@ -2,7 +2,7 @@ import os
 
 from django.test import TestCase
 
-from django_socio_grpc import generics
+from django_socio_grpc import generics, mixins
 from fakeapp.grpc import fakeapp_pb2
 from fakeapp.grpc.fakeapp_pb2_grpc import (
     UnitTestModelControllerStub,
@@ -14,7 +14,7 @@ from fakeapp.serializers import UnitTestModelSerializer
 from .grpc_test_utils.fake_grpc import FakeGRPC
 
 
-class UnitTestService(generics.AsyncModelService):
+class UnitTestService(generics.AsyncModelService, mixins.AsyncStreamModelMixin):
     queryset = UnitTestModel.objects.all()
     serializer_class = UnitTestModelSerializer
 
@@ -47,7 +47,7 @@ class TestAsyncModelService(TestCase):
         self.assertEqual(response.title, "fake")
         self.assertEqual(response.text, "text")
         self.assertEqual(UnitTestModel.objects.count(), 11)
-    
+
     def test_async_list(self):
         grpc_stub = self.fake_grpc.get_fake_stub(UnitTestModelControllerStub)
         request = fakeapp_pb2.UnitTestModelListRequest()
@@ -73,13 +73,10 @@ class TestAsyncModelService(TestCase):
         self.assertEqual(response.title, "newTitle")
         self.assertEqual(response.text, "newText")
 
-    
     def test_async_destroy(self):
         unit_id = UnitTestModel.objects.first().id
         grpc_stub = self.fake_grpc.get_fake_stub(UnitTestModelControllerStub)
         request = fakeapp_pb2.UnitTestModelDestroyRequest(id=unit_id)
-        response = grpc_stub.Destroy(request=request)
+        grpc_stub.Destroy(request=request)
 
         self.assertFalse(UnitTestModel.objects.filter(id=unit_id).exists())
-
-

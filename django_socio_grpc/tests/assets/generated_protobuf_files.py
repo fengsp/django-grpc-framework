@@ -10,6 +10,7 @@ service UnitTestModelController {
     rpc Retrieve(UnitTestModelRetrieveRequest) returns (UnitTestModel) {}
     rpc Update(UnitTestModel) returns (UnitTestModel) {}
     rpc Destroy(UnitTestModelDestroyRequest) returns (google.protobuf.Empty) {}
+    rpc Stream(UnitTestModelStreamRequest) returns (stream UnitTestModel) {}
 }
 
 message UnitTestModel {
@@ -32,6 +33,9 @@ message UnitTestModelRetrieveRequest {
 
 message UnitTestModelDestroyRequest {
     int32 id = 1;
+}
+
+message UnitTestModelStreamRequest {
 }
 
 """
@@ -54,6 +58,7 @@ service UnitTestModelController {
     rpc Retrieve(UnitTestModelRetrieveRequest) returns (UnitTestModel) {}
     rpc Update(UnitTestModel) returns (UnitTestModel) {}
     rpc Destroy(UnitTestModelDestroyRequest) returns (google.protobuf.Empty) {}
+    rpc Stream(UnitTestModelStreamRequest) returns (stream UnitTestModel) {}
 }
 
 message UnitTestModel {
@@ -78,6 +83,9 @@ message UnitTestModelDestroyRequest {
     int32 id = 1;
 }
 
+message UnitTestModelStreamRequest {
+}
+
 """
 
 ALL_APP_GENERATED = """syntax = "proto3";
@@ -93,6 +101,7 @@ service UnitTestModelController {
     rpc Retrieve(UnitTestModelRetrieveRequest) returns (UnitTestModel) {}
     rpc Update(UnitTestModel) returns (UnitTestModel) {}
     rpc Destroy(UnitTestModelDestroyRequest) returns (google.protobuf.Empty) {}
+    rpc Stream(UnitTestModelStreamRequest) returns (stream UnitTestModel) {}
 }
 
 service ForeignModelController {
@@ -144,6 +153,9 @@ message UnitTestModelRetrieveRequest {
 
 message UnitTestModelDestroyRequest {
     int32 id = 1;
+}
+
+message UnitTestModelStreamRequest {
 }
 
 message ForeignModel {

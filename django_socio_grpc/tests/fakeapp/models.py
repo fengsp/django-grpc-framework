@@ -6,6 +6,7 @@ from django.db import models
 from django_socio_grpc.mixins import (
     CreateModelMixin,
     ListModelMixin,
+    StreamModelMixin,
     get_default_grpc_messages,
     get_default_grpc_methods,
 )
@@ -16,6 +17,17 @@ class UnitTestModel(models.Model):
     title = models.CharField(max_length=20)
     text = models.CharField(max_length=100)
     # test
+
+    class Meta:
+        grpc_messages = {
+            **get_default_grpc_messages("UnitTestModel"),
+            **StreamModelMixin.get_default_message("UnitTestModel"),
+        }
+
+        grpc_methods = {
+            **get_default_grpc_methods("UnitTestModel"),
+            **StreamModelMixin.get_default_method("UnitTestModel"),
+        }
 
 
 class ForeignModel(models.Model):

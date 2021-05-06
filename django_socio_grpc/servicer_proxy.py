@@ -2,23 +2,15 @@ import asyncio
 import logging
 import os
 
-import grpc
 from asgiref.sync import async_to_sync
 from django import db
 
-from django_socio_grpc.exceptions import GRPCException
+from django_socio_grpc.exceptions import GRPCException, Unimplemented
 from django_socio_grpc.request_transformer.grpc_socio_proxy_context import (
     GRPCSocioProxyContext,
 )
 
 logger = logging.getLogger("django_socio_grpc")
-
-
-def not_implemented(request, context):
-    """Method not implemented"""
-    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-    context.set_details("Method not implemented!")
-    raise NotImplementedError("Method not implemented!")
 
 
 class ServicerProxy:
@@ -87,6 +79,6 @@ class ServicerProxy:
 
     def __getattr__(self, action):
         if not hasattr(self.service_instance, action):
-            return not_implemented
+            raise Unimplemented()
 
         return self.call_handler(action)

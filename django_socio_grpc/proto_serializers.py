@@ -14,6 +14,7 @@ from django_socio_grpc.protobuf.json_format import message_to_dict, parse_dict
 class BaseProtoSerializer(BaseSerializer):
     def __init__(self, *args, **kwargs):
         message = kwargs.pop("message", None)
+        self.stream = kwargs.pop("stream", None)
         if message is not None:
             self.initial_message = message
             kwargs["data"] = self.message_to_data(message)
@@ -101,9 +102,13 @@ class ListProtoSerializer(BaseProtoSerializer, ListSerializer):
         ), 'Class {serializer_class} missing "Meta.proto_class_list" attribute'.format(
             serializer_class=self.__class__.__name__
         )
-        response = self.child.Meta.proto_class_list()
-        response.results.extend([self.child.data_to_message(item) for item in data])
-        return response
+
+        if getattr(self.child, "stream", False):
+            return [self.child.data_to_message(item) for item in data]
+        else:
+            response = self.child.Meta.proto_class_list()
+            response.results.extend([self.child.data_to_message(item) for item in data])
+            return response
 
 
 class ModelProtoSerializer(ProtoSerializer, ModelSerializer):

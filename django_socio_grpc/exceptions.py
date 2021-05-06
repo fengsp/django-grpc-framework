@@ -168,3 +168,9 @@ class InvalidArgument(GRPCException):
     status_code = StatusCode.INVALID_ARGUMENT
     default_detail = _("Invalid argument.")
     default_code = "invalid_argument"
+
+
+class Unimplemented(GRPCException):
+    status_code = StatusCode.UNIMPLEMENTED
+    default_detail = _("Unimplemented.")
+    default_code = "unimplemented"

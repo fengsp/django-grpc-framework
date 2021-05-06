@@ -1,8 +1,6 @@
-import os
-
 from django.test import TestCase
 
-from django_socio_grpc import generics
+from django_socio_grpc import generics, mixins
 from fakeapp.grpc import fakeapp_pb2
 from fakeapp.grpc.fakeapp_pb2_grpc import (
     UnitTestModelControllerStub,
@@ -14,7 +12,7 @@ from fakeapp.serializers import UnitTestModelSerializer
 from .grpc_test_utils.fake_grpc import FakeGRPC
 
 
-class UnitTestService(generics.ModelService):
+class UnitTestService(generics.ModelService, mixins.StreamModelMixin):
     queryset = UnitTestModel.objects.all()
     serializer_class = UnitTestModelSerializer
 
@@ -45,7 +43,7 @@ class TestModelService(TestCase):
         self.assertEqual(response.title, "fake")
         self.assertEqual(response.text, "text")
         self.assertEqual(UnitTestModel.objects.count(), 11)
-    
+
     def test_list(self):
         grpc_stub = self.fake_grpc.get_fake_stub(UnitTestModelControllerStub)
         request = fakeapp_pb2.UnitTestModelListRequest()
@@ -71,22 +69,19 @@ class TestModelService(TestCase):
         self.assertEqual(response.title, "newTitle")
         self.assertEqual(response.text, "newText")
 
-    
     def test_destroy(self):
         unit_id = UnitTestModel.objects.first().id
         grpc_stub = self.fake_grpc.get_fake_stub(UnitTestModelControllerStub)
         request = fakeapp_pb2.UnitTestModelDestroyRequest(id=unit_id)
-        response = grpc_stub.Destroy(request=request)
+        grpc_stub.Destroy(request=request)
 
         self.assertFalse(UnitTestModel.objects.filter(id=unit_id).exists())
 
-    
     def test_stream(self):
-        unit_id = UnitTestModel.objects.first().id
         grpc_stub = self.fake_grpc.get_fake_stub(UnitTestModelControllerStub)
-        request = fakeapp_pb2.UnitTestModelDestroyRequest(id=unit_id)
-        response = grpc_stub.Destroy(request=request)
+        request = fakeapp_pb2.UnitTestModelStreamRequest()
+        response_stream = grpc_stub.Stream(request=request)
 
-        self.assertFalse(UnitTestModel.objects.filter(id=unit_id).exists())
+        response_list = [response for response in response_stream]
 
-
+        self.assertEqual(len(response_list), 10)
