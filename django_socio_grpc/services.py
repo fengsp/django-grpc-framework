@@ -1,15 +1,9 @@
 import logging
-import os
-from functools import update_wrapper
 
-import grpc
-from django import db
 from django.db.models.query import QuerySet
 
-from django_socio_grpc.exceptions import GRPCException, PermissionDenied, Unauthenticated
-from django_socio_grpc.request_transformer.grpc_socio_proxy_context import (
-    GRPCSocioProxyContext,
-)
+from django_socio_grpc.exceptions import PermissionDenied, Unauthenticated
+from django_socio_grpc.servicer_proxy import ServicerProxy
 from django_socio_grpc.settings import grpc_settings
 
 logger = logging.getLogger("django_socio_grpc")
@@ -95,74 +89,4 @@ class Service:
 
             cls.queryset._fetch_all = force_evaluation
 
-        class Servicer:
-
-            grpc_async = os.environ.get("GRPC_ASYNC")
-
-            def call_handler(self, action):
-                if self.grpc_async:
-
-                    async def async_handler(request, context):
-                        # db connection state managed similarly to the wsgi handler
-                        db.reset_queries()
-                        db.close_old_connections()
-                        try:
-                            self = cls(**initkwargs)
-                            self.request = request
-                            self.context = GRPCSocioProxyContext(context, action)
-                            self.action = action
-                            self.before_action()
-                            return await getattr(self, action)(self.request, self.context)
-                        except GRPCException as grpc_error:
-                            logger.error(grpc_error)
-                            self.context.abort(
-                                grpc_error.status_code, grpc_error.get_full_details()
-                            )
-                        finally:
-                            db.close_old_connections()
-
-                    update_wrapper(async_handler, getattr(cls, action))
-                    return async_handler
-
-                else:
-
-                    def handler(request, context):
-                        # db connection state managed similarly to the wsgi handler
-                        db.reset_queries()
-                        # INFO - AM - 22/04/2021 - next line break tests. Need to more understand the drowback about memory in production
-                        # db.close_old_connections()
-                        try:
-                            self = cls(**initkwargs)
-                            self.request = request
-                            self.context = GRPCSocioProxyContext(context, action)
-                            self.action = action
-                            self.before_action()
-                            return getattr(self, action)(self.request, self.context)
-                        except GRPCException as grpc_error:
-                            logger.error(grpc_error)
-                            self.context.abort(
-                                grpc_error.status_code, grpc_error.get_full_details()
-                            )
-                        finally:
-                            # INFO - AM - 22/04/2021 - next line break tests. Need to more understand the drowback about memory in production
-                            # db.close_old_connections()
-                            pass
-
-                    update_wrapper(handler, getattr(cls, action))
-                    return handler
-
-            def __getattr__(self, action):
-                if not hasattr(cls, action):
-                    return not_implemented
-
-                return self.call_handler(action)
-
-        update_wrapper(Servicer, cls, updated=())
-        return Servicer()
-
-
-def not_implemented(request, context):
-    """Method not implemented"""
-    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-    context.set_details("Method not implemented!")
-    raise NotImplementedError("Method not implemented!")
+        return ServicerProxy(cls)

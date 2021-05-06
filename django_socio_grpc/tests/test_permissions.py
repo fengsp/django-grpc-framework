@@ -124,7 +124,6 @@ class TestPermissionsIntegration(TestCase):
         self.fake_context = FakeContext()
 
         def dummy_method(service, request, context):
-            self.fake_context = context
             return "fake_result"
 
         self.dummy_method = dummy_method
@@ -153,29 +152,29 @@ class TestPermissionsIntegration(TestCase):
     def test_method_map_to_http_list(self):
         self.service.List = self.dummy_method
         self.servicer.List(None, self.fake_context)
-        self.assertEqual(self.fake_context.method, "GET")
+        self.assertEqual(self.servicer.service_instance.context.method, "GET")
 
     def test_method_map_to_http_retrieve(self):
         self.service.Retrieve = self.dummy_method
         self.servicer.Retrieve(None, self.fake_context)
-        self.assertEqual(self.fake_context.method, "GET")
+        self.assertEqual(self.servicer.service_instance.context.method, "GET")
 
     def test_method_map_to_http_create(self):
         self.service.Create = self.dummy_method
         self.servicer.Create(None, self.fake_context)
-        self.assertEqual(self.fake_context.method, "POST")
+        self.assertEqual(self.servicer.service_instance.context.method, "POST")
 
     def test_method_map_to_http_update(self):
         self.service.Update = self.dummy_method
         self.servicer.Update(None, self.fake_context)
-        self.assertEqual(self.fake_context.method, "PUT")
+        self.assertEqual(self.servicer.service_instance.context.method, "PUT")
 
     def test_method_map_to_http_partial_update(self):
         self.service.PartialUpdate = self.dummy_method
         self.servicer.PartialUpdate(None, self.fake_context)
-        self.assertEqual(self.fake_context.method, "PATCH")
+        self.assertEqual(self.servicer.service_instance.context.method, "PATCH")
 
     def test_method_map_to_http_destroy(self):
         self.service.Destroy = self.dummy_method
         self.servicer.Destroy(None, self.fake_context)
-        self.assertEqual(self.fake_context.method, "DELETE")
+        self.assertEqual(self.servicer.service_instance.context.method, "DELETE")
