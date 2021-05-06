@@ -48,6 +48,7 @@ class FakeRpcError(RuntimeError, grpc.RpcError):
 
 class FakeContext(object):
     def __init__(self):
+        self.stream_pipe = []
         self._invocation_metadata = []
 
     def abort(self, code, details):
@@ -55,6 +56,13 @@ class FakeContext(object):
 
     def invocation_metadata(self):
         return self._invocation_metadata
+
+    def write(self, data):
+        self.stream_pipe.append(data)
+
+    def read(self):
+        for data in self.stream_pipe:
+            yield data
 
 
 def get_brand_new_default_event_loop():
@@ -73,6 +81,7 @@ def get_brand_new_default_event_loop():
 class FakeChannel:
     def __init__(self, fake_server):
         self.server = fake_server
+        self.context = FakeContext()
 
     def __enter__(self):
         return self
@@ -86,14 +95,16 @@ class FakeChannel:
 
         def fake_handler(request, metadata=None):
             nonlocal real_method
-            context = FakeContext()
+            self.context = FakeContext()
             if metadata:
-                context._invocation_metadata.extend((_Metadatum(k, v) for k, v in metadata))
+                self.context._invocation_metadata.extend(
+                    (_Metadatum(k, v) for k, v in metadata)
+                )
 
             if asyncio.iscoroutinefunction(real_method):
                 real_method = async_to_sync(real_method)
 
-            return real_method(request, context)
+            return real_method(request, self.context)
 
         return fake_handler
 

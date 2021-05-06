@@ -80,3 +80,12 @@ class TestAsyncModelService(TestCase):
         grpc_stub.Destroy(request=request)
 
         self.assertFalse(UnitTestModel.objects.filter(id=unit_id).exists())
+
+    def test_async_stream(self):
+        grpc_stub = self.fake_grpc.get_fake_stub(UnitTestModelControllerStub)
+        request = fakeapp_pb2.UnitTestModelStreamRequest()
+        grpc_stub.Stream(request=request)
+
+        response_list = [response for response in self.fake_grpc.grpc_channel.context.read()]
+
+        self.assertEqual(len(response_list), 10)
