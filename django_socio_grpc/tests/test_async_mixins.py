@@ -14,7 +14,7 @@ from fakeapp.serializers import UnitTestModelSerializer
 from .grpc_test_utils.fake_grpc import FakeGRPC
 
 
-class UnitTestService(generics.ModelService):
+class UnitTestService(generics.AsyncModelService):
     queryset = UnitTestModel.objects.all()
     serializer_class = UnitTestModelSerializer
 

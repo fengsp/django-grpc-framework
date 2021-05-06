@@ -1,5 +1,4 @@
 import grpc
-from asgiref.sync import sync_to_async
 from django.core.exceptions import ValidationError
 from django.db.models.query import QuerySet
 from django.http import Http404
@@ -28,34 +27,6 @@ class GenericService(services.Service):
 
     # The style to use for queryset pagination.
     pagination_class = grpc_settings.DEFAULT_PAGINATION_CLASS
-
-    @sync_to_async
-    def get_queryset_async(self):
-        """
-        Get the list of items for this service.
-        This must be an iterable, and may be a queryset.
-        Defaults to using ``self.queryset``.
-
-        If you are overriding a handler method, it is important that you call
-        ``get_queryset()`` instead of accessing the ``queryset`` attribute as
-        ``queryset`` will get evaluated only once.
-
-        Override this to provide dynamic behavior, for example::
-
-            def get_queryset(self):
-                if self.action == 'ListSpecialUser':
-                    return SpecialUser.objects.all()
-                return super().get_queryset()
-        """
-        assert self.queryset is not None, (
-            "'%s' should either include a ``queryset`` attribute, "
-            "or override the ``get_queryset()`` method." % self.__class__.__name__
-        )
-        queryset = self.queryset
-        if isinstance(queryset, QuerySet):
-            # Ensure queryset is re-evaluated on each request.
-            queryset = queryset.all()
-        return queryset
 
     def get_queryset(self):
         """
@@ -169,6 +140,11 @@ class GenericService(services.Service):
         return self.paginator.paginate_queryset(queryset, self.context, view=self)
 
 
+############################################################
+#   Synchronous Service                                    #
+############################################################
+
+
 class CreateService(mixins.CreateModelMixin, GenericService):
     """
     Concrete service for creating a model instance that provides a ``Create()``
@@ -236,6 +212,88 @@ class ModelService(
     mixins.UpdateModelMixin,
     mixins.DestroyModelMixin,
     mixins.ListModelMixin,
+    GenericService,
+):
+    """
+    Concrete service that provides default ``Create()``, ``Retrieve()``,
+    ``Update()``, ``Destroy()`` and ``List()`` handlers.
+    """
+
+    pass
+
+
+############################################################
+#   Asynchronous Services                                  #
+############################################################
+class AsyncCreateService(mixins.AsyncCreateModelMixin, GenericService):
+    """
+    Concrete service for creating a model instance that provides a ``Create()``
+    handler.
+    """
+
+    pass
+
+
+class AsyncListService(mixins.AsyncListModelMixin, GenericService):
+    """
+    Concrete service for listing a queryset that provides a ``List()`` handler.
+    """
+
+    pass
+
+
+class AsyncStreamService(mixins.AsyncStreamModelMixin, GenericService):
+    """
+    Concrete service for listing one by one on streaming a queryset that provides a ``Stream()`` handler.
+    """
+
+    pass
+
+
+class AsyncRetrieveService(mixins.AsyncRetrieveModelMixin, GenericService):
+    """
+    Concrete service for retrieving a model instance that provides a
+    ``Retrieve()`` handler.
+    """
+
+    pass
+
+
+class AsyncDestroyService(mixins.AsyncDestroyModelMixin, GenericService):
+    """
+    Concrete service for deleting a model instance that provides a ``Destroy()``
+    handler.
+    """
+
+    pass
+
+
+class AsyncUpdateService(mixins.AsyncUpdateModelMixin, GenericService):
+    """
+    Concrete service for updating a model instance that provides a
+    ``Update()`` handler.
+    """
+
+    pass
+
+
+class AsyncReadOnlyModelService(
+    mixins.AsyncRetrieveModelMixin, mixins.AsyncListModelMixin, GenericService
+):
+    """
+    Concrete service that provides default ``List()`` and ``Retrieve()``
+    handlers.
+    """
+
+    pass
+
+
+class AsyncModelService(
+    mixins.AsyncCreateModelMixin,
+    mixins.AsyncRetrieveModelMixin,
+    mixins.AsyncUpdateModelMixin,
+    mixins.AsyncDestroyModelMixin,
+    mixins.AsyncListModelMixin,
     GenericService,
 ):
     """
