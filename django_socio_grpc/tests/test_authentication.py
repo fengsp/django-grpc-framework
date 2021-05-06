@@ -73,14 +73,14 @@ class TestAuthenticationIntegration(TestCase):
         self.fake_context = FakeContext()
 
         def dummy_method(service, request, context):
-            self.fake_context = context
+            pass
 
         self.service.DummyMethod = dummy_method
 
     def test_user_and_token_none_if_no_auth_class(self):
         self.servicer.DummyMethod(None, self.fake_context)
-        self.assertIsNone(self.fake_context.user)
-        self.assertIsNone(self.fake_context.auth)
+        self.assertIsNone(self.servicer.service_instance.context.user)
+        self.assertIsNone(self.servicer.service_instance.context.auth)
 
     def test_user_and_token_set(self):
         self.service.authentication_classes = [FakeAuthentication]
@@ -88,6 +88,10 @@ class TestAuthenticationIntegration(TestCase):
         self.fake_context._invocation_metadata.extend((_Metadatum(k, v) for k, v in metadata))
         self.servicer.DummyMethod(None, self.fake_context)
 
-        self.assertEqual(self.fake_context.META, {"HTTP_AUTHORIZATION": "faketoken"})
-        self.assertEqual(self.fake_context.user, {"email": "john.doe@johndoe.com"})
-        self.assertEqual(self.fake_context.auth, "faketoken")
+        self.assertEqual(
+            self.servicer.service_instance.context.META, {"HTTP_AUTHORIZATION": "faketoken"}
+        )
+        self.assertEqual(
+            self.servicer.service_instance.context.user, {"email": "john.doe@johndoe.com"}
+        )
+        self.assertEqual(self.servicer.service_instance.context.auth, "faketoken")
