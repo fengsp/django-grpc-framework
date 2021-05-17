@@ -2,7 +2,7 @@ import asyncio
 import logging
 import os
 
-from asgiref.sync import async_to_sync
+from asgiref.sync import async_to_sync, sync_to_async
 from django import db
 
 from django_socio_grpc.exceptions import GRPCException, Unimplemented
@@ -31,7 +31,7 @@ class ServicerProxy:
                     self.service_instance.request = request
                     self.service_instance.context = GRPCSocioProxyContext(context, action)
                     self.service_instance.action = action
-                    self.service_instance.before_action()
+                    await sync_to_async(self.service_instance.before_action)()
 
                     # INFO - AM - 05/05/2021 - getting the real function in the service and then calling it if necessary
                     instance_action = getattr(self.service_instance, action)
