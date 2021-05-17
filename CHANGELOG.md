@@ -1,5 +1,9 @@
 ## Changelog
 
+#### version 0.8.1
+
+- fix async before action in async_handler
+
 #### version 0.8.0
 
 - Refacto the servicer to be a proxy instead of a wrapper to help code structuration
