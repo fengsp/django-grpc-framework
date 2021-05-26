@@ -1,3 +1,4 @@
+from google.protobuf.pyext._message import RepeatedCompositeContainer
 from rest_framework.exceptions import ValidationError
 from rest_framework.serializers import (
     LIST_SERIALIZER_KWARGS,
@@ -15,6 +16,7 @@ class BaseProtoSerializer(BaseSerializer):
     def __init__(self, *args, **kwargs):
         message = kwargs.pop("message", None)
         self.stream = kwargs.pop("stream", None)
+        self.message_list_attr = kwargs.pop("message_list_attr", None)
         if message is not None:
             self.initial_message = message
             kwargs["data"] = self.message_to_data(message)
@@ -40,6 +42,8 @@ class BaseProtoSerializer(BaseSerializer):
         child_serializer = cls(*args, **kwargs)
         list_kwargs = {
             "child": child_serializer,
+            "message": kwargs.get("message", None),
+            "message_list_attr": kwargs.get("message_list_attr", None),
         }
         if allow_empty is not None:
             list_kwargs["allow_empty"] = allow_empty
@@ -71,20 +75,22 @@ class ProtoSerializer(BaseProtoSerializer, Serializer):
         return parse_dict(data, self.Meta.proto_class())
 
 
-class ListProtoSerializer(BaseProtoSerializer, ListSerializer):
+class ListProtoSerializer(ListSerializer, BaseProtoSerializer):
     def message_to_data(self, message):
         """
         List of protobuf messages -> List of dicts of python primitive datatypes.
         """
-        if not isinstance(message, list):
-            error_message = self.error_messages["not_a_list"].format(
-                input_type=type(message).__name__
+
+        real_message = getattr(message, self.message_list_attr)
+        if type(real_message) != RepeatedCompositeContainer:
+            error_message = self.default_error_messages["not_a_list"].format(
+                input_type=type(real_message).__name__
             )
             raise ValidationError(
                 {api_settings.NON_FIELD_ERRORS_KEY: [error_message]}, code="not_a_list"
             )
         ret = []
-        for item in message:
+        for item in real_message:
             ret.append(self.child.message_to_data(item))
         return ret
 
