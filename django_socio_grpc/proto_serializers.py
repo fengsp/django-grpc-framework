@@ -42,11 +42,7 @@ class BaseProtoSerializer(BaseSerializer):
     def many_init(cls, *args, **kwargs):
         allow_empty = kwargs.pop("allow_empty", None)
         child_serializer = cls(*args, **kwargs)
-        list_kwargs = {
-            "child": child_serializer,
-            "message": kwargs.get("message", None),
-            "message_list_attr": kwargs.get("message_list_attr", None),
-        }
+        list_kwargs = {"child": child_serializer}
         if allow_empty is not None:
             list_kwargs["allow_empty"] = allow_empty
         list_kwargs.update(
@@ -90,16 +86,16 @@ class ListProtoSerializer(ListSerializer, BaseProtoSerializer):
         if self.message_list_attr is None:
             raise TypeError("message_list_attr is NoneType")
 
-        real_message = getattr(message, self.message_list_attr, "")
-        if not isinstance(real_message, RepeatedCompositeContainer):
+        repeated_message = getattr(message, self.message_list_attr, "")
+        if not isinstance(repeated_message, RepeatedCompositeContainer):
             error_message = self.default_error_messages["not_a_list"].format(
-                input_type=real_message.__class__.__name__
+                input_type=repeated_message.__class__.__name__
             )
             raise ValidationError(
                 {api_settings.NON_FIELD_ERRORS_KEY: [error_message]}, code="not_a_list"
             )
         ret = []
-        for item in real_message:
+        for item in repeated_message:
             ret.append(self.child.message_to_data(item))
         return ret
 
