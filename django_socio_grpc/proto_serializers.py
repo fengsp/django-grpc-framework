@@ -1,3 +1,4 @@
+from google.protobuf.pyext._message import RepeatedCompositeContainer
 from rest_framework.exceptions import ValidationError
 from rest_framework.serializers import (
     LIST_SERIALIZER_KWARGS,
@@ -10,11 +11,14 @@ from rest_framework.settings import api_settings
 
 from django_socio_grpc.protobuf.json_format import message_to_dict, parse_dict
 
+LIST_PROTO_SERIALIZER_KWARGS = (*LIST_SERIALIZER_KWARGS, "message_list_attr", "message")
+
 
 class BaseProtoSerializer(BaseSerializer):
     def __init__(self, *args, **kwargs):
         message = kwargs.pop("message", None)
         self.stream = kwargs.pop("stream", None)
+        self.message_list_attr = kwargs.pop("message_list_attr", None)
         if message is not None:
             self.initial_message = message
             kwargs["data"] = self.message_to_data(message)
@@ -38,13 +42,15 @@ class BaseProtoSerializer(BaseSerializer):
     def many_init(cls, *args, **kwargs):
         allow_empty = kwargs.pop("allow_empty", None)
         child_serializer = cls(*args, **kwargs)
-        list_kwargs = {
-            "child": child_serializer,
-        }
+        list_kwargs = {"child": child_serializer}
         if allow_empty is not None:
             list_kwargs["allow_empty"] = allow_empty
         list_kwargs.update(
-            {key: value for key, value in kwargs.items() if key in LIST_SERIALIZER_KWARGS}
+            {
+                key: value
+                for key, value in kwargs.items()
+                if key in LIST_PROTO_SERIALIZER_KWARGS
+            }
         )
         meta = getattr(cls, "Meta", None)
         list_serializer_class = getattr(meta, "list_serializer_class", ListProtoSerializer)
@@ -71,20 +77,25 @@ class ProtoSerializer(BaseProtoSerializer, Serializer):
         return parse_dict(data, self.Meta.proto_class())
 
 
-class ListProtoSerializer(BaseProtoSerializer, ListSerializer):
+class ListProtoSerializer(ListSerializer, BaseProtoSerializer):
     def message_to_data(self, message):
         """
         List of protobuf messages -> List of dicts of python primitive datatypes.
         """
-        if not isinstance(message, list):
-            error_message = self.error_messages["not_a_list"].format(
-                input_type=type(message).__name__
+
+        if self.message_list_attr is None:
+            raise TypeError("message_list_attr is NoneType")
+
+        repeated_message = getattr(message, self.message_list_attr, "")
+        if not isinstance(repeated_message, RepeatedCompositeContainer):
+            error_message = self.default_error_messages["not_a_list"].format(
+                input_type=repeated_message.__class__.__name__
             )
             raise ValidationError(
                 {api_settings.NON_FIELD_ERRORS_KEY: [error_message]}, code="not_a_list"
             )
         ret = []
-        for item in message:
+        for item in repeated_message:
             ret.append(self.child.message_to_data(item))
         return ret
 
