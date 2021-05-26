@@ -82,9 +82,9 @@ class ListProtoSerializer(ListSerializer, BaseProtoSerializer):
         """
 
         real_message = getattr(message, self.message_list_attr)
-        if type(real_message) != RepeatedCompositeContainer:
+        if not isinstance(real_message, RepeatedCompositeContainer):
             error_message = self.default_error_messages["not_a_list"].format(
-                input_type=type(real_message).__name__
+                input_type=real_message.__class__.__name__
             )
             raise ValidationError(
                 {api_settings.NON_FIELD_ERRORS_KEY: [error_message]}, code="not_a_list"
