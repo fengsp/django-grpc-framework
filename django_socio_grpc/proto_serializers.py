@@ -11,6 +11,8 @@ from rest_framework.settings import api_settings
 
 from django_socio_grpc.protobuf.json_format import message_to_dict, parse_dict
 
+LIST_PROTO_SERIALIZER_KWARGS = (*LIST_SERIALIZER_KWARGS, "message_list_attr", "message")
+
 
 class BaseProtoSerializer(BaseSerializer):
     def __init__(self, *args, **kwargs):
@@ -48,7 +50,11 @@ class BaseProtoSerializer(BaseSerializer):
         if allow_empty is not None:
             list_kwargs["allow_empty"] = allow_empty
         list_kwargs.update(
-            {key: value for key, value in kwargs.items() if key in LIST_SERIALIZER_KWARGS}
+            {
+                key: value
+                for key, value in kwargs.items()
+                if key in LIST_PROTO_SERIALIZER_KWARGS
+            }
         )
         meta = getattr(cls, "Meta", None)
         list_serializer_class = getattr(meta, "list_serializer_class", ListProtoSerializer)
@@ -81,7 +87,10 @@ class ListProtoSerializer(ListSerializer, BaseProtoSerializer):
         List of protobuf messages -> List of dicts of python primitive datatypes.
         """
 
-        real_message = getattr(message, self.message_list_attr)
+        if self.message_list_attr is None:
+            raise TypeError("message_list_attr is NoneType")
+
+        real_message = getattr(message, self.message_list_attr, "")
         if not isinstance(real_message, RepeatedCompositeContainer):
             error_message = self.default_error_messages["not_a_list"].format(
                 input_type=real_message.__class__.__name__
