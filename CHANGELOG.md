@@ -1,8 +1,12 @@
 ## Changelog
 
-#### version 0.8.2
+#### version 0.8.3
 
 - Add option check to generateproto command for ci
+
+#### version 0.8.2
+
+- Fix serializer when reading many data
 
 #### version 0.8.1
 
