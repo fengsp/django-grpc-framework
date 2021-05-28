@@ -93,7 +93,9 @@ class Command(BaseCommand):
         """
         if self.check and not os.path.exists(file_path):
             raise ProtobufGenerationException(
-                detail="Check fail ! You doesn't have a proto file to compare to"
+                app_name=self.app_name,
+                model_name=self.model_name,
+                detail="Check fail ! You doesn't have a proto file to compare to",
             )
         with open(file_path, "r+") as f:
             if self.check:
@@ -107,7 +109,11 @@ class Command(BaseCommand):
         If not raise a ProtobufGenerationException
         """
         if original_file != new_proto_content:
-            raise ProtobufGenerationException(detail="Check fail ! Generated proto mismatch")
+            raise ProtobufGenerationException(
+                app_name=self.app_name,
+                model_name=self.model_name,
+                detail="Check fail ! Generated proto mismatch",
+            )
         else:
             print("Check Success ! File are identical")
 
