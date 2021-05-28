@@ -1,5 +1,9 @@
 ## Changelog
 
+#### version 0.8.2
+
+- Add option check to generateproto command for ci
+
 #### version 0.8.1
 
 - fix async before action in async_handler

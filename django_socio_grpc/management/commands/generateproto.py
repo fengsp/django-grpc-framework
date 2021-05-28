@@ -32,6 +32,11 @@ class Command(BaseCommand):
             default=True,
             help="generate python file too",
         )
+        parser.add_argument(
+            "--check",
+            action="store_true",
+            help="Return an error if the file generated is different from the file existent",
+        )
 
     def handle(self, *args, **options):
 
@@ -46,6 +51,7 @@ class Command(BaseCommand):
         self.file_path = options["file"]
         self.dry_run = options["dry_run"]
         self.generate_python = options["generate_python"]
+        self.check = options["check"]
 
         self.check_options()
 
@@ -59,12 +65,12 @@ class Command(BaseCommand):
         # ------------------------------------------------------------
         path_used_for_generation = None
         proto = generator.get_proto()
-        if self.dry_run:
+
+        if self.dry_run and not self.check:
             self.stdout.write(proto)
         elif self.file_path:
             self.create_directory_if_not_exist(self.file_path)
-            with open(self.file_path, "w") as f:
-                f.write(proto)
+            self.check_or_write(self.file_path, proto)
             path_used_for_generation = self.file_path
         # if no filepath specified we create it in a grpc directory in the app
         else:
@@ -72,14 +78,38 @@ class Command(BaseCommand):
                 apps.get_app_config(self.app_name).path, "grpc", f"{self.app_name}.proto"
             )
             self.create_directory_if_not_exist(auto_file_path)
-            with open(auto_file_path, "w") as f:
-                f.write(proto)
+            self.check_or_write(auto_file_path, proto)
             path_used_for_generation = auto_file_path
 
         if self.generate_python:
             os.system(
                 f"python -m grpc_tools.protoc --proto_path={settings.BASE_DIR} --python_out=./ --grpc_python_out=./ {path_used_for_generation}"
             )
+
+    def check_or_write(self, file_path, proto):
+        """
+        Write the new generated proto to the corresponding file
+        If option --check is used verify if the new content is identical to one already there
+        """
+        if self.check and not os.path.exists(file_path):
+            raise ProtobufGenerationException(
+                detail="Check fail ! You doesn't have a proto file to compare to"
+            )
+        with open(file_path, "r+") as f:
+            if self.check:
+                self.check_proto_generation(f.read(), proto)
+            else:
+                f.write(proto)
+
+    def check_proto_generation(self, original_file, new_proto_content):
+        """
+        If option --check activated allow to verify that the new generated content is identical to the content of the actual file
+        If not raise a ProtobufGenerationException
+        """
+        if original_file != new_proto_content:
+            raise ProtobufGenerationException(detail="Check fail ! Generated proto mismatch")
+        else:
+            print("Check Success ! File are identical")
 
     def check_options(self):
         """
