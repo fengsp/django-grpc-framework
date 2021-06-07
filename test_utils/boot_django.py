@@ -20,6 +20,7 @@ def boot_django():
         GRPC_FRAMEWORK={
             "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination"
         },
+        DJANGO_SETTINGS_MODULE="myproject.settings",
         DATABASES={
             "default": {
                 "ENGINE": "django.db.backends.postgresql",

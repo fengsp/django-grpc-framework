@@ -20,6 +20,7 @@ class Command(BaseCommand):
         )
         parser.add_argument("--file", help="the generated proto file path")
         parser.add_argument("--app", help="specify Django Application")
+        parser.add_argument("--project", help="specify Django project. Use path by default")
         parser.add_argument(
             "--update", action="store_true", default=True, help="Replace the proto file"
         )
@@ -47,6 +48,15 @@ class Command(BaseCommand):
         self.model_name = options["model"]
         if self.model_name:
             self.model_name = self.model_name.lower()
+        self.project_name = options["project"]
+        if not self.project_name and hasattr(settings, "DJANGO_SETTINGS_MODULE"):
+            self.project_name = settings.DJANGO_SETTINGS_MODULE.split(".")[0]
+        else:
+            raise ProtobufGenerationException(
+                app_name=self.app_name,
+                model_name=self.model_name,
+                detail="Can't automatically found the correct project name. Set DJANGO_SETTINGS_MODULE or specify the --project option",
+            )
         self.update_proto_file = options["update"]
         self.file_path = options["file"]
         self.dry_run = options["dry_run"]
@@ -58,7 +68,9 @@ class Command(BaseCommand):
         # ----------------------------------------------
         # --- Proto Generation Process               ---
         # ----------------------------------------------
-        generator = ModelProtoGenerator(app_name=self.app_name, model_name=self.model_name)
+        generator = ModelProtoGenerator(
+            project_name=self.project_name, app_name=self.app_name, model_name=self.model_name
+        )
 
         # ------------------------------------------------------------
         # ---- Produce a proto file on current filesystem and Path ---

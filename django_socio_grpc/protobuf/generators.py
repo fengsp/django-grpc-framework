@@ -47,9 +47,10 @@ class ModelProtoGenerator:
         models.Field.__name__: "string",
     }
 
-    def __init__(self, app_name, model_name=None):
+    def __init__(self, project_name, app_name, model_name=None):
         self.model_name = model_name
         self.app_name = app_name
+        self.project_name = project_name
 
         # if there is a model_name that mean we want to generate for only one model
         if self.model_name:
@@ -66,7 +67,7 @@ class ModelProtoGenerator:
         self._writer.write_line('syntax = "proto3";')
         self._writer.write_line("")
         self._writer.write_line(
-            f"package {self.app_name if self.app_name else self.model_name};"
+            f"package {self.project_name}.{self.app_name if self.app_name else self.model_name};"
         )
         self._writer.write_line("")
         self._writer.write_line("IMPORT_PLACEHOLDER")

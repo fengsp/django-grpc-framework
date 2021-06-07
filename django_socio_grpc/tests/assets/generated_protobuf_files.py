@@ -1,6 +1,6 @@
 SIMPLE_MODEL_GENERATED = """syntax = "proto3";
 
-package unittestmodel;
+package myproject.unittestmodel;
 
 import "google/protobuf/empty.proto";
 
@@ -42,13 +42,13 @@ message UnitTestModelStreamRequest {
 
 SIMPLE_APP_MODEL_NO_GENERATION = """syntax = "proto3";
 
-package fakeapp;
+package myproject.fakeapp;
 
 """
 
 SIMPLE_APP_MODEL_GENERATED = """syntax = "proto3";
 
-package fakeapp;
+package myproject.fakeapp;
 
 import "google/protobuf/empty.proto";
 
@@ -90,7 +90,7 @@ message UnitTestModelStreamRequest {
 
 ALL_APP_GENERATED = """syntax = "proto3";
 
-package fakeapp;
+package myproject.fakeapp;
 
 import "google/protobuf/empty.proto";
 import "google/protobuf/struct.proto";
@@ -251,7 +251,7 @@ message ImportStructEvenInArrayModel {
 
 CUSTOM_APP_MODEL_GENERATED = """syntax = "proto3";
 
-package fakeapp;
+package myproject.fakeapp;
 
 service ForeignModelController {
     rpc List(ForeignModelListRequest) returns (ForeignModelListResponse) {}
@@ -279,7 +279,7 @@ message ForeignModelRetrieveRequestCustom {
 
 MODEL_WITH_M2M_GENERATED = """syntax = "proto3";
 
-package fakeapp;
+package myproject.fakeapp;
 
 import "google/protobuf/empty.proto";
 
@@ -319,7 +319,7 @@ message RelatedFieldModelDestroyRequest {
 
 MODEL_WITH_STRUCT_IMORT_IN_ARRAY = """syntax = "proto3";
 
-package fakeapp;
+package myproject.fakeapp;
 
 import "google/protobuf/struct.proto";
 
