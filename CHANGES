@@ -2,6 +2,12 @@ Changelog
 =========
 
 
+Version 0.2.1
+-------------
+
+- Fixed close_old_connections in test channel
+
+
 Version 0.2
 -----------
 
