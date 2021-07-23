@@ -8,7 +8,7 @@ import os
 import grpc
 from django.utils import autoreload
 from django.conf import settings
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand
 
 from django_grpc_framework.settings import grpc_settings
 
