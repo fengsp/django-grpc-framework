@@ -29,6 +29,10 @@ class Command(BaseCommand):
             help='Number of maximum worker threads.'
         )
         parser.add_argument(
+            '--maximum-concurrent-rpcs', type=int, default=None, dest='maximum_concurrent_rpcs',
+            help='Number of maximum concurrent remote procedure calls(RPCs).'
+        )
+        parser.add_argument(
             '--dev', action='store_true', dest='development_mode',
             help=(
                 'Run the server in development mode.  This tells Django to use '
@@ -40,6 +44,7 @@ class Command(BaseCommand):
         self.address = options['address']
         self.development_mode = options['development_mode']
         self.max_workers = options['max_workers']
+        self.maximum_concurrent_rpcs = options['maximum_concurrent_rpcs']
         self.run(**options)
 
     def run(self, **options):
@@ -59,7 +64,8 @@ class Command(BaseCommand):
 
     def _serve(self):
         server = grpc.server(futures.ThreadPoolExecutor(max_workers=self.max_workers),
-                             interceptors=grpc_settings.SERVER_INTERCEPTORS)
+                             interceptors=grpc_settings.SERVER_INTERCEPTORS,
+                             maximum_concurrent_rpcs=self.maximum_concurrent_rpcs)
         grpc_settings.ROOT_HANDLERS_HOOK(server)
         server.add_insecure_port(self.address)
         server.start()
