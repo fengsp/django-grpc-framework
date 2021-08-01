@@ -1,7 +1,22 @@
+from contextlib import contextmanager
+
 from django.test import testcases
 import grpc
+from django.db import close_old_connections
 
 from django_grpc_framework.settings import grpc_settings
+from django_grpc_framework.signals import grpc_request_started, grpc_request_finished
+
+
+@contextmanager
+def _disable_close_old_connections():
+    try:
+        grpc_request_started.disconnect(close_old_connections)
+        grpc_request_finished.disconnect(close_old_connections)
+        yield
+    finally:
+        grpc_request_started.connect(close_old_connections)
+        grpc_request_finished.connect(close_old_connections)
 
 
 class Channel:
@@ -42,30 +57,34 @@ class _MultiCallable:
 
 class UnaryUnary(_MultiCallable, grpc.UnaryUnaryMultiCallable):
     def __call__(self, request, timeout=None, metadata=None, *args, **kwargs):
-        context = FakeContext()
-        context._invocation_metadata.extend(metadata or [])
-        return self._handler.unary_unary(request, context)
+        with _disable_close_old_connections():
+            context = FakeContext()
+            context._invocation_metadata.extend(metadata or [])
+            return self._handler.unary_unary(request, context)
 
 
 class UnaryStream(_MultiCallable, grpc.UnaryStreamMultiCallable):
     def __call__(self, request, timeout=None, metadata=None, *args, **kwargs):
-        context = FakeContext()
-        context._invocation_metadata.extend(metadata or [])
-        return self._handler.unary_stream(request, context)
+        with _disable_close_old_connections():
+            context = FakeContext()
+            context._invocation_metadata.extend(metadata or [])
+            return self._handler.unary_stream(request, context)
 
 
 class StreamUnary(_MultiCallable, grpc.StreamUnaryMultiCallable):
     def __call__(self, request_iterator, timeout=None, metadata=None, *args, **kwargs):
-        context = FakeContext()
-        context._invocation_metadata.extend(metadata or [])
-        return self._handler.stream_unary(request_iterator, context)
+        with _disable_close_old_connections():
+            context = FakeContext()
+            context._invocation_metadata.extend(metadata or [])
+            return self._handler.stream_unary(request_iterator, context)
 
 
 class StreamStream(_MultiCallable, grpc.StreamStreamMultiCallable):
     def __call__(self, request_iterator, timeout=None, metadata=None, *args, **kwargs):
-        context = FakeContext()
-        context._invocation_metadata.extend(metadata or [])
-        return self._handler.stream_stream(request_iterator, context)
+        with _disable_close_old_connections():
+            context = FakeContext()
+            context._invocation_metadata.extend(metadata or [])
+            return self._handler.stream_stream(request_iterator, context)
 
 
 class FakeRpcError(grpc.RpcError):
