@@ -12,6 +12,9 @@ class PostServiceTest(RPCTestCase):
         self.assertEqual(response.content, 'content')
         self.assertEqual(Post.objects.count(), 1)
 
+        post_list = list(stub.List(post_pb2.PostListRequest()))
+        self.assertEqual(len(post_list), 1)
+
     def test_list_posts(self):
         Post.objects.create(title='title1', content='content1')
         Post.objects.create(title='title2', content='content2')

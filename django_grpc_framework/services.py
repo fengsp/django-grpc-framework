@@ -7,6 +7,9 @@ from django.http import HttpRequest
 from rest_framework.request import Request
 from rest_framework.settings import api_settings
 
+from django_grpc_framework.signals import (grpc_request_finished,
+                                           grpc_request_started)
+
 
 class Service:
     authentication_classes = api_settings.DEFAULT_AUTHENTICATION_CLASSES
@@ -46,9 +49,7 @@ class Service:
                     return not_implemented
 
                 def handler(request, context):
-                    # db connection state managed similarly to the wsgi handler
-                    db.reset_queries()
-                    db.close_old_connections()
+                    grpc_request_started.send(sender=handler, request=request, context=context)
                     try:
                         self = cls(**initkwargs)
                         self.request = request
@@ -56,7 +57,7 @@ class Service:
                         self.action = action
                         return getattr(self, action)(request, context)
                     finally:
-                        db.close_old_connections()
+                        grpc_request_finished.send(sender=handler)
                 update_wrapper(handler, getattr(cls, action))
                 return handler
         update_wrapper(Servicer, cls, updated=())
