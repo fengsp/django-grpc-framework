@@ -1,11 +1,15 @@
-from django.db.models.query import QuerySet
-from django.shortcuts import get_object_or_404
-from django.core.exceptions import ValidationError
-from django.http import Http404
 import grpc
+from django.core.exceptions import ValidationError
+from django.db.models.query import QuerySet
+from django.http import Http404
+from django.http.request import HttpRequest, QueryDict
+from django.shortcuts import get_object_or_404
+from rest_framework.request import Request
+from rest_framework.settings import api_settings
+from google.protobuf.json_format import MessageToDict
 
-from django_grpc_framework.utils import model_meta
 from django_grpc_framework import mixins, services
+from django_grpc_framework.utils import model_meta
 
 
 class GenericService(services.Service):
@@ -19,6 +23,8 @@ class GenericService(services.Service):
     # Set this if you want to use object lookups other than id
     lookup_field = None
     lookup_request_field = None
+
+    filter_backends = api_settings.DEFAULT_FILTER_BACKENDS
 
     def get_queryset(self):
         """
@@ -66,7 +72,8 @@ class GenericService(services.Service):
         Defaults to using the lookup_field parameter to filter the base
         queryset.
         """
-        queryset = self.filter_queryset(self.get_queryset())
+        queryset = self.get_queryset()
+        # queryset = self.filter_queryset(self.get_queryset())
         lookup_field = (
             self.lookup_field
             or model_meta.get_model_pk(queryset.model).name
@@ -102,14 +109,30 @@ class GenericService(services.Service):
         Extra context provided to the serializer class.  Defaults to including
         ``grpc_request``, ``grpc_context``, and ``service`` keys.
         """
+        request = HttpRequest()
+        request.META = dict(self.context.invocation_metadata())
+
         return {
             'grpc_request': self.request,
             'grpc_context': self.context,
             'service': self,
+            'request': Request(
+                request,
+                authenticators=self.get_authenticators(),
+                # negotiator=self.get_content_negotiator(),
+                # parser_context=parser_context
+            )
         }
 
     def filter_queryset(self, queryset):
         """Given a queryset, filter it, returning a new queryset."""
+        keys = self.request.DESCRIPTOR.fields_by_name.keys()
+        request = HttpRequest()
+        query_params = QueryDict('', mutable=True)
+        query_params.update(MessageToDict(self.request, preserving_proto_field_name=True))
+        request.query_params = query_params
+        for backend in list(self.filter_backends):
+            queryset = backend().filter_queryset(request, queryset, self)
         return queryset
 
 

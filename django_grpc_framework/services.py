@@ -1,12 +1,20 @@
 from functools import update_wrapper
 
 import grpc
+from django import db
 from django.db.models.query import QuerySet
+from django.http import HttpRequest
+from rest_framework.request import Request
+from rest_framework.settings import api_settings
 
-from django_grpc_framework.signals import grpc_request_started, grpc_request_finished
+from django_grpc_framework.signals import (grpc_request_finished,
+                                           grpc_request_started)
 
 
 class Service:
+    authentication_classes = api_settings.DEFAULT_AUTHENTICATION_CLASSES
+    permission_classes = api_settings.DEFAULT_PERMISSION_CLASSES
+
     def __init__(self, **kwargs):
         for key, value in kwargs.items():
             setattr(self, key, value)
@@ -45,7 +53,7 @@ class Service:
                     try:
                         self = cls(**initkwargs)
                         self.request = request
-                        self.context = context
+                        self.context = self.initialize_context(context)
                         self.action = action
                         return getattr(self, action)(request, context)
                     finally:
@@ -54,6 +62,59 @@ class Service:
                 return handler
         update_wrapper(Servicer, cls, updated=())
         return Servicer()
+
+    def initialize_context(self,  context: grpc.ServicerContext, *args, **kwargs):
+        """
+        Returns the initial request object.
+        """
+        # parser_context = cls.get_parser_context(request)
+        request = HttpRequest()
+        request.META = dict(context.invocation_metadata())
+        r = Request(
+            request,
+            authenticators=self.get_authenticators(),
+            # negotiator=self.get_content_negotiator(),
+            # parser_context=parser_context
+        )
+        context.user = r.user
+        self.check_permissions(r, context)
+        return context
+
+    def get_authenticators(self):
+        """
+        Instantiates and returns the list of authenticators that this view can use.
+        """
+        return [auth() for auth in self.authentication_classes]
+
+    def get_permissions(self):
+        """
+        Instantiates and returns the list of permissions that this view requires.
+        """
+        return [permission() for permission in self.permission_classes]
+
+    def check_permissions(self, request, context):
+        """
+        Check if the request should be permitted.
+        Raises an appropriate exception if the request is not permitted.
+        """
+        for permission in self.get_permissions():
+            if not permission.has_permission(request, self):
+                self.permission_denied(
+                    request,
+                    context,
+                    message=getattr(permission, 'message', None),
+                    code=getattr(permission, 'code', None),
+                )
+
+    def permission_denied(self, request, context: grpc.ServicerContext, message=None, code=None):
+        """
+        If request is not permitted, determine what kind of exception to raise.
+        """
+        if request.authenticators and not request.successful_authenticator:
+            context.abort(grpc.StatusCode.UNAUTHENTICATED, details=message if message else '')
+            # raise exceptions.NotAuthenticated()
+        context.abort(grpc.StatusCode.PERMISSION_DENIED, details=message if message else '')
+        # raise exceptions.PermissionDenied(detail=message, code=code)
 
 
 def not_implemented(request, context):

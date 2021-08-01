@@ -93,9 +93,10 @@ class ModelProtoGenerator:
             for field_name, proto_type in self.get_fields().items():
                 number += 1
                 self._writer.write_line(
-                    '%s %s = %s;' %
-                    (proto_type, field_name, number)
-                )
+                    '%s %s = %s;\t%s' %
+                    (proto_type, field_name, number, '//%s' % self.model._meta.get_field(field_name).help_text
+                     if self.model._meta.get_field(field_name).help_text else
+                     '// %s' %  self.model._meta.get_field(field_name).verbose_name))
         self._writer.write_line('}')
         self._writer.write_line('')
         self._writer.write_line('message %sListRequest {' % self.model.__name__)
