@@ -21,6 +21,8 @@ DEFAULTS = {
 
     # gRPC server configuration
     'SERVER_INTERCEPTORS': None,
+
+    'SERVER_OPTIONS': [],
 }
 
 
