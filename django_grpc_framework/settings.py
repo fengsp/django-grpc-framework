@@ -23,6 +23,8 @@ DEFAULTS = {
     'SERVER_INTERCEPTORS': None,
 
     'SERVER_OPTIONS': [],
+
+    'COMPRESSION': None,
 }
 
 

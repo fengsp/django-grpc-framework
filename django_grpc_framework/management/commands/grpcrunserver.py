@@ -60,7 +60,8 @@ class Command(BaseCommand):
     def _serve(self):
         server = grpc.server(futures.ThreadPoolExecutor(max_workers=self.max_workers),
                              interceptors=grpc_settings.SERVER_INTERCEPTORS,
-                             options=grpc_settings.SERVER_OPTIONS)
+                             options=grpc_settings.SERVER_OPTIONS,
+                             compression=grpc_settings.COMPRESSION)
         grpc_settings.ROOT_HANDLERS_HOOK(server)
         server.add_insecure_port(self.address)
         server.start()
