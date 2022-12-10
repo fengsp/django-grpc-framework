@@ -20,7 +20,7 @@ DEFAULTS = {
     'ROOT_HANDLERS_HOOK': None,
 
     # gRPC server configuration
-    'SERVER_INTERCEPTORS': None,
+    'SERVER_INTERCEPTORS': [],
 }
 
 
